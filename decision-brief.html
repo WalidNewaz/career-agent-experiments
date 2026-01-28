@@ -1,0 +1,2344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Decision Brief — Case</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2f;
+      --card:#0f1a2f;
+      --card2:#0c162a;
+      --text:#e7eefc;
+      --muted:#a8b4d6;
+      --muted2:#7f8bb0;
+      --border:rgba(255,255,255,.08);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --accent:#7c5cff;
+      --accent2:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --info:#38bdf8;
+      --chip:#18264a;
+      --chipText:#dbe7ff;
+      --focus: #ffd166;
+      --radius: 14px;
+      --radius2: 10px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --line: 1.55;
+      --max: 1120px;
+    }
+
+    /* Light mode (optional) */
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg:#f6f8ff;
+        --panel:#ffffff;
+        --card:#ffffff;
+        --card2:#f4f6ff;
+        --text:#111827;
+        --muted:#4b5563;
+        --muted2:#6b7280;
+        --border:rgba(17,24,39,.10);
+        --shadow: 0 10px 24px rgba(17,24,39,.08);
+        --chip:#eef2ff;
+        --chipText:#1f2a56;
+      }
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 800px at 20% -10%, rgba(124,92,255,.25), transparent 55%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(56,189,248,.20), transparent 55%),
+                  radial-gradient(900px 700px at 50% 110%, rgba(34,197,94,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:var(--line);
+    }
+
+    a{color:inherit}
+    :focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:8px}
+
+    /* Layout */
+    .app{
+      display:grid;
+      grid-template-columns: 280px 1fr;
+      min-height:100vh;
+    }
+
+    aside{
+      position:sticky;
+      top:0;
+      height:100vh;
+      padding:18px 14px 14px;
+      border-right:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%),
+                  rgba(0,0,0,.06);
+      backdrop-filter: blur(10px);
+    }
+
+    main{
+      padding:18px 18px 80px;
+    }
+
+    .container{
+      max-width:var(--max);
+      margin:0 auto;
+    }
+
+    /* Sidebar */
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 10px 12px;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(124,92,255,.12), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+    }
+    .brand .left{
+      display:flex; gap:10px; align-items:center;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 45%),
+                  linear-gradient(135deg, rgba(124,92,255,.95), rgba(56,189,248,.75));
+      border:1px solid var(--border);
+      box-shadow: 0 8px 18px rgba(124,92,255,.18);
+    }
+    .brand h1{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+      line-height:1.2;
+    }
+    .brand p{
+      margin:2px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.2;
+    }
+
+    .nav{
+      margin-top:14px;
+      padding:10px;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.02);
+    }
+    .nav h2{
+      margin:0 0 8px;
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+    .nav a{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:10px 10px;
+      text-decoration:none;
+      border-radius:12px;
+      border:1px solid transparent;
+      color:var(--text);
+      font-size:13px;
+    }
+    .nav a:hover{
+      background: rgba(124,92,255,.10);
+      border-color: rgba(124,92,255,.20);
+    }
+    .nav a[aria-current="true"]{
+      background: rgba(124,92,255,.16);
+      border-color: rgba(124,92,255,.35);
+    }
+    .pill{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      background: rgba(255,255,255,.02);
+      white-space:nowrap;
+    }
+    .sidebar-footer{
+      margin-top:14px;
+      padding:10px;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.02);
+      display:grid;
+      gap:8px;
+    }
+    .kbd{
+      font-family:var(--mono);
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    /* Header */
+    header.top{
+      position:sticky;
+      top:0;
+      z-index:10;
+      margin-bottom:16px;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(15,26,47,.65);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+    @media (prefers-color-scheme: light){
+      header.top{ background: rgba(255,255,255,.82); }
+    }
+
+    .header-grid{
+      display:grid;
+      grid-template-columns: 1.4fr .8fr;
+      gap:12px;
+      <!-- align-items:center; -->
+    }
+    .case-title{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .case-title .meta{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .case-title h2{
+      margin:0;
+      font-size:18px;
+      line-height:1.25;
+      letter-spacing:.2px;
+    }
+    .subtle{
+      color:var(--muted);
+      font-size:13px;
+      margin:4px 0 0;
+    }
+
+    .verdict{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-end;
+      text-align:right;
+    }
+
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      border-radius:999px;
+      padding:6px 10px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--muted2);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+    .dot.proceed{ background: var(--accent2); }
+    .dot.consider{ background: var(--warn); }
+    .dot.no{ background: var(--danger); }
+
+    .confidence{
+      width:100%;
+      max-width:340px;
+      border:1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(255,255,255,.02);
+      padding:10px 12px;
+    }
+    .confidence .row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .meter{
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      overflow:hidden;
+      border:1px solid var(--border);
+    }
+    .meter > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(239,68,68,.95), rgba(245,158,11,.95), rgba(34,197,94,.95));
+    }
+    .meter-note{
+      margin-top:8px;
+      font-size:11px;
+      color:var(--muted2);
+    }
+
+    /* Cards */
+    section{
+      scroll-margin-top: 110px;
+      margin-top:16px;
+    }
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.02);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card + .card{ margin-top:14px; }
+    .card .hd{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:14px 14px 12px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 90%);
+    }
+    .card .hd h3{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .card .hd .hint{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .card .bd{
+      padding:14px;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .app{grid-template-columns: 1fr}
+      aside{position:relative; height:auto}
+      .header-grid{grid-template-columns: 1fr}
+      .verdict{align-items:flex-start; text-align:left}
+      .confidence{max-width:none}
+      .grid2{grid-template-columns: 1fr}
+    }
+
+    /* Lists */
+    .list{
+      display:grid;
+      gap:10px;
+    }
+    .item{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: rgba(0,0,0,.12);
+      padding:10px 10px;
+    }
+    @media (prefers-color-scheme: light){
+      .item{ background: rgba(17,24,39,.03); }
+    }
+    .item .title{
+      font-size:13px;
+      margin:0 0 6px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .item .meta{
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    /* Chips */
+    .chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:4px 10px;
+      border:1px solid var(--border);
+      background: var(--chip);
+      color: var(--chipText);
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      text-decoration:none;
+    }
+    .chip:hover{ border-color: rgba(124,92,255,.55); }
+    .chip small{
+      color: var(--muted);
+      font-size:11px;
+    }
+
+    /* States */
+    .callout{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      padding:12px;
+      background: rgba(255,255,255,.02);
+    }
+    .callout.unknown{
+      border-color: rgba(245,158,11,.45);
+      background: rgba(245,158,11,.10);
+    }
+    .callout.assumption{
+      border-color: rgba(56,189,248,.40);
+      background: rgba(56,189,248,.10);
+    }
+    .callout.missing{
+      border-color: rgba(239,68,68,.40);
+      background: rgba(239,68,68,.10);
+    }
+    .callout h4{
+      margin:0 0 6px;
+      font-size:13px;
+    }
+    .callout p, .callout li{ color: var(--text); font-size:13px; margin:0 }
+    .callout ul{ margin:8px 0 0; padding-left:18px; color:var(--text) }
+
+    /* Evidence table */
+    .evidence-toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .search{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      width: 100%;
+    }
+    .search input{
+      width: 100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      outline:none;
+    }
+    .search input::placeholder{ color: var(--muted2); }
+    @media (prefers-color-scheme: light){
+      .search input{ background: rgba(17,24,39,.03); }
+    }
+
+    .table-wrap{
+      display:grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .table-wrap{grid-template-columns: 1fr}
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.02);
+    }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--border);
+      vertical-align:top;
+      font-size:12px;
+    }
+    th{
+      text-align:left;
+      color: var(--muted);
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-size:11px;
+      background: rgba(255,255,255,.03);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    tr:last-child td{ border-bottom:none; }
+    tr[data-highlight="true"] td{
+      box-shadow: inset 0 0 0 2px rgba(124,92,255,.55);
+      background: rgba(124,92,255,.10);
+    }
+    .evi-id{
+      font-family: var(--mono);
+      font-size:11px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .evi-snippet{
+      color: var(--text);
+      font-size:12px;
+    }
+    .evi-source{
+      color: var(--muted);
+      font-size:11px;
+    }
+    .evi-tags{
+      display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;
+    }
+    .tag{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color: var(--muted);
+      background: rgba(255,255,255,.02);
+    }
+
+    /* Evidence preview */
+    .preview{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.02);
+      overflow:hidden;
+      position:sticky;
+      top: 96px;
+      box-shadow: var(--shadow);
+    }
+    .preview .phd{
+      padding:12px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .preview .phd strong{
+      font-size:12px;
+      letter-spacing:.2px;
+    }
+    .preview .pbd{
+      padding:12px;
+      font-size:12px;
+      color: var(--text);
+    }
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      padding:6px 10px;
+      border-radius: 10px;
+      cursor:pointer;
+      font-size:12px;
+    }
+    .btn:hover{ border-color: rgba(124,92,255,.5); }
+    .btn:active{ transform: translateY(1px); }
+
+    /* Details / collapsibles */
+    details{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.02);
+      overflow:hidden;
+    }
+    details + details{ margin-top:10px; }
+    summary{
+      cursor:pointer;
+      list-style:none;
+      padding:12px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      user-select:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    summary .sleft{
+      display:flex; align-items:center; gap:10px;
+      font-size:13px;
+    }
+    .caret{
+      width:10px; height:10px;
+      border-right:2px solid var(--muted);
+      border-bottom:2px solid var(--muted);
+      transform: rotate(-45deg);
+      transition: transform .15s ease;
+      margin-left:auto;
+      opacity:.9;
+    }
+    details[open] .caret{ transform: rotate(45deg); }
+    .details-body{
+      border-top:1px solid var(--border);
+      padding:12px;
+    }
+    pre{
+      margin:0;
+      padding:12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.28);
+      border:1px solid var(--border);
+      overflow:auto;
+      font-family: var(--mono);
+      font-size:11px;
+      color: var(--text);
+      line-height:1.45;
+      max-height: 360px;
+    }
+    @media (prefers-color-scheme: light){
+      pre{ background: rgba(17,24,39,.06); }
+    }
+
+    /* Inputs */
+    .qa{
+      display:grid;
+      gap:10px;
+    }
+    .qa .q{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      padding:10px;
+      background: rgba(255,255,255,.02);
+    }
+    .qa label{
+      font-size:12px;
+      color: var(--muted);
+      display:block;
+      margin:0 0 6px;
+    }
+    .qa textarea{
+      width:100%;
+      min-height:70px;
+      resize:vertical;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      outline:none;
+      font-family: var(--sans);
+      font-size:13px;
+    }
+    @media (prefers-color-scheme: light){
+      .qa textarea{ background: rgba(17,24,39,.03); }
+    }
+
+    /* Small util */
+    .muted{ color: var(--muted); }
+    .muted2{ color: var(--muted2); }
+    .kpi{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 980px){
+      .kpi{grid-template-columns: 1fr 1fr}
+    }
+    .kpi .box{
+      border:1px solid var(--border);
+      border-radius: var(--radius2);
+      padding:10px;
+      background: rgba(255,255,255,.02);
+    }
+    .kpi .box .v{
+      font-size:16px;
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .kpi .box .l{
+      margin:4px 0 0;
+      font-size:11px;
+      color: var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.10em;
+    }
+
+    .hr{
+      height:1px;
+      background: var(--border);
+      margin:12px 0;
+    }
+
+    .footnote{
+      font-size:11px;
+      color: var(--muted2);
+      margin-top:10px;
+    }
+
+    .sr-only{
+      position:absolute;
+      width:1px;height:1px;
+      padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0,0,0,0);
+      white-space:nowrap;border:0;
+    }
+
+    /* Print-friendly */
+    @media print{
+      aside{display:none}
+      header.top{position:relative}
+      .app{grid-template-columns: 1fr}
+      body{background:#fff; color:#111}
+      .card, header.top, .brand, .nav, .preview{box-shadow:none}
+      .preview{position:relative; top:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside aria-label="Section navigation">
+      <div class="brand" role="banner">
+        <div class="left">
+          <!-- <div class="logo" aria-hidden="true"></div> -->
+          <div>
+            <h1>Decision Brief</h1>
+            <p id="caseIdLine">Case: —</p>
+          </div>
+        </div>
+        <span class="pill" id="nowTag" title="Local time">—</span>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <h2>Sections</h2>
+        <a href="#overview" data-nav="overview"><span>Overview</span><span class="pill" id="navOverview">—</span></a>
+        <a href="#reasons_not" data-nav="reasons_not"><span>Reasons not to proceed</span><span class="pill" id="navReasonsNot">—</span></a>
+        <a href="#claims" data-nav="claims"><span>Key claims</span><span class="pill" id="navClaims">—</span></a>
+        <a href="#unknowns" data-nav="unknowns"><span>Unknowns & assumptions</span><span class="pill" id="navUnknowns">—</span></a>
+        <a href="#research_plan" data-nav="research_plan"><span>Research plan</span><span class="pill" id="navResearch">—</span></a>
+        <a href="#followups" data-nav="followups"><span>Follow-up questions</span><span class="pill" id="navFollowups">—</span></a>
+        <a href="#evidence" data-nav="evidence"><span>Evidence ledger</span><span class="pill" id="navEvidence">—</span></a>
+        <a href="#run" data-nav="run"><span>Run metadata</span><span class="pill" id="navRun">—</span></a>
+        <a href="#raw" data-nav="raw"><span>Raw JSON</span><span class="pill">⟂</span></a>
+      </nav>
+
+      <div class="sidebar-footer" aria-label="Keyboard tips">
+        <div class="kbd">Tip: Use <strong>/</strong> to focus Evidence search</div>
+        <div class="kbd">Tip: Press <strong>Esc</strong> to clear highlights</div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="container">
+        <header class="top" aria-label="Case header">
+          <div class="header-grid">
+            <div class="case-title">
+              <div>
+                <h2 id="caseTitle">—</h2>
+                <p class="subtle" id="caseSubtitle">—</p>
+                <!-- <div class="meta" id="caseMeta"></div> -->
+              </div>
+            </div>
+
+            <div class="verdict">
+              <div class="badge" id="verdictBadge" aria-label="Verdict and confidence">
+                <span class="dot consider" id="verdictDot" aria-hidden="true"></span>
+                <strong id="verdictText">—</strong>
+                <span class="muted" id="confidenceBand">—</span>
+              </div>
+
+              <div class="confidence" role="group" aria-label="Confidence meter">
+                <div class="row">
+                  <span>Confidence (coverage)</span>
+                  <span id="confidencePct">—</span>
+                </div>
+                <div class="meter" aria-hidden="true">
+                  <div id="confidenceFill"></div>
+                </div>
+                <div class="meter-note" id="confidenceNote">
+                  Confidence reflects thoroughness + evidence coverage, not likelihood of success.
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- OVERVIEW -->
+        <section id="overview" aria-label="Overview">
+          <div class="card">
+            <div class="hd">
+              <h3>Overview</h3>
+              <div class="hint">What the system recommends, why, and what could change it.</div>
+            </div>
+            <div class="bd">
+              <div class="grid2">
+                <div class="callout" id="summaryBox">
+                  <h4>Decision summary</h4>
+                  <p id="decisionSummary" class="muted">—</p>
+                </div>
+                <div class="callout" id="sensitivityBox">
+                  <h4>Decision sensitivity</h4>
+                  <p class="muted" id="decisionSensitivity">—</p>
+                  <div class="chips" id="sensitivityChips"></div>
+                </div>
+              </div>
+
+              <div class="hr"></div>
+
+              <div class="grid2">
+                <div>
+                  <h4 style="margin:0 0 8px;font-size:13px;">Next actions</h4>
+                  <div class="list" id="nextActions"></div>
+                </div>
+                <div>
+                  <h4 style="margin:0 0 8px;font-size:13px;">Constraints & preferences</h4>
+                  <div class="list" id="constraints"></div>
+                </div>
+              </div>
+
+              <p class="footnote" id="overviewFootnote">—</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- REASONS NOT TO PROCEED -->
+        <section id="reasons_not" aria-label="Reasons not to proceed">
+          <div class="card">
+            <div class="hd">
+              <h3>Reasons not to proceed / not to apply</h3>
+              <div class="hint">Anti-confirmation bias: what argues against the recommendation.</div>
+            </div>
+            <div class="bd">
+              <div class="callout missing" id="reasonsNotCallout">
+                <h4>Primary blockers</h4>
+                <ul id="reasonsNotList"></ul>
+              </div>
+
+              <div class="hr"></div>
+
+              <details id="counterfactualDetails">
+                <summary>
+                  <span class="sleft">
+                    <strong>What would change the verdict?</strong>
+                    <span class="pill" id="counterfactualCount">—</span>
+                  </span>
+                  <span class="caret" aria-hidden="true"></span>
+                </summary>
+                <div class="details-body">
+                  <div class="list" id="counterfactuals"></div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <!-- CLAIMS -->
+        <section id="claims" aria-label="Key claims">
+          <div class="card">
+            <div class="hd">
+              <h3>Key claims</h3>
+              <div class="hint">Claims are traceable to evidence IDs.</div>
+            </div>
+            <div class="bd">
+              <div class="list" id="claimsList"></div>
+
+              <details style="margin-top:12px;">
+                <summary>
+                  <span class="sleft">
+                    <strong>Verbose notes</strong>
+                    <span class="pill" id="notesCount">—</span>
+                  </span>
+                  <span class="caret" aria-hidden="true"></span>
+                </summary>
+                <div class="details-body">
+                  <div class="list" id="notesList"></div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <!-- UNKNOWNS & ASSUMPTIONS -->
+        <section id="unknowns" aria-label="Unknowns and assumptions">
+          <div class="card">
+            <div class="hd">
+              <h3>Unknowns, assumptions & missing info</h3>
+              <div class="hint">Clearly separated to support user control.</div>
+            </div>
+            <div class="bd">
+              <div class="grid2">
+                <div class="callout unknown">
+                  <h4>Unknowns</h4>
+                  <ul id="unknownsList"></ul>
+                </div>
+                <div class="callout assumption">
+                  <h4>Assumptions</h4>
+                  <ul id="assumptionsList"></ul>
+                </div>
+              </div>
+
+              <div class="hr"></div>
+
+              <div class="callout missing">
+                <h4>Missing info (required to increase confidence)</h4>
+                <ul id="missingInfoList"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RESEARCH PLAN -->
+        <section id="research_plan" aria-label="Research plan">
+          <div class="card">
+            <div class="hd">
+              <h3>Research plan</h3>
+              <div class="hint">Pro/con queries and tasks to reduce uncertainty.</div>
+            </div>
+            <div class="bd">
+              <div class="grid2">
+                <div>
+                  <h4 style="margin:0 0 8px;font-size:13px;">Pro-seeking queries</h4>
+                  <div class="list" id="proQueries"></div>
+                </div>
+                <div>
+                  <h4 style="margin:0 0 8px;font-size:13px;">Con-seeking queries</h4>
+                  <div class="list" id="conQueries"></div>
+                </div>
+              </div>
+
+              <div class="hr"></div>
+
+              <details>
+                <summary>
+                  <span class="sleft">
+                    <strong>Tasks & checkpoints</strong>
+                    <span class="pill" id="tasksCount">—</span>
+                  </span>
+                  <span class="caret" aria-hidden="true"></span>
+                </summary>
+                <div class="details-body">
+                  <div class="list" id="researchTasks"></div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <!-- FOLLOW-UP QUESTIONS -->
+        <section id="followups" aria-label="Follow-up questions">
+          <div class="card">
+            <div class="hd">
+              <h3>Follow-up questions</h3>
+              <div class="hint">Mock inputs for user answers (not persisted).</div>
+            </div>
+            <div class="bd">
+              <div class="qa" id="followupQA"></div>
+              <p class="footnote">Answers are not saved; this is an inline mock UI to support review and decision control.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- EVIDENCE LEDGER -->
+        <section id="evidence" aria-label="Evidence ledger">
+          <div class="card">
+            <div class="hd">
+              <h3>Evidence ledger</h3>
+              <div class="hint">Searchable + traceable. Click chips from claims to jump here.</div>
+            </div>
+            <div class="bd">
+              <div class="evidence-toolbar">
+                <div class="search">
+                  <label for="evidenceSearch" class="sr-only">Search evidence</label>
+                  <input id="evidenceSearch" type="search" placeholder="Search evidence by id, tag, snippet, source…" autocomplete="off" />
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <div>
+                  <table aria-label="Evidence table">
+                    <thead>
+                      <tr>
+                        <th style="width:160px;">Evidence ID</th>
+                        <th>Snippet / Notes</th>
+                        <th style="width:220px;">Source</th>
+                      </tr>
+                    </thead>
+                    <tbody id="evidenceTbody"></tbody>
+                  </table>
+
+                  <details style="margin-top:12px;">
+                    <summary>
+                      <span class="sleft">
+                        <strong>Full evidence snippets (verbose)</strong>
+                        <span class="pill" id="evidenceVerboseCount">—</span>
+                      </span>
+                      <span class="caret" aria-hidden="true"></span>
+                    </summary>
+                    <div class="details-body">
+                      <div class="list" id="evidenceVerboseList"></div>
+                    </div>
+                  </details>
+                </div>
+
+                <aside class="preview" aria-label="Evidence preview panel">
+                  <div class="phd">
+                    <strong>Evidence preview</strong>
+                    <button class="btn" id="clearHighlightBtn" type="button">Clear</button>
+                  </div>
+                  <div class="pbd" id="evidencePreview">
+                    <p class="muted">Select an evidence item to see details here.</p>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RUN METADATA -->
+        <section id="run" aria-label="Run metadata">
+          <div class="card">
+            <div class="hd">
+              <h3>Run metadata</h3>
+              <div class="hint">Model calls, tokens, latency, cost totals.</div>
+            </div>
+            <div class="bd">
+              <div class="kpi" id="runKpis"></div>
+
+              <div class="hr"></div>
+
+              <details open>
+                <summary>
+                  <span class="sleft">
+                    <strong>Model calls</strong>
+                    <span class="pill" id="modelCallsCount">—</span>
+                  </span>
+                  <span class="caret" aria-hidden="true"></span>
+                </summary>
+                <div class="details-body">
+                  <table aria-label="Model calls table">
+                    <thead>
+                      <tr>
+                        <th>Model</th>
+                        <th>Prompt version</th>
+                        <th>Tokens</th>
+                        <th>Latency</th>
+                        <th>Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody id="modelCallsTbody"></tbody>
+                  </table>
+                  <p class="footnote" id="runFootnote">—</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <!-- RAW JSON -->
+        <section id="raw" aria-label="Raw JSON">
+          <div class="card">
+            <div class="hd">
+              <h3>Raw JSON</h3>
+              <div class="hint">Original payload (collapsible).</div>
+            </div>
+            <div class="bd">
+              <details>
+                <summary>
+                  <span class="sleft">
+                    <strong>Show / hide raw input JSON</strong>
+                    <span class="pill">JSON</span>
+                  </span>
+                  <span class="caret" aria-hidden="true"></span>
+                </summary>
+                <div class="details-body">
+                  <pre id="rawJsonPre"></pre>
+                </div>
+              </details>
+
+              <details style="margin-top:12px;">
+                <summary>
+                  <span class="sleft">
+                    <strong>Where to paste your real JSON</strong>
+                    <span class="pill">instructions</span>
+                  </span>
+                  <span class="caret" aria-hidden="true"></span>
+                </summary>
+                <div class="details-body">
+                  <div class="callout">
+                    <h4>Paste location</h4>
+                    <p class="muted">
+                      Replace the sample object assigned to <span style="font-family:var(--mono);">const data = { ... }</span>
+                      inside the <span style="font-family:var(--mono);">&lt;script&gt;</span> tag near the bottom.
+                      Search for the marker:
+                      <span style="font-family:var(--mono);">/* PASTE_REAL_JSON_HERE */</span>
+                    </p>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    "use strict";
+
+    // =========================
+    // SAMPLE PLACEHOLDER DATA
+    // =========================
+    // Replace this entire object with your real payload.
+    // IMPORTANT: Keep the same top-level keys: case, decision_brief, evidence_ledger, run_record.
+    /* const data = {
+      "case": {
+        "case_id": "case_017_041",
+        "title": "Senior Frontend Engineer — StartupX (Series B) vs Candidate cand_017",
+        "subtitle": "Decision-support brief for a stretch-fit: Next.js gap, remote US, comp floor $160k.",
+        "created_at": "2026-01-27T18:45:00-07:00",
+        "owner": "Walid",
+        "tags": ["hiring", "career", "frontend", "react", "nextjs"],
+        "context": {
+          "candidate_id": "cand_017",
+          "job_id": "jd_041",
+          "scenario_tag": "stretch_fit_missing_nextjs"
+        }
+      },
+      "decision_brief": {
+        "verdict": "consider",
+        "confidence": {
+          "band": "high",
+          "score_0_1": 0.78,
+          "coverage_note": "Evidence covers core role fit; missing a direct Next.js project artifact and comp alignment confirmation."
+        },
+        "decision_summary": "Proceed with targeted hiring-manager outreach emphasizing frontend architecture + performance, while explicitly addressing Next.js ramp plan. Do not over-index on general React experience; verify Next.js production readiness quickly.",
+        "decision_sensitivity": {
+          "what_would_change": [
+            {"label": "If Next.js experience is required to be immediate", "evidence_ids": ["evi_003"]},
+            {"label": "If salary band cannot meet $160k+ base", "evidence_ids": ["evi_006"]},
+            {"label": "If role demands deep startup ambiguity handling", "evidence_ids": ["evi_004"]}
+          ]
+        },
+        "next_actions": [
+          {"title":"Send HM outreach message", "detail":"Lead with design-system + architecture wins; propose 30–45 min call.", "priority":"high", "evidence_ids":["evi_001","evi_002"]},
+          {"title":"Produce a small Next.js artifact", "detail":"Build a mini app showcasing routing, data fetching, perf profiling.", "priority":"high", "evidence_ids":["evi_003"]},
+          {"title":"Clarify compensation range", "detail":"Ask recruiter for base + equity + benefits range and leveling.", "priority":"medium", "evidence_ids":["evi_006"]}
+        ],
+        "constraints_and_preferences": [
+          {"label":"Location policy", "value":"Remote (US)"},
+          {"label":"Salary minimum (override)", "value":"$160,000"},
+          {"label":"Role rigor", "value":"Medium (startup posting style)"},
+          {"label":"Time-to-credibility", "value":"2–3 weeks for Next.js artifact + interview narratives"}
+        ],
+        "reasons_not_to_proceed": [
+          {"reason":"Next.js experience gap may be a hard filter for this team.", "severity":"high", "evidence_ids":["evi_003"]},
+          {"reason":"Limited startup experience could be risky if role expects high ambiguity tolerance.", "severity":"medium", "evidence_ids":["evi_004"]},
+          {"reason":"Comp may fall below required floor once base/equity is clarified.", "severity":"medium", "evidence_ids":["evi_006"]}
+        ],
+        "counterfactuals": [
+          {"title":"If team is flexible on Next.js and values architecture/mentorship", "impact":"strongly_positive", "evidence_ids":["evi_001","evi_002"]},
+          {"title":"If Next.js is non-negotiable day-1", "impact":"strongly_negative", "evidence_ids":["evi_003"]},
+          {"title":"If startup context requires cross-functional scrappiness", "impact":"negative", "evidence_ids":["evi_004"]}
+        ],
+        "key_claims": [
+          {
+            "claim_id":"c_001",
+            "text":"Candidate aligns strongly with frontend architecture and performance needs of the role.",
+            "confidence":"high",
+            "evidence_ids":["evi_001","evi_002"]
+          },
+          {
+            "claim_id":"c_002",
+            "text":"Primary gap is Next.js, but can be mitigated with a focused artifact and narrative.",
+            "confidence":"medium",
+            "evidence_ids":["evi_003","evi_005"]
+          },
+          {
+            "claim_id":"c_003",
+            "text":"Startup ambiguity tolerance is uncertain; validate via targeted questions.",
+            "confidence":"medium",
+            "evidence_ids":["evi_004"]
+          }
+        ],
+        "notes": [
+          {"title":"Tone guidance", "detail":"Avoid persuasion. Present evidence + uncertainty. Offer ramp plan and invite assessment.", "evidence_ids":["evi_005"]},
+          {"title":"Interview risk", "detail":"If onsite includes Next.js deep-dive, prep must be explicit and time-boxed.", "evidence_ids":["evi_003"]}
+        ],
+        "unknowns": [
+          {"text":"Does the team treat Next.js as a hard requirement or a preference?", "evidence_ids":[]},
+          {"text":"Exact interview loop focus (system design vs framework trivia).", "evidence_ids":[]}
+        ],
+        "assumptions": [
+          {"text":"Candidate can ramp on Next.js quickly due to strong React + architecture background.", "evidence_ids":["evi_005"]},
+          {"text":"Hiring manager values mentorship and design systems beyond feature delivery.", "evidence_ids":["evi_002"]}
+        ],
+        "missing_info": [
+          {"text":"Comp band (base/equity) and leveling expectations.", "evidence_ids":["evi_006"]},
+          {"text":"Whether role includes ownership of Next.js SSR/ISR patterns day-1.", "evidence_ids":["evi_003"]}
+        ],
+        "research_plan": {
+          "pro_queries": [
+            {"title":"Evidence of ramp success", "query":"examples where strong React engineers ramped to Next.js quickly; what artifacts convince HMs?", "evidence_ids":[]},
+            {"title":"Role fit signal", "query":"signals that architecture/DS leadership is valued in Series B product orgs", "evidence_ids":[]}
+          ],
+          "con_queries": [
+            {"title":"Hard filter risk", "query":"how often Series B roles list Next.js as a hard filter; what screening looks like", "evidence_ids":[]},
+            {"title":"Comp mismatch risk", "query":"typical base ranges for Senior Frontend Eng at Series B remote US; variance by market", "evidence_ids":[]}
+          ],
+          "tasks": [
+            {"title":"Ask recruiter for interview loop + must-haves", "owner":"user", "priority":"high"},
+            {"title":"Build Next.js artifact with perf + tests", "owner":"user", "priority":"high"},
+            {"title":"Draft HM message with evidence-backed bullets", "owner":"user", "priority":"medium"}
+          ]
+        },
+        "follow_up_questions": [
+          {"id":"q_001","question":"What is the compensation range (base + equity) for this role?"},
+          {"id":"q_002","question":"Is Next.js required day-1, or can the candidate ramp in the first month?"},
+          {"id":"q_003","question":"What does the interview loop emphasize (architecture, performance, product, framework specifics)?"}
+        ],
+        "ui_hints": {
+          "disclaimer":"This brief supports decision-making. It does not guarantee outcomes.",
+          "last_updated":"2026-01-27"
+        }
+      },
+      "evidence_ledger": {
+        "items": [
+          {
+            "evidence_id":"evi_001",
+            "snippet":"Candidate has 8 years of enterprise React/TypeScript with performance focus; aligns with frontend architecture role theme.",
+            "source": {"type":"profile","label":"Candidate profile summary","ref":"cand_017"},
+            "tags":["fit","frontend_architecture","performance"],
+            "created_at":"2026-01-27T18:40:00-07:00"
+          },
+          {
+            "evidence_id":"evi_002",
+            "snippet":"Job emphasizes frontend architecture, design system leadership, and React/GraphQL stack.",
+            "source": {"type":"job_post","label":"Job description","ref":"jd_041"},
+            "tags":["role_requirements","design_system","graphql"],
+            "created_at":"2026-01-27T18:41:00-07:00"
+          },
+          {
+            "evidence_id":"evi_003",
+            "snippet":"Candidate gap: no Next.js; job stack includes Next.js—risk of hard filter or deep technical screen.",
+            "source": {"type":"gap_analysis","label":"Gap profile / posting stack mismatch","ref":"case_017_041"},
+            "tags":["risk","nextjs","screening"],
+            "created_at":"2026-01-27T18:42:00-07:00"
+          },
+          {
+            "evidence_id":"evi_004",
+            "snippet":"Limited startup experience; Series B environment may require ambiguity tolerance and rapid iteration.",
+            "source": {"type":"analysis","label":"Experience-to-context mapping","ref":"case_017_041"},
+            "tags":["risk","startup","ambiguity"],
+            "created_at":"2026-01-27T18:43:00-07:00"
+          },
+          {
+            "evidence_id":"evi_005",
+            "snippet":"Mitigation: build a small Next.js artifact demonstrating routing, data fetching, SSR/ISR basics, and perf profiling.",
+            "source": {"type":"playbook","label":"Portfolio mitigation guidance","ref":"playbook_nextjs_ramp"},
+            "tags":["mitigation","artifact","nextjs"],
+            "created_at":"2026-01-27T18:44:00-07:00"
+          },
+          {
+            "evidence_id":"evi_006",
+            "snippet":"Salary minimum override set to $160k; comp band unknown—could be misaligned with startup range.",
+            "source": {"type":"preference","label":"User preferences override","ref":"case_override"},
+            "tags":["constraint","compensation","unknown"],
+            "created_at":"2026-01-27T18:45:00-07:00"
+          }
+        ]
+      },
+      "run_record": {
+        "run_id":"run_9d2c",
+        "prompt_bundle_version":"db_v0.6.2",
+        "started_at":"2026-01-27T18:39:12-07:00",
+        "ended_at":"2026-01-27T18:45:17-07:00",
+        "model_calls":[
+          {
+            "call_id":"mc_001",
+            "model":"gpt-5.2",
+            "prompt_version":"db_verdict_v3",
+            "input_tokens": 1824,
+            "output_tokens": 641,
+            "latency_ms": 2480,
+            "cost_usd": 0.0324
+          },
+          {
+            "call_id":"mc_002",
+            "model":"gpt-5.2",
+            "prompt_version":"db_evidence_link_v2",
+            "input_tokens": 2102,
+            "output_tokens": 512,
+            "latency_ms": 1920,
+            "cost_usd": 0.0309
+          }
+        ],
+        "totals":{
+          "input_tokens": 3926,
+          "output_tokens": 1153,
+          "latency_ms": 4400,
+          "cost_usd": 0.0633
+        }
+      }
+    }; */
+
+    const data = {
+      "case": {
+        "case_id": "case_017_041",
+        "case_type": "career_decision",
+        "created_at": "2026-01-27T02:10:00Z",
+        "updated_at": "2026-01-27T02:14:30Z",
+        "title": "Senior Frontend Engineer @ StartupX",
+        "subtitle": "Decision-support brief for a stretch-fit: Next.js gap, remote US, comp floor $160k.",
+        "owner": "Walid",
+        "status": "completed",
+        "user_context": {
+          "user_id": "user_001",
+          "timezone": "America/Denver"
+        },
+        "inputs": {
+          "resume_source": {
+            "type": "uploaded_doc",
+            "filename": "master_resume.md",
+            "content_type": "text/markdown",
+            "sha256": "4eea5a2d7b9e0d0f111111111111111111111111111111111111111111111111"
+          },
+          "job_description_source": {
+            "type": "pasted_text",
+            "origin": "LinkedIn",
+            "url": "https://example.com/jobs/123",
+            "sha256": "6f2f8b3c1a9b2c0d222222222222222222222222222222222222222222222222"
+          },
+          "profile": {
+            "location": "Denver, CO",
+            "work_auth": "US",
+            "salary_min": 160000,
+            "remote_only": true,
+            "preferences": {
+              "role_focus": ["frontend_architecture", "design_system"],
+              "stack": ["React", "TypeScript", "GraphQL"],
+              "avoid": ["heavy on-call"]
+            },
+            "constraints": {
+              "relocation": false
+            },
+            "links": {
+              "linkedin": "https://linkedin.com/in/example",
+              "github": "https://github.com/example"
+            }
+          }
+        }
+      },
+      "decision_brief": {
+        "brief_type": "career_decision",
+        "version": 2,
+        "created_at": "2026-01-27T02:14:30Z",
+        "job_title": "Senior Frontend Engineer",
+        "company": "StartupX",
+        "verdict": "consider",
+        "confidence": 0.74,
+        "confidence_notes": [
+          "Core React/TypeScript/GraphQL match is strong.",
+          "Next.js experience gap is material for this role; impact depends on how strict the team is.",
+          "Company/culture info is incomplete; decision could shift based on leadership/pace fit."
+        ],
+        "role_reality": {
+          "responsibilities": [
+            "Lead frontend architecture and component design decisions",
+            "Collaborate on GraphQL data modeling and client performance",
+            "Build/scale design system with reusable components"
+          ],
+          "implicit_expectations": [
+            "Comfort shipping quickly in startup environment",
+            "Able to own UI performance and reliability",
+            "Experience mentoring and setting standards"
+          ]
+        },
+        "fit_assessment": {
+          "overall_score": 78,
+          "breakdown": {
+            "skills": 85,
+            "experience": 80,
+            "domain_familiarity": 70,
+            "constraints": 90,
+            "preferences": 65
+          },
+          "strengths": [
+            {
+              "statement": "Strong match on React + TypeScript + GraphQL and frontend architecture focus.",
+              "evidence_ids": ["ev_resume_001", "ev_jd_001"],
+              "certainty": "likely"
+            },
+            {
+              "statement": "Mentorship/leadership experience aligns with senior expectations.",
+              "evidence_ids": ["ev_resume_004"],
+              "certainty": "likely"
+            }
+          ],
+          "gaps": [
+            {
+              "gap": "Limited Next.js experience (explicit requirement).",
+              "impact": "high",
+              "why_it_matters": "The role stack includes Next.js; lack of experience may reduce interview success or ramp speed.",
+              "evidence_ids": ["ev_jd_002", "ev_resume_006"]
+            },
+            {
+              "gap": "Limited startup experience (role expects startup pace).",
+              "impact": "medium",
+              "why_it_matters": "Hiring teams may prioritize candidates with startup delivery cadence and ambiguity tolerance.",
+              "evidence_ids": ["ev_jd_003", "ev_resume_007"]
+            }
+          ]
+        },
+        "reasons_not_to_apply": [
+          {
+            "statement": "If the team requires deep Next.js production experience from day one, you may be screened out early.",
+            "evidence_ids": ["ev_jd_002", "ev_resume_006"],
+            "certainty": "likely"
+          },
+          {
+            "statement": "If you strongly prefer enterprise stability, this Series B startup role may be a mismatch.",
+            "evidence_ids": ["ev_jd_003"],
+            "certainty": "uncertain"
+          }
+        ],
+        "engagement_strategy": {
+          "primary_path": "hiring_manager_outreach",
+          "secondary_path": "employee_referral",
+          "fallback_path": "optimized_application",
+          "rationale": [
+            "Front-door applications may be crowded; direct outreach increases probability of review.",
+            "Missing Next.js is a gap best addressed via narrative and quick portfolio proof."
+          ]
+        },
+        "positioning_angle": {
+          "headline": "Senior frontend architect who ships high-performance React + GraphQL UIs and mentors teams",
+          "emphasize": [
+            "frontend architecture decisions",
+            "performance and reliability outcomes",
+            "design system leadership",
+            "GraphQL client patterns"
+          ],
+          "de_emphasize": [
+            "lack of Next.js depth (address with a plan + quick proof project instead)",
+            "limited startup background"
+          ]
+        },
+        "next_actions": [
+          "Build a small Next.js proof project (1–2 days) showcasing routing/data fetching and performance basics.",
+          "Draft a concise outreach note to the hiring manager addressing Next.js gap with proof link.",
+          "Research company culture signals (pace, leadership stability, product maturity) before committing."
+        ],
+        "follow_up_questions": [
+          {
+            "id": "q_salary_band",
+            "question": "What salary range is acceptable for you if equity is included?",
+            "why_needed": "Comp misalignment is a common deal-breaker; helps refine verdict and negotiation plan."
+          },
+          {
+            "id": "q_startup_pace",
+            "question": "How comfortable are you with ambiguity and fast-changing priorities (startup pace)?",
+            "why_needed": "This directly affects culture fit and long-term satisfaction."
+          }
+        ],
+        "research_plan": {
+          "max_tasks": 3,
+          "tasks": [
+            {
+              "id": "rt_culture_pro",
+              "target": "Culture and engineering maturity signals",
+              "pro_query": "StartupX engineering blog design system Next.js GraphQL",
+              "con_query": "StartupX Glassdoor engineering leadership turnover burnout",
+              "why": "Culture fit is a high-impact unknown; gather pro and con signals to reduce confirmation bias.",
+              "source_hints": ["company_site", "engineering_blog", "Glassdoor", "LinkedIn_tenure"]
+            },
+            {
+              "id": "rt_role_reality",
+              "target": "Role reality and hiring urgency",
+              "pro_query": "StartupX Senior Frontend Engineer role responsibilities design system",
+              "con_query": "StartupX hiring freeze layoffs job posting real",
+              "why": "Validate role reality and reduce wasted effort on non-viable postings.",
+              "source_hints": ["news", "LinkedIn_company_posts", "team_member_profiles"]
+            }
+          ]
+        }
+      },
+      "evidence_journal": {
+        "ledger_version": 3,
+        "created_at": "2026-01-27T02:14:25Z",
+        "items": [
+          {
+            "evidence_id": "ev_jd_001",
+            "source_type": "job_description",
+            "source_uri": "https://example.com/jobs/123",
+            "chunk_id": "jd:1",
+            "snippet": "We are seeking a Senior Frontend Engineer... React, TypeScript, Next.js, GraphQL...",
+            "hash": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999",
+            "retrieved_at": "2026-01-27T02:10:10Z",
+            "tool_call_id": null,
+            "confidence": 0.95,
+            "tags": ["requirements", "stack"]
+          },
+          {
+            "evidence_id": "ev_jd_002",
+            "source_type": "job_description",
+            "source_uri": "https://example.com/jobs/123",
+            "chunk_id": "jd:2",
+            "snippet": "Tech stack: React, TypeScript, Next.js, GraphQL...",
+            "hash": "bbbbccccddddeeeeffff0000111122223333444455556666777788889999aaaa",
+            "retrieved_at": "2026-01-27T02:10:10Z",
+            "tool_call_id": null,
+            "confidence": 0.95,
+            "tags": ["nextjs", "must_have"]
+          },
+          {
+            "evidence_id": "ev_resume_001",
+            "source_type": "user_resume",
+            "source_uri": "master_resume.md",
+            "chunk_id": "resume:summary",
+            "snippet": "8+ years building React/TypeScript UIs, GraphQL clients, performance optimization...",
+            "hash": "ccccddddeeeeffff0000111122223333444455556666777788889999aaaabbbb",
+            "retrieved_at": "2026-01-27T02:10:00Z",
+            "tool_call_id": null,
+            "confidence": 0.9,
+            "tags": ["skills", "frontend_architecture"]
+          },
+          {
+            "evidence_id": "ev_resume_004",
+            "source_type": "user_resume",
+            "source_uri": "master_resume.md",
+            "chunk_id": "resume:leadership",
+            "snippet": "Mentored engineers, led frontend standards, reviewed architecture proposals...",
+            "hash": "ddddeeeeffff0000111122223333444455556666777788889999aaaabbbbcccc",
+            "retrieved_at": "2026-01-27T02:10:00Z",
+            "tool_call_id": null,
+            "confidence": 0.85,
+            "tags": ["mentorship", "leadership"]
+          },
+          {
+            "evidence_id": "ev_company_001",
+            "source_type": "company_research",
+            "source_uri": "https://startupx.com/blog/design-system",
+            "chunk_id": "web:design-system",
+            "snippet": "StartupX shares details about their design system and component library roadmap...",
+            "hash": "eeeeffff0000111122223333444455556666777788889999aaaabbbbccccdddd",
+            "retrieved_at": "2026-01-27T02:13:40Z",
+            "tool_call_id": "tool_company_research_01",
+            "confidence": 0.7,
+            "tags": ["culture_pro", "engineering_blog", "design_system"]
+          }
+        ],
+        "dedupe_notes": [
+          "Deduped 2 identical JD snippets by hash.",
+          "Kept highest-confidence snippet when duplicates found."
+        ]
+      },
+      "run_record": {
+        "run_id": "run_2026_01_27_001",
+        "created_at": "2026-01-27T02:10:05Z",
+        "ended_at": "2026-01-27T02:14:30Z",
+        "provider": "openai",
+        "prompt_bundle": {
+          "prompt_key": "career_decision.decider",
+          "prompt_version": 3,
+          "prompt_sha256": "111122223333444455556666777788889999aaaabbbbccccddddeeeeffff0000"
+        },
+        "iterations": 2,
+        "confidence_threshold": 0.7,
+        "repair_attempts": 1,
+        "model_calls": [
+          {
+            "step": "decider_v1",
+            "model": "gpt-4.1-2025-04-14",
+            "latency_ms": 1430.2,
+            "input_tokens": 3120,
+            "output_tokens": 820,
+            "total_tokens": 3940,
+            "estimated_cost_usd": 0.065,
+            "cache_hit": false,
+            "error": null
+          },
+          {
+            "step": "critic_v1",
+            "model": "gpt-4.1-mini-2025-04-14",
+            "latency_ms": 620.5,
+            "input_tokens": 2100,
+            "output_tokens": 420,
+            "total_tokens": 2520,
+            "estimated_cost_usd": 0.010,
+            "cache_hit": false,
+            "error": null
+          },
+          {
+            "step": "decider_v2",
+            "model": "gpt-4.1-2025-04-14",
+            "latency_ms": 1189.9,
+            "input_tokens": 3560,
+            "output_tokens": 910,
+            "total_tokens": 4470,
+            "estimated_cost_usd": 0.075,
+            "cache_hit": true,
+            "error": null
+          }
+        ],
+        "totals": {
+          "total_latency_ms": 3240.6,
+          "total_tokens": 10930,
+          "estimated_cost_usd": 0.15
+        }
+      },
+      "artifacts": [
+        {
+          "artifact_id": "art_resume_001",
+          "type": "tailored_resume",
+          "format": "markdown",
+          "created_at": "2026-01-27T02:14:10Z",
+          "title": "Tailored Resume — Senior Frontend Engineer @ StartupX",
+          "summary": "Resume tailored to emphasize frontend architecture and GraphQL performance work; includes Next.js gap plan.",
+          "source_brief_version": 2,
+          "content": "# Walid Newaz\n...\n",
+          "sha256": "9999aaaabbbbccccddddeeeeffff000011112222333344445555666677778888",
+          "provenance": {
+            "model": "gpt-4.1-mini-2025-04-14",
+            "prompt_key": "career_artifact.resume",
+            "prompt_version": 1
+          }
+        },
+        {
+          "artifact_id": "art_outreach_001",
+          "type": "outreach_message",
+          "format": "text",
+          "created_at": "2026-01-27T02:14:20Z",
+          "title": "Hiring Manager Outreach",
+          "summary": "Short outreach emphasizing architecture outcomes and linking a Next.js proof project.",
+          "source_brief_version": 2,
+          "content": "Hi [Name] — I’m a senior frontend engineer focused on ...",
+          "sha256": "888877776666555544443333222211110000ffffeeeeddccbbbbaaaa99998888",
+          "provenance": {
+            "model": "gpt-4.1-mini-2025-04-14",
+            "prompt_key": "career_artifact.outreach",
+            "prompt_version": 1
+          }
+        }
+      ]
+    };
+
+    // =========================
+    // UTILITIES
+    // =========================
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    const fmt = {
+      money(n){
+        if (n === null || n === undefined || isNaN(Number(n))) return "—";
+        return "$" + Number(n).toFixed(4);
+      },
+      ms(n){
+        if (n === null || n === undefined || isNaN(Number(n))) return "—";
+        if (n >= 1000) return (n/1000).toFixed(2) + " s";
+        return n + " ms";
+      },
+      pct01(x){
+        if (x === null || x === undefined || isNaN(Number(x))) return "—";
+        const p = Math.round(Number(x) * 100);
+        return p + "%";
+      },
+      iso(s){
+        if (!s) return "—";
+        try{
+          const d = new Date(s);
+          if (isNaN(d.getTime())) return s;
+          return d.toLocaleString(undefined, {year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+        }catch{ return s; }
+      },
+      safe(str){
+        return (str ?? "").toString();
+      }
+    };
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function verdictDotClass(verdict){
+      const v = (verdict||"").toLowerCase();
+      if (["proceed","yes","go","apply"].includes(v)) return "proceed";
+      if (["no","dont","do_not","reject","decline","avoid"].includes(v)) return "no";
+      return "consider";
+    }
+
+    // evidence index for fast lookup
+    const evidenceById = new Map();
+
+    // highlight state
+    let highlightedEvidenceId = null;
+
+    // =========================
+    // RENDERERS
+    // =========================
+    function setText(id, value){
+      const el = $(id);
+      if (el) el.textContent = value ?? "—";
+    }
+
+    function renderHeader(){
+      const c = data.case || {};
+      const db = data.decision_brief || {};
+      const conf = db.confidence || {};
+      const verdict = db.verdict || "—";
+
+      setText("#caseTitle", c.title || "Untitled case");
+      setText("#caseSubtitle", c.subtitle || "");
+      setText("#caseIdLine", `Case: ${c.case_id || "—"}`);
+
+
+
+      const meta = $("#caseMeta");
+      if (meta) {
+        meta.innerHTML = "";
+        const metaPairs = [
+          ["Created", fmt.iso(c.created_at)],
+          ["Owner", c.owner || "—"],
+          ["Scenario", c.context?.scenario_tag || "—"],
+          ["Candidate", c.context?.candidate_id || "—"],
+          ["Job", c.context?.job_id || "—"]
+        ];
+        for (const [k,v] of metaPairs){
+          const span = document.createElement("span");
+          span.className = "pill";
+          span.textContent = `${k}: ${v}`;
+          meta.appendChild(span);
+        }
+        if (Array.isArray(c.tags)){
+          for (const t of c.tags.slice(0,6)){
+            const span = document.createElement("span");
+            span.className = "pill";
+            span.textContent = `#${t}`;
+            meta.appendChild(span);
+          }
+        }
+      }
+
+
+      const dot = $("#verdictDot");
+      dot.classList.remove("proceed","consider","no");
+      dot.classList.add(verdictDotClass(verdict));
+
+      $("#verdictText").textContent = (verdict || "—").toString().toUpperCase();
+      $("#confidenceBand").textContent = conf.band ? `· ${conf.band.toUpperCase()}` : "";
+
+      const score = conf.score_0_1 ?? null;
+      $("#confidencePct").textContent = fmt.pct01(score);
+      $("#confidenceFill").style.width = (score != null ? Math.max(0, Math.min(1, Number(score))) * 100 : 0) + "%";
+      $("#confidenceNote").textContent = conf.coverage_note || "Confidence reflects thoroughness + evidence coverage, not likelihood of success.";
+
+      $("#nowTag").textContent = new Date().toLocaleString(undefined, {month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit"});
+    }
+
+    function renderOverview(){
+      const db = data.decision_brief || {};
+      $("#decisionSummary").textContent = db.decision_summary || "—";
+
+      const sens = db.decision_sensitivity || {};
+      $("#decisionSensitivity").textContent = "Key conditions that could change the verdict:";
+      const chips = $("#sensitivityChips");
+      chips.innerHTML = "";
+      (sens.what_would_change || []).forEach((w, idx)=>{
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <p class="title">${escapeHtml(w.label || `Sensitivity ${idx+1}`)} <span class="pill">condition</span></p>
+          <div class="chips">${renderEvidenceChips(w.evidence_ids || [])}</div>
+        `;
+        chips.appendChild(div);
+      });
+
+      const next = $("#nextActions");
+      next.innerHTML = "";
+      (db.next_actions || []).forEach((a)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title">
+            <span>${escapeHtml(a.title || "Action")}</span>
+            <span class="pill">${escapeHtml((a.priority || "—").toUpperCase())}</span>
+          </p>
+          <p class="muted" style="margin:0">${escapeHtml(a.detail || "")}</p>
+          <div class="chips">${renderEvidenceChips(a.evidence_ids || [])}</div>
+        `;
+        next.appendChild(item);
+      });
+
+      const cons = $("#constraints");
+      cons.innerHTML = "";
+      (db.constraints_and_preferences || []).forEach((x)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title"><span>${escapeHtml(x.label || "—")}</span><span class="pill">constraint</span></p>
+          <p class="muted" style="margin:0">${escapeHtml(x.value || "—")}</p>
+        `;
+        cons.appendChild(item);
+      });
+
+      const hint = db.ui_hints || {};
+      $("#overviewFootnote").textContent = hint.disclaimer
+        ? `${hint.disclaimer} • Last updated: ${hint.last_updated || "—"}`
+        : "—";
+
+      $("#navOverview").textContent = (db.next_actions?.length ?? 0) + " actions";
+    }
+
+    function renderReasonsNot(){
+      const db = data.decision_brief || {};
+      const ul = $("#reasonsNotList");
+      ul.innerHTML = "";
+
+      const reasons = db.reasons_not_to_proceed || [];
+      $("#navReasonsNot").textContent = reasons.length ? `${reasons.length} risks` : "—";
+
+      if (!reasons.length){
+        const li = document.createElement("li");
+        li.textContent = "No blockers listed.";
+        ul.appendChild(li);
+      } else {
+        reasons.forEach((r)=>{
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <div style="display:grid; gap:6px;">
+              <div><strong>${escapeHtml(r.reason || "—")}</strong> <span class="pill">${escapeHtml((r.severity||"—").toUpperCase())}</span></div>
+              <div class="chips">${renderEvidenceChips(r.evidence_ids || [])}</div>
+            </div>
+          `;
+          ul.appendChild(li);
+        });
+      }
+
+      const counter = db.counterfactuals || [];
+      $("#counterfactualCount").textContent = `${counter.length} items`;
+      const list = $("#counterfactuals");
+      list.innerHTML = "";
+      counter.forEach((c)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title">
+            <span>${escapeHtml(c.title || "Counterfactual")}</span>
+            <span class="pill">${escapeHtml((c.impact||"—").replaceAll("_"," ").toUpperCase())}</span>
+          </p>
+          <div class="chips">${renderEvidenceChips(c.evidence_ids || [])}</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function renderClaims(){
+      const db = data.decision_brief || {};
+      const claims = db.key_claims || [];
+      $("#navClaims").textContent = `${claims.length} claims`;
+
+      const list = $("#claimsList");
+      list.innerHTML = "";
+
+      claims.forEach((c)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title">
+            <span>${escapeHtml(c.claim_id || "claim")}</span>
+            <span class="pill">${escapeHtml((c.confidence || "—").toUpperCase())}</span>
+          </p>
+          <p class="evi-snippet" style="margin:0">${escapeHtml(c.text || "")}</p>
+          <div class="chips">${renderEvidenceChips(c.evidence_ids || [])}</div>
+        `;
+        list.appendChild(item);
+      });
+
+      const notes = db.notes || [];
+      $("#notesCount").textContent = `${notes.length} notes`;
+      const nlist = $("#notesList");
+      nlist.innerHTML = "";
+      notes.forEach((n)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title"><span>${escapeHtml(n.title || "Note")}</span><span class="pill">note</span></p>
+          <p class="muted" style="margin:0">${escapeHtml(n.detail || "")}</p>
+          <div class="chips">${renderEvidenceChips(n.evidence_ids || [])}</div>
+        `;
+        nlist.appendChild(item);
+      });
+    }
+
+    function renderUnknowns(){
+      const db = data.decision_brief || {};
+      const unknowns = db.unknowns || [];
+      const assumptions = db.assumptions || [];
+      const missing = db.missing_info || [];
+
+      $("#navUnknowns").textContent = `${unknowns.length + assumptions.length + missing.length} items`;
+
+      const u = $("#unknownsList"); u.innerHTML = "";
+      unknowns.forEach((x)=>{
+        const li = document.createElement("li");
+        li.innerHTML = `${escapeHtml(x.text || "—")} ${x.evidence_ids?.length ? `<div class="chips">${renderEvidenceChips(x.evidence_ids)}</div>` : ""}`;
+        u.appendChild(li);
+      });
+      if (!unknowns.length){
+        const li = document.createElement("li"); li.textContent = "None listed."; u.appendChild(li);
+      }
+
+      const a = $("#assumptionsList"); a.innerHTML = "";
+      assumptions.forEach((x)=>{
+        const li = document.createElement("li");
+        li.innerHTML = `${escapeHtml(x.text || "—")} ${x.evidence_ids?.length ? `<div class="chips">${renderEvidenceChips(x.evidence_ids)}</div>` : ""}`;
+        a.appendChild(li);
+      });
+      if (!assumptions.length){
+        const li = document.createElement("li"); li.textContent = "None listed."; a.appendChild(li);
+      }
+
+      const m = $("#missingInfoList"); m.innerHTML = "";
+      missing.forEach((x)=>{
+        const li = document.createElement("li");
+        li.innerHTML = `${escapeHtml(x.text || "—")} ${x.evidence_ids?.length ? `<div class="chips">${renderEvidenceChips(x.evidence_ids)}</div>` : ""}`;
+        m.appendChild(li);
+      });
+      if (!missing.length){
+        const li = document.createElement("li"); li.textContent = "None listed."; m.appendChild(li);
+      }
+    }
+
+    function renderResearchPlan(){
+      const rp = data.decision_brief?.research_plan || {};
+      const pro = rp.pro_queries || [];
+      const con = rp.con_queries || [];
+      const tasks = rp.tasks || [];
+
+      $("#navResearch").textContent = `${(pro.length + con.length + tasks.length) || 0} items`;
+
+      const proEl = $("#proQueries"); proEl.innerHTML = "";
+      pro.forEach((q)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title"><span>${escapeHtml(q.title || "Pro query")}</span><span class="pill">PRO</span></p>
+          <p class="muted" style="margin:0">${escapeHtml(q.query || "")}</p>
+          <div class="chips">${renderEvidenceChips(q.evidence_ids || [])}</div>
+        `;
+        proEl.appendChild(item);
+      });
+      if (!pro.length){
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `<p class="muted" style="margin:0">No pro queries listed.</p>`;
+        proEl.appendChild(item);
+      }
+
+      const conEl = $("#conQueries"); conEl.innerHTML = "";
+      con.forEach((q)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title"><span>${escapeHtml(q.title || "Con query")}</span><span class="pill">CON</span></p>
+          <p class="muted" style="margin:0">${escapeHtml(q.query || "")}</p>
+          <div class="chips">${renderEvidenceChips(q.evidence_ids || [])}</div>
+        `;
+        conEl.appendChild(item);
+      });
+      if (!con.length){
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `<p class="muted" style="margin:0">No con queries listed.</p>`;
+        conEl.appendChild(item);
+      }
+
+      $("#tasksCount").textContent = `${tasks.length} tasks`;
+      const tEl = $("#researchTasks"); tEl.innerHTML = "";
+      tasks.forEach((t)=>{
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <p class="title">
+            <span>${escapeHtml(t.title || "Task")}</span>
+            <span class="pill">${escapeHtml((t.priority || "—").toUpperCase())}</span>
+          </p>
+          <div class="meta">
+            <span class="pill">Owner: ${escapeHtml(t.owner || "—")}</span>
+            <span class="pill">Status: ${escapeHtml((t.status || "todo").toUpperCase())}</span>
+          </div>
+        `;
+        tEl.appendChild(item);
+      });
+    }
+
+    function renderFollowups(){
+      const qs = data.decision_brief?.follow_up_questions || [];
+      $("#navFollowups").textContent = `${qs.length} q`;
+      const wrap = $("#followupQA");
+      wrap.innerHTML = "";
+
+      qs.forEach((q, idx)=>{
+        const div = document.createElement("div");
+        div.className = "q";
+        const id = q.id || `q_${idx+1}`;
+        div.innerHTML = `
+          <label for="${escapeHtml(id)}"><strong>Q${idx+1}.</strong> ${escapeHtml(q.question || "")}</label>
+          <textarea id="${escapeHtml(id)}" placeholder="Type your answer… (not saved)"></textarea>
+        `;
+        wrap.appendChild(div);
+      });
+
+      if (!qs.length){
+        const div = document.createElement("div");
+        div.className = "q";
+        div.innerHTML = `<p class="muted" style="margin:0">No follow-up questions listed.</p>`;
+        wrap.appendChild(div);
+      }
+    }
+
+    function renderEvidenceChips(evidenceIds){
+      if (!evidenceIds || !evidenceIds.length) return `<span class="muted2">No evidence linked.</span>`;
+      return evidenceIds.map((id)=> {
+        const safe = escapeHtml(id);
+        return `<button class="chip" type="button" data-evidence-chip="${safe}" aria-label="Jump to evidence ${safe}">
+          <span style="font-family:var(--mono);">${safe}</span>
+        </button>`;
+      }).join("");
+    }
+
+    function renderEvidence(){
+      const items = data.evidence_ledger?.items || [];
+      $("#navEvidence").textContent = `${items.length} items`;
+      $("#evidenceVerboseCount").textContent = `${items.length} items`;
+
+      evidenceById.clear();
+      items.forEach((it)=> evidenceById.set(it.evidence_id, it));
+
+      const tbody = $("#evidenceTbody");
+      tbody.innerHTML = "";
+      items.forEach((it)=>{
+        const tr = document.createElement("tr");
+        tr.dataset.evidenceId = it.evidence_id || "";
+        tr.innerHTML = `
+          <td>
+            <div class="evi-id">${escapeHtml(it.evidence_id || "—")}</div>
+            <div class="evi-tags">
+              ${(it.tags || []).slice(0,3).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
+            </div>
+          </td>
+          <td>
+            <div class="evi-snippet">${escapeHtml(it.snippet || "")}</div>
+            <div class="muted2" style="margin-top:6px;">${escapeHtml(it.created_at ? fmt.iso(it.created_at) : "")}</div>
+          </td>
+          <td>
+            <div class="evi-source">${escapeHtml(it.source?.label || "—")}</div>
+            <div class="muted2" style="margin-top:4px;">Type: ${escapeHtml(it.source?.type || "—")}</div>
+            <div class="muted2">Ref: <span style="font-family:var(--mono)">${escapeHtml(it.source?.ref || "—")}</span></div>
+          </td>
+        `;
+        tr.tabIndex = 0;
+        tr.addEventListener("click", ()=> selectEvidence(it.evidence_id, {scroll:false}));
+        tr.addEventListener("keydown", (e)=>{
+          if (e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            selectEvidence(it.evidence_id, {scroll:false});
+          }
+        });
+        tbody.appendChild(tr);
+      });
+
+      // verbose list
+      const v = $("#evidenceVerboseList");
+      v.innerHTML = "";
+      items.forEach((it)=>{
+        const div = document.createElement("div");
+        div.className = "item";
+        div.id = `verbose_${it.evidence_id}`;
+        div.innerHTML = `
+          <p class="title">
+            <span><span class="pill" style="font-family:var(--mono)">${escapeHtml(it.evidence_id || "—")}</span></span>
+            <span class="pill">${escapeHtml((it.source?.type || "—").toUpperCase())}</span>
+          </p>
+          <p class="muted" style="margin:0">${escapeHtml(it.source?.label || "—")}</p>
+          <div style="margin-top:10px;">
+            <pre aria-label="Full snippet for ${escapeHtml(it.evidence_id || "")}">${escapeHtml(it.snippet || "")}</pre>
+          </div>
+        `;
+        v.appendChild(div);
+      });
+
+      // wire chips
+      document.addEventListener("click", (e)=>{
+        const btn = e.target.closest("[data-evidence-chip]");
+        if (!btn) return;
+        const id = btn.getAttribute("data-evidence-chip");
+        selectEvidence(id, {scroll:true});
+      });
+
+      // evidence search
+      const input = $("#evidenceSearch");
+      input.addEventListener("input", ()=>{
+        const q = input.value.trim().toLowerCase();
+        filterEvidence(q);
+      });
+
+      // keyboard shortcut /
+      document.addEventListener("keydown", (e)=>{
+        if (e.key === "/" && !/input|textarea/i.test(document.activeElement?.tagName || "")){
+          e.preventDefault();
+          input.focus();
+        }
+        if (e.key === "Escape"){
+          clearEvidenceHighlight();
+          if (document.activeElement === input) input.blur();
+        }
+      });
+    }
+
+    function filterEvidence(q){
+      const rows = $$("#evidenceTbody tr");
+      let visible = 0;
+      rows.forEach((tr)=>{
+        const id = (tr.dataset.evidenceId || "").toLowerCase();
+        const it = evidenceById.get(tr.dataset.evidenceId);
+        const hay = [
+          id,
+          (it?.snippet || ""),
+          (it?.source?.label || ""),
+          (it?.source?.type || ""),
+          (it?.source?.ref || ""),
+          ...(it?.tags || [])
+        ].join(" ").toLowerCase();
+
+        const show = !q || hay.includes(q);
+        tr.style.display = show ? "" : "none";
+        if (show) visible++;
+      });
+
+      // If highlighted row filtered out, clear preview highlight to avoid confusion
+      if (highlightedEvidenceId){
+        const row = document.querySelector(`tr[data-evidence-id="${CSS.escape(highlightedEvidenceId)}"]`);
+        if (row && row.style.display === "none"){
+          clearEvidenceHighlight();
+        }
+      }
+
+      $("#navEvidence").textContent = `${visible}/${(data.evidence_ledger?.items || []).length} shown`;
+    }
+
+    function selectEvidence(evidenceId, {scroll}={scroll:true}){
+      if (!evidenceId) return;
+      const it = evidenceById.get(evidenceId);
+      if (!it) return;
+
+      // clear previous highlight
+      clearEvidenceHighlight(false);
+
+      highlightedEvidenceId = evidenceId;
+
+      // highlight row
+      const row = document.querySelector(`tr[data-evidence-id="${CSS.escape(evidenceId)}"]`);
+      if (row){
+        row.dataset.highlight = "true";
+        if (scroll){
+          row.scrollIntoView({behavior:"smooth", block:"center"});
+        }
+      }
+
+      // update preview panel
+      const p = $("#evidencePreview");
+      p.innerHTML = `
+        <div class="pill" style="display:inline-block; margin-bottom:10px; font-family:var(--mono);">${escapeHtml(it.evidence_id || "—")}</div>
+        <p style="margin:0 0 10px;">${escapeHtml(it.snippet || "")}</p>
+        <div class="hr"></div>
+        <div class="muted" style="font-size:12px;">
+          <div><strong>Source:</strong> ${escapeHtml(it.source?.label || "—")}</div>
+          <div><strong>Type:</strong> ${escapeHtml(it.source?.type || "—")}</div>
+          <div><strong>Ref:</strong> <span style="font-family:var(--mono)">${escapeHtml(it.source?.ref || "—")}</span></div>
+          <div><strong>Created:</strong> ${escapeHtml(it.created_at ? fmt.iso(it.created_at) : "—")}</div>
+          <div style="margin-top:8px;"><strong>Tags:</strong> ${(it.tags || []).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join(" ") || "<span class='muted2'>—</span>"}</div>
+        </div>
+      `;
+
+      // also ensure evidence section in view if invoked from elsewhere
+      if (scroll){
+        const sec = $("#evidence");
+        if (sec){
+          sec.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      }
+    }
+
+    function clearEvidenceHighlight(clearPreview=true){
+      const rows = $$("#evidenceTbody tr[data-highlight='true']");
+      rows.forEach(r => { r.dataset.highlight = "false"; r.removeAttribute("data-highlight"); });
+      highlightedEvidenceId = null;
+      if (clearPreview){
+        $("#evidencePreview").innerHTML = `<p class="muted">Select an evidence item to see details here.</p>`;
+      }
+    }
+
+    function renderRunMetadata(){
+      const rr = data.run_record || {};
+      $("#navRun").textContent = (rr.model_calls?.length ?? 0) + " calls";
+
+      const totals = rr.totals || {};
+      const kpis = [
+        {v: rr.run_id || "—", l:"Run ID"},
+        {v: rr.prompt_bundle_version || "—", l:"Prompt bundle"},
+        {v: (Number(totals.input_tokens||0) + Number(totals.output_tokens||0)) ? (Number(totals.input_tokens||0) + Number(totals.output_tokens||0)).toLocaleString() : "—", l:"Total tokens"},
+        {v: fmt.money(totals.cost_usd), l:"Total cost"}
+      ];
+      const kpiEl = $("#runKpis");
+      kpiEl.innerHTML = "";
+      kpis.forEach(k=>{
+        const box = document.createElement("div");
+        box.className = "box";
+        box.innerHTML = `<p class="v">${escapeHtml(k.v)}</p><p class="l">${escapeHtml(k.l)}</p>`;
+        kpiEl.appendChild(box);
+      });
+
+      $("#modelCallsCount").textContent = `${(rr.model_calls || []).length} calls`;
+
+      const tb = $("#modelCallsTbody");
+      tb.innerHTML = "";
+      (rr.model_calls || []).forEach((mc)=>{
+        const tr = document.createElement("tr");
+        const tokens = (Number(mc.input_tokens||0) + Number(mc.output_tokens||0)) || 0;
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(mc.model || "—")}</strong></td>
+          <td><span class="pill" style="font-family:var(--mono)">${escapeHtml(mc.prompt_version || "—")}</span></td>
+          <td>
+            <div>${tokens ? tokens.toLocaleString() : "—"}</div>
+            <div class="muted2">in: ${(mc.input_tokens ?? 0).toLocaleString()} · out: ${(mc.output_tokens ?? 0).toLocaleString()}</div>
+          </td>
+          <td>${escapeHtml(fmt.ms(mc.latency_ms))}</td>
+          <td>${escapeHtml(fmt.money(mc.cost_usd))}</td>
+        `;
+        tb.appendChild(tr);
+      });
+
+      const started = rr.started_at ? fmt.iso(rr.started_at) : "—";
+      const ended = rr.ended_at ? fmt.iso(rr.ended_at) : "—";
+      $("#runFootnote").textContent = `Started: ${started} • Ended: ${ended} • Total latency: ${fmt.ms(totals.latency_ms)}`;
+    }
+
+    function renderRawJson(){
+      const pre = $("#rawJsonPre");
+      pre.textContent = JSON.stringify(data, null, 2);
+    }
+
+    // =========================
+    // NAV ACTIVE STATE
+    // =========================
+    function setupActiveNav(){
+      const links = $$(".nav a[data-nav]");
+      const sections = links.map(a => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean);
+
+      // const obs = new IntersectionObserver((entries)=>{
+      //   // choose the one most visible / nearest top
+      //   const visible = entries
+      //     .filter(e => e.isIntersecting)
+      //     .sort((a,b)=> b.intersectionRatio - a.intersectionRatio);
+      //
+      //   // console.log("links", links.map(link => link.href))
+      //   // console.log("visible", visible)
+      //   if (visible.length){
+      //     const id = visible[0].target.id;
+      //     links.forEach(a=>{
+      //       const active = a.getAttribute("href") === `#${id}`;
+      //       a.setAttribute("aria-current", active ? "true" : "false");
+      //     });
+      //   }
+      // }, {root:null, threshold:[0.20, 0.35, 0.5, 0.65]});
+      //
+      // sections.forEach(s=>obs.observe(s));
+
+      // smooth scroll + focus management
+      links.forEach(a=>{
+        a.addEventListener("click", (e)=>{
+          const href = a.getAttribute("href");
+          if (!href || !href.startsWith("#")) return;
+          const target = document.getElementById(href.slice(1));
+          if (!target) return;
+          e.preventDefault();
+          // target.scrollIntoView({behavior:"smooth", block:"start"});
+          // console.log("target", target.id)
+          const id = target.id;
+          links.forEach(a=>{
+            const active = a.getAttribute("href") === `#${id}`;
+            a.setAttribute("aria-current", active ? "true" : "false");
+          });
+          window.scrollTo({
+            top: (target).offsetTop - 175,
+            behavior: "smooth",
+          });
+          // focus the section for accessibility
+          target.setAttribute("tabindex","-1");
+          target.focus({preventScroll:true});
+          setTimeout(()=> target.removeAttribute("tabindex"), 500);
+        });
+      });
+    }
+
+    // =========================
+    // INIT
+    // =========================
+    function init(){
+      renderHeader();
+      renderOverview();
+      renderReasonsNot();
+      renderClaims();
+      renderUnknowns();
+      renderResearchPlan();
+      renderFollowups();
+      renderEvidence();
+      renderRunMetadata();
+      renderRawJson();
+      setupActiveNav();
+
+      $("#clearHighlightBtn").addEventListener("click", ()=> clearEvidenceHighlight());
+
+      // counts
+      const items = data.evidence_ledger?.items || [];
+      $("#navEvidence").textContent = `${items.length} items`;
+    }
+
+    init();
+  </script>
+
+  <!--
+    ===========================================================
+    PASTE YOUR REAL JSON PAYLOAD HERE
+    ===========================================================
+    1) Find:   const data = { ... }
+    2) Replace the entire object with your payload.
+    3) Keep the marker comment if you want; it's optional.
+
+    Example:
+    const data = {
+      "case": {...},
+      "decision_brief": {...},
+      "evidence_ledger": {...},
+      "run_record": {...}
+    };
+  -->
+</body>
+</html>

@@ -1,0 +1,338 @@
+{
+  "case": {
+    "case_id": "case_017_041",
+    "case_type": "career_decision",
+    "created_at": "2026-01-27T02:10:00Z",
+    "updated_at": "2026-01-27T02:14:30Z",
+    "title": "Senior Frontend Engineer @ StartupX",
+    "status": "completed",
+    "user_context": {
+      "user_id": "user_001",
+      "timezone": "America/Denver"
+    },
+    "inputs": {
+      "resume_source": {
+        "type": "uploaded_doc",
+        "filename": "master_resume.md",
+        "content_type": "text/markdown",
+        "sha256": "4eea5a2d7b9e0d0f111111111111111111111111111111111111111111111111"
+      },
+      "job_description_source": {
+        "type": "pasted_text",
+        "origin": "LinkedIn",
+        "url": "https://example.com/jobs/123",
+        "sha256": "6f2f8b3c1a9b2c0d222222222222222222222222222222222222222222222222"
+      },
+      "profile": {
+        "location": "Denver, CO",
+        "work_auth": "US",
+        "salary_min": 160000,
+        "remote_only": true,
+        "preferences": {
+          "role_focus": ["frontend_architecture", "design_system"],
+          "stack": ["React", "TypeScript", "GraphQL"],
+          "avoid": ["heavy on-call"]
+        },
+        "constraints": {
+          "relocation": false
+        },
+        "links": {
+          "linkedin": "https://linkedin.com/in/example",
+          "github": "https://github.com/example"
+        }
+      }
+    }
+  },
+  "decision_brief": {
+    "brief_type": "career_decision",
+    "version": 2,
+    "created_at": "2026-01-27T02:14:30Z",
+    "job_title": "Senior Frontend Engineer",
+    "company": "StartupX",
+    "verdict": "consider",
+    "confidence": 0.74,
+    "confidence_notes": [
+      "Core React/TypeScript/GraphQL match is strong.",
+      "Next.js experience gap is material for this role; impact depends on how strict the team is.",
+      "Company/culture info is incomplete; decision could shift based on leadership/pace fit."
+    ],
+    "role_reality": {
+      "responsibilities": [
+        "Lead frontend architecture and component design decisions",
+        "Collaborate on GraphQL data modeling and client performance",
+        "Build/scale design system with reusable components"
+      ],
+      "implicit_expectations": [
+        "Comfort shipping quickly in startup environment",
+        "Able to own UI performance and reliability",
+        "Experience mentoring and setting standards"
+      ]
+    },
+    "fit_assessment": {
+      "overall_score": 78,
+      "breakdown": {
+        "skills": 85,
+        "experience": 80,
+        "domain_familiarity": 70,
+        "constraints": 90,
+        "preferences": 65
+      },
+      "strengths": [
+        {
+          "statement": "Strong match on React + TypeScript + GraphQL and frontend architecture focus.",
+          "evidence_ids": ["ev_resume_001", "ev_jd_001"],
+          "certainty": "likely"
+        },
+        {
+          "statement": "Mentorship/leadership experience aligns with senior expectations.",
+          "evidence_ids": ["ev_resume_004"],
+          "certainty": "likely"
+        }
+      ],
+      "gaps": [
+        {
+          "gap": "Limited Next.js experience (explicit requirement).",
+          "impact": "high",
+          "why_it_matters": "The role stack includes Next.js; lack of experience may reduce interview success or ramp speed.",
+          "evidence_ids": ["ev_jd_002", "ev_resume_006"]
+        },
+        {
+          "gap": "Limited startup experience (role expects startup pace).",
+          "impact": "medium",
+          "why_it_matters": "Hiring teams may prioritize candidates with startup delivery cadence and ambiguity tolerance.",
+          "evidence_ids": ["ev_jd_003", "ev_resume_007"]
+        }
+      ]
+    },
+    "reasons_not_to_apply": [
+      {
+        "statement": "If the team requires deep Next.js production experience from day one, you may be screened out early.",
+        "evidence_ids": ["ev_jd_002", "ev_resume_006"],
+        "certainty": "likely"
+      },
+      {
+        "statement": "If you strongly prefer enterprise stability, this Series B startup role may be a mismatch.",
+        "evidence_ids": ["ev_jd_003"],
+        "certainty": "uncertain"
+      }
+    ],
+    "engagement_strategy": {
+      "primary_path": "hiring_manager_outreach",
+      "secondary_path": "employee_referral",
+      "fallback_path": "optimized_application",
+      "rationale": [
+        "Front-door applications may be crowded; direct outreach increases probability of review.",
+        "Missing Next.js is a gap best addressed via narrative and quick portfolio proof."
+      ]
+    },
+    "positioning_angle": {
+      "headline": "Senior frontend architect who ships high-performance React + GraphQL UIs and mentors teams",
+      "emphasize": [
+        "frontend architecture decisions",
+        "performance and reliability outcomes",
+        "design system leadership",
+        "GraphQL client patterns"
+      ],
+      "de_emphasize": [
+        "lack of Next.js depth (address with a plan + quick proof project instead)",
+        "limited startup background"
+      ]
+    },
+    "next_actions": [
+      "Build a small Next.js proof project (1–2 days) showcasing routing/data fetching and performance basics.",
+      "Draft a concise outreach note to the hiring manager addressing Next.js gap with proof link.",
+      "Research company culture signals (pace, leadership stability, product maturity) before committing."
+    ],
+    "follow_up_questions": [
+      {
+        "id": "q_salary_band",
+        "question": "What salary range is acceptable for you if equity is included?",
+        "why_needed": "Comp misalignment is a common deal-breaker; helps refine verdict and negotiation plan."
+      },
+      {
+        "id": "q_startup_pace",
+        "question": "How comfortable are you with ambiguity and fast-changing priorities (startup pace)?",
+        "why_needed": "This directly affects culture fit and long-term satisfaction."
+      }
+    ],
+    "research_plan": {
+      "max_tasks": 3,
+      "tasks": [
+        {
+          "id": "rt_culture_pro",
+          "target": "Culture and engineering maturity signals",
+          "pro_query": "StartupX engineering blog design system Next.js GraphQL",
+          "con_query": "StartupX Glassdoor engineering leadership turnover burnout",
+          "why": "Culture fit is a high-impact unknown; gather pro and con signals to reduce confirmation bias.",
+          "source_hints": ["company_site", "engineering_blog", "Glassdoor", "LinkedIn_tenure"]
+        },
+        {
+          "id": "rt_role_reality",
+          "target": "Role reality and hiring urgency",
+          "pro_query": "StartupX Senior Frontend Engineer role responsibilities design system",
+          "con_query": "StartupX hiring freeze layoffs job posting real",
+          "why": "Validate role reality and reduce wasted effort on non-viable postings.",
+          "source_hints": ["news", "LinkedIn_company_posts", "team_member_profiles"]
+        }
+      ]
+    }
+  },
+  "evidence_journal": {
+    "ledger_version": 3,
+    "created_at": "2026-01-27T02:14:25Z",
+    "items": [
+      {
+        "evidence_id": "ev_jd_001",
+        "source_type": "job_description",
+        "source_uri": "https://example.com/jobs/123",
+        "chunk_id": "jd:1",
+        "snippet": "We are seeking a Senior Frontend Engineer... React, TypeScript, Next.js, GraphQL...",
+        "hash": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999",
+        "retrieved_at": "2026-01-27T02:10:10Z",
+        "tool_call_id": null,
+        "confidence": 0.95,
+        "tags": ["requirements", "stack"]
+      },
+      {
+        "evidence_id": "ev_jd_002",
+        "source_type": "job_description",
+        "source_uri": "https://example.com/jobs/123",
+        "chunk_id": "jd:2",
+        "snippet": "Tech stack: React, TypeScript, Next.js, GraphQL...",
+        "hash": "bbbbccccddddeeeeffff0000111122223333444455556666777788889999aaaa",
+        "retrieved_at": "2026-01-27T02:10:10Z",
+        "tool_call_id": null,
+        "confidence": 0.95,
+        "tags": ["nextjs", "must_have"]
+      },
+      {
+        "evidence_id": "ev_resume_001",
+        "source_type": "user_resume",
+        "source_uri": "master_resume.md",
+        "chunk_id": "resume:summary",
+        "snippet": "8+ years building React/TypeScript UIs, GraphQL clients, performance optimization...",
+        "hash": "ccccddddeeeeffff0000111122223333444455556666777788889999aaaabbbb",
+        "retrieved_at": "2026-01-27T02:10:00Z",
+        "tool_call_id": null,
+        "confidence": 0.9,
+        "tags": ["skills", "frontend_architecture"]
+      },
+      {
+        "evidence_id": "ev_resume_004",
+        "source_type": "user_resume",
+        "source_uri": "master_resume.md",
+        "chunk_id": "resume:leadership",
+        "snippet": "Mentored engineers, led frontend standards, reviewed architecture proposals...",
+        "hash": "ddddeeeeffff0000111122223333444455556666777788889999aaaabbbbcccc",
+        "retrieved_at": "2026-01-27T02:10:00Z",
+        "tool_call_id": null,
+        "confidence": 0.85,
+        "tags": ["mentorship", "leadership"]
+      },
+      {
+        "evidence_id": "ev_company_001",
+        "source_type": "company_research",
+        "source_uri": "https://startupx.com/blog/design-system",
+        "chunk_id": "web:design-system",
+        "snippet": "StartupX shares details about their design system and component library roadmap...",
+        "hash": "eeeeffff0000111122223333444455556666777788889999aaaabbbbccccdddd",
+        "retrieved_at": "2026-01-27T02:13:40Z",
+        "tool_call_id": "tool_company_research_01",
+        "confidence": 0.7,
+        "tags": ["culture_pro", "engineering_blog", "design_system"]
+      }
+    ],
+    "dedupe_notes": [
+      "Deduped 2 identical JD snippets by hash.",
+      "Kept highest-confidence snippet when duplicates found."
+    ]
+  },
+  "run_record": {
+    "run_id": "run_2026_01_27_001",
+    "created_at": "2026-01-27T02:10:05Z",
+    "ended_at": "2026-01-27T02:14:30Z",
+    "provider": "openai",
+    "prompt_bundle": {
+      "prompt_key": "career_decision.decider",
+      "prompt_version": 3,
+      "prompt_sha256": "111122223333444455556666777788889999aaaabbbbccccddddeeeeffff0000"
+    },
+    "iterations": 2,
+    "confidence_threshold": 0.7,
+    "repair_attempts": 1,
+    "model_calls": [
+      {
+        "step": "decider_v1",
+        "model": "gpt-4.1-2025-04-14",
+        "latency_ms": 1430.2,
+        "input_tokens": 3120,
+        "output_tokens": 820,
+        "total_tokens": 3940,
+        "estimated_cost_usd": 0.065,
+        "cache_hit": false,
+        "error": null
+      },
+      {
+        "step": "critic_v1",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "latency_ms": 620.5,
+        "input_tokens": 2100,
+        "output_tokens": 420,
+        "total_tokens": 2520,
+        "estimated_cost_usd": 0.010,
+        "cache_hit": false,
+        "error": null
+      },
+      {
+        "step": "decider_v2",
+        "model": "gpt-4.1-2025-04-14",
+        "latency_ms": 1189.9,
+        "input_tokens": 3560,
+        "output_tokens": 910,
+        "total_tokens": 4470,
+        "estimated_cost_usd": 0.075,
+        "cache_hit": true,
+        "error": null
+      }
+    ],
+    "totals": {
+      "total_latency_ms": 3240.6,
+      "total_tokens": 10930,
+      "estimated_cost_usd": 0.15
+    }
+  },
+  "artifacts": [
+    {
+      "artifact_id": "art_resume_001",
+      "type": "tailored_resume",
+      "format": "markdown",
+      "created_at": "2026-01-27T02:14:10Z",
+      "title": "Tailored Resume — Senior Frontend Engineer @ StartupX",
+      "summary": "Resume tailored to emphasize frontend architecture and GraphQL performance work; includes Next.js gap plan.",
+      "source_brief_version": 2,
+      "content": "# Walid Newaz\n...\n",
+      "sha256": "9999aaaabbbbccccddddeeeeffff000011112222333344445555666677778888",
+      "provenance": {
+        "model": "gpt-4.1-mini-2025-04-14",
+        "prompt_key": "career_artifact.resume",
+        "prompt_version": 1
+      }
+    },
+    {
+      "artifact_id": "art_outreach_001",
+      "type": "outreach_message",
+      "format": "text",
+      "created_at": "2026-01-27T02:14:20Z",
+      "title": "Hiring Manager Outreach",
+      "summary": "Short outreach emphasizing architecture outcomes and linking a Next.js proof project.",
+      "source_brief_version": 2,
+      "content": "Hi [Name] — I’m a senior frontend engineer focused on ...",
+      "sha256": "888877776666555544443333222211110000ffffeeeeddccbbbbaaaa99998888",
+      "provenance": {
+        "model": "gpt-4.1-mini-2025-04-14",
+        "prompt_key": "career_artifact.outreach",
+        "prompt_version": 1
+      }
+    }
+  ]
+}
