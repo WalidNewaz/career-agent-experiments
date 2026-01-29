@@ -793,31 +793,33 @@
                   <ul id="implicitExpList"></ul>
                 </div>
 
-                <div class="callout" id="summaryBox">
+                <!-- <div class="callout" id="summaryBox">
                   <h4>Decision summary</h4>
                   <p id="decisionSummary" class="muted">—</p>
                 </div>
+
                 <div class="callout" id="sensitivityBox">
                   <h4>Decision sensitivity</h4>
                   <p class="muted" id="decisionSensitivity">—</p>
                   <div class="chips" id="sensitivityChips"></div>
-                </div>
+                </div> -->
               </div>
 
               <div class="hr"></div>
 
               <div class="grid2">
-                <div>
+                <!-- <div>
                   <h4 style="margin:0 0 8px;font-size:13px;">Next actions</h4>
                   <div class="list" id="nextActions"></div>
-                </div>
+                </div> -->
+
                 <div>
                   <h4 style="margin:0 0 8px;font-size:13px;">Constraints & preferences</h4>
                   <div class="list" id="constraints"></div>
                 </div>
               </div>
 
-              <p class="footnote" id="overviewFootnote">—</p>
+              <!-- <p class="footnote" id="overviewFootnote">—</p> -->
             </div>
           </div>
         </section>
@@ -1475,6 +1477,12 @@
             }
           ]
         },
+        "constraints_and_preferences": [
+          {"label":"Location policy", "value":"Remote (US)"},
+          {"label":"Salary minimum (override)", "value":"$160,000"},
+          {"label":"Role rigor", "value":"Medium (startup posting style)"},
+          {"label":"Time-to-credibility", "value":"2–3 weeks for Next.js artifact + interview narratives"}
+        ],
         "reasons_not_to_apply": [
           {
             "statement": "If the team requires deep Next.js production experience from day one, you may be screened out early.",
@@ -1486,6 +1494,11 @@
             "evidence_ids": ["ev_jd_003"],
             "certainty": "uncertain"
           }
+        ],
+        "counterfactuals": [
+          {"title":"If team is flexible on Next.js and values architecture/mentorship", "impact":"strongly_positive", "evidence_ids":["evi_001","evi_002"]},
+          {"title":"If Next.js is non-negotiable day-1", "impact":"strongly_negative", "evidence_ids":["evi_003"]},
+          {"title":"If startup context requires cross-functional scrappiness", "impact":"negative", "evidence_ids":["evi_004"]}
         ],
         "engagement_strategy": {
           "primary_path": "hiring_manager_outreach",
@@ -1884,38 +1897,40 @@
 
 
       /* Summary section */
-      $("#decisionSummary").textContent = db.decision_summary || "—";
+      // $("#decisionSummary").textContent = db.decision_summary || "—";
+      //
+      // const sens = db.decision_sensitivity || {};
+      // $("#decisionSensitivity").textContent = "Key conditions that could change the verdict:";
+      // const chips = $("#sensitivityChips");
+      // chips.innerHTML = "";
+      // (sens.what_would_change || []).forEach((w, idx)=>{
+      //   const div = document.createElement("div");
+      //   div.className = "item";
+      //   div.innerHTML = `
+      //     <p class="title">${escapeHtml(w.label || `Sensitivity ${idx+1}`)} <span class="pill">condition</span></p>
+      //     <div class="chips">${renderEvidenceChips(w.evidence_ids || [])}</div>
+      //   `;
+      //   chips.appendChild(div);
+      // });
 
-      const sens = db.decision_sensitivity || {};
-      $("#decisionSensitivity").textContent = "Key conditions that could change the verdict:";
-      const chips = $("#sensitivityChips");
-      chips.innerHTML = "";
-      (sens.what_would_change || []).forEach((w, idx)=>{
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <p class="title">${escapeHtml(w.label || `Sensitivity ${idx+1}`)} <span class="pill">condition</span></p>
-          <div class="chips">${renderEvidenceChips(w.evidence_ids || [])}</div>
-        `;
-        chips.appendChild(div);
-      });
+      /* Next actions */
+      // const next = $("#nextActions");
+      // next.innerHTML = "";
+      // (db.next_actions || []).forEach((a)=>{
+      //   const item = document.createElement("div");
+      //   item.className = "item";
+      //   item.innerHTML = `
+      //     <p class="title">
+      //       <span>${escapeHtml(a.title || "Action")}</span>
+      //       <span class="pill">${escapeHtml((a.priority || "—").toUpperCase())}</span>
+      //     </p>
+      //     <p class="muted" style="margin:0">${escapeHtml(a.detail || "")}</p>
+      //     <div class="chips">${renderEvidenceChips(a.evidence_ids || [])}</div>
+      //   `;
+      //   next.appendChild(item);
+      // });
 
-      const next = $("#nextActions");
-      next.innerHTML = "";
-      (db.next_actions || []).forEach((a)=>{
-        const item = document.createElement("div");
-        item.className = "item";
-        item.innerHTML = `
-          <p class="title">
-            <span>${escapeHtml(a.title || "Action")}</span>
-            <span class="pill">${escapeHtml((a.priority || "—").toUpperCase())}</span>
-          </p>
-          <p class="muted" style="margin:0">${escapeHtml(a.detail || "")}</p>
-          <div class="chips">${renderEvidenceChips(a.evidence_ids || [])}</div>
-        `;
-        next.appendChild(item);
-      });
-
+      /* Constraints */
       const cons = $("#constraints");
       cons.innerHTML = "";
       (db.constraints_and_preferences || []).forEach((x)=>{
@@ -1928,12 +1943,13 @@
         cons.appendChild(item);
       });
 
-      const hint = db.ui_hints || {};
-      $("#overviewFootnote").textContent = hint.disclaimer
-        ? `${hint.disclaimer} • Last updated: ${hint.last_updated || "—"}`
-        : "—";
+      /* Footnote */
+      // const hint = db.ui_hints || {};
+      // $("#overviewFootnote").textContent = hint.disclaimer
+      //   ? `${hint.disclaimer} • Last updated: ${hint.last_updated || "—"}`
+      //   : "—";
 
-      $("#navOverview").textContent = (db.next_actions?.length ?? 0) + " actions";
+      // $("#navOverview").textContent = (db.next_actions?.length ?? 0) + " actions";
     }
 
     function renderReasonsNot(){
@@ -1941,7 +1957,7 @@
       const ul = $("#reasonsNotList");
       ul.innerHTML = "";
 
-      const reasons = db.reasons_not_to_proceed || [];
+      const reasons = db.reasons_not_to_apply || [];
       $("#navReasonsNot").textContent = reasons.length ? `${reasons.length} risks` : "—";
 
       if (!reasons.length){
@@ -1953,7 +1969,10 @@
           const li = document.createElement("li");
           li.innerHTML = `
             <div style="display:grid; gap:6px;">
-              <div><strong>${escapeHtml(r.reason || "—")}</strong> <span class="pill">${escapeHtml((r.severity||"—").toUpperCase())}</span></div>
+              <div>
+                <strong>${escapeHtml(r.statement || "—")}</strong>
+                <span class="pill">${escapeHtml((r.certainty||"—").toUpperCase())}</span>
+              </div>
               <div class="chips">${renderEvidenceChips(r.evidence_ids || [])}</div>
             </div>
           `;
