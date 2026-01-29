@@ -782,6 +782,17 @@
             </div>
             <div class="bd">
               <div class="grid2">
+
+                <div class="callout" id="roleAbout">
+                  <h4>What is this role actually about?</h4>
+                  <ul id="roleAboutList"></ul>
+                </div>
+
+                <div class="callout" id="implicitExpectations">
+                  <h4>Implicit Expectations</h4>
+                  <ul id="implicitExpList"></ul>
+                </div>
+
                 <div class="callout" id="summaryBox">
                   <h4>Decision summary</h4>
                   <p id="decisionSummary" class="muted">—</p>
@@ -808,6 +819,39 @@
 
               <p class="footnote" id="overviewFootnote">—</p>
             </div>
+          </div>
+        </section>
+
+        <!-- FIT ASSESSMENT -->
+        <section id="fit-assessment" aria-label="Fit assessment">
+          <div class="card">
+            <div class="hd">
+              <h3>Fit assessment</h3>
+              <div class="hint">Confidence scores.</div>
+            </div>
+
+            <div class="bd">
+              <div class="kpi" id="fitScores"></div>
+
+              <div class="hr"></div>
+            </div>
+
+            <div class="bd">
+              <div class="grid2">
+
+                <div class="callout" id="assessmentStrengths">
+                  <h4>Strengths</h4>
+                  <ul id="strengthsList"></ul>
+                </div>
+
+                <div class="callout" id="assessmentGaps">
+                  <h4>Gaps</h4>
+                  <ul id="gapsList"></ul>
+                </div>
+
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -1101,7 +1145,8 @@
     // =========================
     // Replace this entire object with your real payload.
     // IMPORTANT: Keep the same top-level keys: case, decision_brief, evidence_ledger, run_record.
-    /* const data = {
+
+    var data = {
       "case": {
         "case_id": "case_017_041",
         "title": "Senior Frontend Engineer — StartupX (Series B) vs Candidate cand_017",
@@ -1290,9 +1335,9 @@
           "cost_usd": 0.0633
         }
       }
-    }; */
+    };
 
-    const data = {
+    var data = {
       "case": {
         "case_id": "case_017_041",
         "case_type": "career_decision",
@@ -1346,22 +1391,52 @@
         "job_title": "Senior Frontend Engineer",
         "company": "StartupX",
         "verdict": "consider",
-        "confidence": 0.74,
-        "confidence_notes": [
-          "Core React/TypeScript/GraphQL match is strong.",
-          "Next.js experience gap is material for this role; impact depends on how strict the team is.",
-          "Company/culture info is incomplete; decision could shift based on leadership/pace fit."
-        ],
+        // "confidence": 0.74,
+        // "confidence_notes": [
+        //   "Core React/TypeScript/GraphQL match is strong.",
+        //   "Next.js experience gap is material for this role; impact depends on how strict the team is.",
+        //   "Company/culture info is incomplete; decision could shift based on leadership/pace fit."
+        // ],
+        "confidence": {
+          "band": "high",
+          "score_0_1": 0.78,
+          // "coverage_note": "Evidence covers core role fit; missing a direct Next.js project artifact and comp alignment confirmation."
+          "coverage_note": "Refers to completeness of data not success odds!"
+        },
         "role_reality": {
           "responsibilities": [
-            "Lead frontend architecture and component design decisions",
-            "Collaborate on GraphQL data modeling and client performance",
-            "Build/scale design system with reusable components"
+            {
+              "description": "Lead frontend architecture and component design decisions",
+              "severity": "high",
+              "evidence_ids":["evi_003"]
+            },
+            {
+              "description": "Collaborate on GraphQL data modeling and client performance",
+              "severity": "high",
+              "evidence_ids":["evi_003"]
+            },
+            {
+              "description": "Build/scale design system with reusable components",
+              "severity": "high",
+              "evidence_ids":["evi_003"]
+            },
           ],
           "implicit_expectations": [
-            "Comfort shipping quickly in startup environment",
-            "Able to own UI performance and reliability",
-            "Experience mentoring and setting standards"
+            {
+              "description": "Comfort shipping quickly in startup environment",
+              "severity": "high",
+              "evidence_ids":["evi_003"]
+            },
+            {
+              "description": "Able to own UI performance and reliability",
+              "severity": "high",
+              "evidence_ids":["evi_003"]
+            },
+            {
+              "description": "Experience mentoring and setting standards",
+              "severity": "high",
+              "evidence_ids":["evi_003"]
+            },
           ]
         },
         "fit_assessment": {
@@ -1753,6 +1828,62 @@
 
     function renderOverview(){
       const db = data.decision_brief || {};
+
+      /* Role About */
+      // #roleAboutList
+
+      const about_ul = $("#roleAboutList");
+      about_ul.innerHTML = "";
+
+      const role_about = db.role_reality?.responsibilities || [];
+      // $("#roleAboutList").textContent = role_about.length ? `${role_about.length}` : "—";
+
+      if (!role_about.length){
+        const li = document.createElement("li");
+        li.textContent = "No role responsibilities listed.";
+        about_ul.appendChild(li);
+      } else {
+        role_about.forEach((r)=>{
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <div style="display:grid; gap:6px;">
+              <div><strong>${escapeHtml(r.description || "—")}</strong> <span class="pill">${escapeHtml((r.severity||"—").toUpperCase())}</span></div>
+              <div class="chips">${renderEvidenceChips(r.evidence_ids || [])}</div>
+            </div>
+          `;
+          about_ul.appendChild(li);
+        });
+      }
+
+
+      /* Implicit Expectations */
+      // # implicitExpList
+
+      const implicit_ul = $("#implicitExpList");
+      implicit_ul.innerHTML = "";
+
+      const implicit_expectations = db.role_reality?.implicit_expectations || [];
+      // $("#implicitExpList").textContent = implicit_expectations.length ? `${implicit_expectations.length}` : "—";
+
+      if (!implicit_expectations.length){
+        const li = document.createElement("li");
+        li.textContent = "No implicit expectations listed.";
+        implicit_ul.appendChild(li);
+      } else {
+        implicit_expectations.forEach((r)=>{
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <div style="display:grid; gap:6px;">
+              <div><strong>${escapeHtml(r.description || "—")}</strong> <span class="pill">${escapeHtml((r.severity||"—").toUpperCase())}</span></div>
+              <div class="chips">${renderEvidenceChips(r.evidence_ids || [])}</div>
+            </div>
+          `;
+          implicit_ul.appendChild(li);
+        });
+      }
+
+
+      /* Summary section */
       $("#decisionSummary").textContent = db.decision_summary || "—";
 
       const sens = db.decision_sensitivity || {};
@@ -2195,6 +2326,88 @@
       }
     }
 
+    function renderFitAssessment() {
+      const db = data.decision_brief || {};
+
+      /* Scores */
+      const fcEl = $("#fitScores");
+      fcEl.innerHTML = "";
+
+      const scores = [
+        {v: db.fit_assessment.overall_score || "—", l:"Overall Score"},
+        {v: db.fit_assessment.breakdown.skills || "—", l:"Skills"},
+        {v: db.fit_assessment.breakdown.experience || "—", l:"Experience"},
+        {v: db.fit_assessment.breakdown.domain_familiarity || "—", l:"Domain Familiarity"},
+        {v: db.fit_assessment.breakdown.constraints || "—", l:"Constraints"},
+        {v: db.fit_assessment.breakdown.preferences || "—", l:"Preferences"},
+      ];
+      scores.forEach(k=>{
+        const box = document.createElement("div");
+        box.className = "box";
+        box.innerHTML = `<p class="v">${escapeHtml(k.v)}</p><p class="l">${escapeHtml(k.l)}</p>`;
+        fcEl.appendChild(box);
+      });
+
+      /* Strengths */
+      // #roleAboutList
+
+      const s_ul = $("#strengthsList");
+      s_ul.innerHTML = "";
+
+      const strengths = db.fit_assessment?.strengths || [];
+      // $("#roleAboutList").textContent = role_about.length ? `${role_about.length}` : "—";
+
+      if (!strengths.length){
+        const li = document.createElement("li");
+        li.textContent = "No assessed strengths listed.";
+        s_ul.appendChild(li);
+      } else {
+        strengths.forEach((s)=>{
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <div style="display:grid; gap:6px;">
+              <div>
+                <strong>${escapeHtml(s.statement || "—")}</strong>
+                <span class="pill">${escapeHtml((s.certainty||"—").toUpperCase())}</span>
+              </div>
+              <div class="chips">${renderEvidenceChips(s.evidence_ids || [])}</div>
+            </div>
+          `;
+          s_ul.appendChild(li);
+        });
+      }
+
+      /* Gaps */
+      const g_ul = $("#gapsList");
+      g_ul.innerHTML = "";
+
+      const gaps = db.fit_assessment?.gaps || [];
+      // $("#roleAboutList").textContent = role_about.length ? `${role_about.length}` : "—";
+
+      if (!gaps.length){
+        const li = document.createElement("li");
+        li.textContent = "No assessed gaps listed.";
+        g_ul.appendChild(li);
+      } else {
+        gaps.forEach((g)=>{
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <div style="display:grid; gap:6px;">
+              <div>
+                <strong>${escapeHtml(g.gap || "—")}</strong>
+                <span class="pill">${escapeHtml((g.impact||"—").toUpperCase())}</span>
+              </div>
+              <div>
+                <span>${escapeHtml(g.why_it_matters || "—")}</span>
+              </div>
+              <div class="chips">${renderEvidenceChips(g.evidence_ids || [])}</div>
+            </div>
+          `;
+          g_ul.appendChild(li);
+        });
+      }
+    }
+
     function renderRunMetadata(){
       const rr = data.run_record || {};
       $("#navRun").textContent = (rr.model_calls?.length ?? 0) + " calls";
@@ -2304,6 +2517,7 @@
     function init(){
       renderHeader();
       renderOverview();
+      renderFitAssessment();
       renderReasonsNot();
       renderClaims();
       renderUnknowns();
