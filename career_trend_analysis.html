@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Career Fit Dashboard (Concise)</title>
+
+  <!-- Plotly for fast, insightful charts -->
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <!-- numeric.js for lightweight linear algebra (PCA) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 16px; color: #111; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; flex: 1 1 320px; }
+    .kpi { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 10px; }
+    .kpi .tile { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px; }
+    .kpi .label { font-size: 12px; color: #6b7280; }
+    .kpi .value { font-size: 18px; font-weight: 700; margin-top: 2px; }
+    textarea { width: 100%; min-height: 190px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
+    button { padding: 10px 12px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; }
+    button:hover { background: #f9fafb; }
+    .muted { color: #6b7280; font-size: 12px; }
+    .h { font-weight: 700; margin: 0 0 6px 0; }
+    .list { margin: 8px 0 0; padding-left: 18px; }
+    .pill { display:inline-block; padding: 2px 8px; border: 1px solid #e5e7eb; border-radius: 999px; font-size: 12px; margin-right: 6px; }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 980px) { .kpi { grid-template-columns: 1fr 1fr; } .grid2 { grid-template-columns: 1fr; } }
+    .small { font-size: 12px; }
+    .hr { height: 1px; background: #e5e7eb; margin: 10px 0; }
+  </style>
+</head>
+
+<body>
+  <h2 style="margin:0 0 6px 0;">Career Insight Dashboard</h2>
+  <div class="muted">
+    Shows the <b>6 highest-impact</b> signals from ~N job briefs: (1) Top Weighted Gaps, (2) Gap Priorities,
+    (3) Realistic Role Clusters, (4) Salary Market View, (5) Fit/Confidence Calibration, (6) Prep Plan.
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="row">
+    <div class="card" style="flex: 1 1 520px;">
+      <div class="h">Input</div>
+      <div class="muted">
+        Paste JSON and click <b>Render</b>. This demo includes an example dataset (~25 jobs).
+        In your NextJS app, you’ll replace the example generator with your real Decision Brief + JD analysis output.
+      </div>
+      <div style="margin-top:8px;">
+        <textarea id="input"></textarea>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <button id="btnExample">Load example (25)</button>
+        <button id="btnRender">Render</button>
+        <span id="status" class="muted"></span>
+      </div>
+    </div>
+
+    <div class="card" style="flex: 1 1 420px;">
+      <div class="h">What this page is for</div>
+      <ul class="list small">
+        <li><b>Largest true gaps</b> across many roles (weighted; not all gaps matter equally)</li>
+        <li><b>What to prepare for</b> next (gap urgency/importance)</li>
+        <li><b>Most realistic target clusters</b> (roles similar to each other + closest to your profile)</li>
+        <li><b>Salary market view</b> (distribution by cluster + trend by time if provided)</li>
+        <li><b>Calibration</b> (are your high-confidence calls actually converting?)</li>
+        <li><b>Actionable prep plan</b> (top 5 highest ROI)</li>
+      </ul>
+      <div class="muted" style="margin-top:10px;">
+        Clicking a gap bar highlights which role clusters demand it most.
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- KPI tiles -->
+  <div class="kpi" style="margin-bottom:12px;">
+    <div class="tile">
+      <div class="label">Jobs analyzed</div>
+      <div class="value" id="k_jobs">—</div>
+    </div>
+    <div class="tile">
+      <div class="label">Median salary (market)</div>
+      <div class="value" id="k_median_salary">—</div>
+    </div>
+    <div class="tile">
+      <div class="label">Top gap (weighted)</div>
+      <div class="value" id="k_top_gap">—</div>
+    </div>
+    <div class="tile">
+      <div class="label">Most realistic cluster</div>
+      <div class="value" id="k_cluster">—</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="h">1) Top Weighted Gaps (Market-Weighted)</div>
+      <div class="muted">Weight = frequency × requirement strength × missing penalty. Click a bar to drill.</div>
+      <div id="chart_gaps" style="height:320px;"></div>
+      <div class="muted" id="gaps_hint"></div>
+    </div>
+
+    <div class="card">
+      <div class="h">2) Gap Priorities (Do Next)</div>
+      <div class="muted">Urgency = how often it’s <b>must-have</b>. Importance = weighted gap score.</div>
+      <div id="chart_gap_priority" style="height:320px;"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:12px;">
+    <div class="card">
+      <div class="h">3) Role Clusters (Realistic Targets)</div>
+      <div class="muted">
+        Jobs clustered by stack/domain keywords (PCA → 2D). Cluster “realism” favors higher fit + fewer critical gaps.
+      </div>
+      <div id="chart_clusters" style="height:360px;"></div>
+      <div class="muted" id="cluster_hint"></div>
+    </div>
+
+    <div class="card">
+      <div class="h">4) Salary Market View</div>
+      <div class="muted">
+        Distribution by cluster (box plots). If dates exist, you’ll also get a trend line.
+      </div>
+      <div id="chart_salary" style="height:360px;"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:12px;">
+    <div class="card">
+      <div class="h">5) Fit vs Outcome (Calibration)</div>
+      <div class="muted">
+        Not causation—just whether “high confidence / high fit” tends to move forward more often.
+      </div>
+      <div id="chart_calibration" style="height:320px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="h">6) Prep Plan (Highest ROI)</div>
+      <div class="muted">Concise next steps based on the top weighted gaps.</div>
+      <div id="prep_plan"></div>
+    </div>
+  </div>
+
+<script>
+/**
+ * =========================
+ * INPUT SHAPE (recommended)
+ * =========================
+ * {
+ *   "candidate": {
+ *     "id": "cand_017",
+ *     "known_skills": ["React","TypeScript","GraphQL","Performance"],
+ *     "constraints": { "remote_only": true, "salary_min": 160000 }
+ *   },
+ *   "jobs": [
+ *     {
+ *       "id": "job_001",
+ *       "date": "2026-01-10",
+ *       "title": "Senior Frontend Engineer",
+ *       "company": { "name": "X", "stage": "Series B", "domain": "B2B SaaS", "location_policy":"Remote" },
+ *       "salary": { "min": 160000, "max": 210000, "currency":"USD" },
+ *       "stack": ["React","TypeScript","Next.js","GraphQL"],
+ *       "requirements": [
+ *         { "gap":"Next.js", "strength":"must" | "nice", "candidate_has": false },
+ *         ...
+ *       ],
+ *       "fit": 0..100,
+ *       "confidence": 0..100,
+ *       "strategy": { "channel": "hiring_manager_outreach" },
+ *       "outcome": { "stage": "applied|screen|interview|offer|rejection|none" }
+ *     }
+ *   ]
+ * }
+ */
+
+const $ = (s)=>document.querySelector(s);
+
+const UI = {
+  input: $("#input"),
+  status: $("#status"),
+  k_jobs: $("#k_jobs"),
+  k_median_salary: $("#k_median_salary"),
+  k_top_gap: $("#k_top_gap"),
+  k_cluster: $("#k_cluster"),
+  gaps_hint: $("#gaps_hint"),
+  cluster_hint: $("#cluster_hint"),
+  prep_plan: $("#prep_plan"),
+};
+
+function safeJsonParse(txt){
+  try { return {ok:true, value: JSON.parse(txt)}; }
+  catch(e){ return {ok:false, error: e.message || String(e)}; }
+}
+
+function median(arr){
+  const a = arr.filter(x => Number.isFinite(x)).slice().sort((x,y)=>x-y);
+  if(!a.length) return null;
+  const mid = Math.floor(a.length/2);
+  return a.length%2 ? a[mid] : (a[mid-1]+a[mid])/2;
+}
+
+function pct(x){
+  if(x == null) return "—";
+  return Math.round(x*100) + "%";
+}
+
+function normalizeGapName(s){
+  const t = String(s||"").trim();
+  const low = t.toLowerCase();
+  if(low.includes("next")) return "Next.js";
+  if(low.includes("startup")) return "Startup experience";
+  if(low.includes("kubernetes") || low === "k8s") return "Kubernetes";
+  if(low.includes("system design") || low.includes("architecture")) return "Frontend architecture";
+  if(low.includes("performance") || low.includes("web vitals")) return "Frontend performance";
+  if(low.includes("testing")) return "Testing";
+  if(low.includes("graphql")) return "GraphQL depth";
+  if(low.includes("security")) return "Security";
+  if(low.includes("java") || low.includes("spring")) return "Java/Spring";
+  if(low.includes("css")) return "Modern CSS";
+  return t;
+}
+
+function strengthWeight(strength){
+  const s = String(strength||"").toLowerCase();
+  if(s === "must" || s === "required") return 1.0;
+  if(s === "strong") return 0.8;
+  if(s === "nice" || s === "preferred") return 0.4;
+  return 0.6;
+}
+
+function outcomeScore(stage){
+  const s = String(stage||"none").toLowerCase();
+  if(s === "offer") return 3;
+  if(s === "interview") return 2;
+  if(s === "screen") return 1;
+  if(s === "rejection") return -2;
+  return 0;
+}
+
+function salaryMid(job){
+  const min = job?.salary?.min, max = job?.salary?.max;
+  if(Number.isFinite(min) && Number.isFinite(max)) return (min+max)/2;
+  if(Number.isFinite(min)) return min;
+  if(Number.isFinite(max)) return max;
+  return null;
+}
+
+function buildGapStats(jobs){
+  // Weighted gap scoring:
+  // score(gap) = Σ over jobs: [missing?] * (strengthWeight) * (1 + fitPenaltyBoost)
+  // plus urgency (must-have frequency).
+  const stats = new Map(); // gap -> {score, mustN, totalN, missingN, examples:[]}
+  for(const j of jobs){
+    const reqs = Array.isArray(j.requirements) ? j.requirements : [];
+    for(const r of reqs){
+      const gap = normalizeGapName(r.gap || r.name);
+      if(!gap) continue;
+      const w = strengthWeight(r.strength);
+      const has = (r.candidate_has === true);
+      const missing = !has;
+      const fit = Number.isFinite(j.fit) ? j.fit : 60;
+      const fitBoost = (missing ? (1 + (Math.max(0, 70 - fit) / 140)) : 0); // missing hurts more if fit already borderline
+      const add = missing ? w * fitBoost : 0;
+
+      if(!stats.has(gap)) stats.set(gap, {gap, score:0, mustN:0, totalN:0, missingN:0, examples:[]});
+      const s = stats.get(gap);
+      s.totalN += 1;
+      if(String(r.strength||"").toLowerCase() === "must") s.mustN += 1;
+      if(missing) {
+        s.score += add;
+        s.missingN += 1;
+        if(s.examples.length < 4) s.examples.push({job_id:j.id, title:j.title, company:j.company?.name, strength:r.strength});
+      }
+    }
+  }
+  const arr = [...stats.values()];
+  // importance: normalize score
+  const maxScore = Math.max(0.0001, ...arr.map(x=>x.score));
+  for(const g of arr){
+    g.importance = g.score / maxScore; // 0..1
+    g.urgency = g.totalN ? (g.mustN / g.totalN) : 0; // 0..1
+    g.missingRate = g.totalN ? (g.missingN / g.totalN) : 0; // 0..1
+  }
+  // Sort by score desc
+  arr.sort((a,b)=>b.score-a.score);
+  return arr;
+}
+
+function vectorizeJobs(jobs){
+  // Simple feature vector: stack tokens + domain + stage + title keywords (sparse → dense)
+  const tokenSet = new Set();
+  const tokenize = (j) => {
+    const toks = [];
+    (j.stack||[]).forEach(x=>toks.push("stack:"+String(x)));
+    if(j.company?.domain) toks.push("domain:"+String(j.company.domain));
+    if(j.company?.stage) toks.push("stage:"+String(j.company.stage));
+    String(j.title||"").split(/\W+/).filter(Boolean).slice(0,6).forEach(w=>toks.push("title:"+w.toLowerCase()));
+    return toks;
+  };
+  const jobTokens = jobs.map(j => tokenize(j));
+  jobTokens.forEach(ts => ts.forEach(t => tokenSet.add(t)));
+  const vocab = [...tokenSet.values()].slice(0,200); // cap to keep it light
+  const idx = new Map(vocab.map((t,i)=>[t,i]));
+
+  const X = jobs.map((j, rowIdx) => {
+    const v = Array(vocab.length).fill(0);
+    for(const t of jobTokens[rowIdx]){
+      const k = idx.get(t);
+      if(k != null) v[k] = 1;
+    }
+    // add scalar signals (fit, salary presence)
+    v.push(Number.isFinite(j.fit) ? j.fit/100 : 0.6);
+    v.push(Number.isFinite(j.confidence) ? j.confidence/100 : 0.6);
+    const sm = salaryMid(j);
+    v.push(Number.isFinite(sm) ? sm/250000 : 0.0);
+    return v;
+  });
+
+  return { X, vocabPlus: vocab.concat(["fit","confidence","salaryMidNorm"]) };
+}
+
+function pca2D(X){
+  // PCA via SVD on centered data
+  const A = X.map(r=>r.slice());
+  const m = A.length;
+  const n = A[0]?.length || 0;
+  if(m < 3 || n < 2) return X.map(()=>[0,0]);
+
+  // center columns
+  const colMeans = Array(n).fill(0);
+  for(const r of A) for(let j=0;j<n;j++) colMeans[j] += r[j];
+  for(let j=0;j<n;j++) colMeans[j] /= m;
+  for(const r of A) for(let j=0;j<n;j++) r[j] -= colMeans[j];
+
+  // numeric.svd requires rows >= cols.
+  // If m < n, do SVD on transpose and use U (left singular vectors) as V for A.
+  let V_like; // will hold the right singular vectors for A (shape n x n-ish)
+  if(m >= n){
+    const svd = numeric.svd(A);
+    V_like = svd.V; // n x n
+  } else {
+    const AT = numeric.transpose(A); // n x m (now rows >= cols)
+    const svdT = numeric.svd(AT);
+    // For A^T = V S U^T, svdT.U is V (right singular vectors of A)
+    V_like = svdT.U; // n x m
+  }
+
+  // Take first 2 principal directions (columns 0 and 1)
+  const pc1 = V_like.map(row => row[0]);
+  const pc2 = V_like.map(row => row[1]);
+
+  // project onto 2D
+  return A.map(r => [dot(r, pc1), dot(r, pc2)]);
+}
+
+
+function dot(a,b){
+  let s=0;
+  for(let i=0;i<a.length;i++) s += a[i]*b[i];
+  return s;
+}
+
+function kmeans(points, k=4, iters=20){
+  // points: [[x,y],...]
+  const n = points.length;
+  if(n === 0) return {labels:[], centroids:[]};
+  k = Math.max(2, Math.min(k, n));
+
+  // init: pick evenly spaced points
+  const centroids = [];
+  for(let i=0;i<k;i++){
+    centroids.push(points[Math.floor(i*(n-1)/(k-1))].slice());
+  }
+
+  const labels = Array(n).fill(0);
+
+  for(let it=0; it<iters; it++){
+    // assign
+    for(let i=0;i<n;i++){
+      let best=0, bestD=Infinity;
+      for(let c=0;c<k;c++){
+        const d = dist2(points[i], centroids[c]);
+        if(d < bestD){ bestD = d; best = c; }
+      }
+      labels[i] = best;
+    }
+    // recompute
+    const sums = Array.from({length:k}, ()=>[0,0,0]); // x,y,count
+    for(let i=0;i<n;i++){
+      const c = labels[i];
+      sums[c][0] += points[i][0];
+      sums[c][1] += points[i][1];
+      sums[c][2] += 1;
+    }
+    for(let c=0;c<k;c++){
+      if(sums[c][2] > 0){
+        centroids[c][0] = sums[c][0]/sums[c][2];
+        centroids[c][1] = sums[c][1]/sums[c][2];
+      }
+    }
+  }
+
+  return {labels, centroids};
+}
+
+function dist2(a,b){
+  const dx=a[0]-b[0], dy=a[1]-b[1];
+  return dx*dx+dy*dy;
+}
+
+function clusterRealismScore(jobsInCluster, gapStatsByName){
+  // Higher realism if: higher avg fit, fewer top-importance missing gaps
+  const fits = jobsInCluster.map(j=>Number.isFinite(j.fit)?j.fit:60);
+  const avgFit = fits.reduce((s,x)=>s+x,0)/Math.max(1,fits.length);
+
+  // Count critical missing gaps among top 6 gaps
+  const topCritical = [...gapStatsByName.values()]
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,6)
+    .map(x=>x.gap);
+
+  let critMissing = 0;
+  for(const j of jobsInCluster){
+    const reqs = j.requirements||[];
+    for(const r of reqs){
+      const g = normalizeGapName(r.gap);
+      if(topCritical.includes(g) && r.candidate_has === false && String(r.strength).toLowerCase()==="must"){
+        critMissing += 1;
+      }
+    }
+  }
+  const penalty = critMissing / Math.max(1, jobsInCluster.length);
+  return { avgFit, score: avgFit - 20*penalty };
+}
+
+function renderPrepPlan(topGaps){
+  const library = {
+    "Next.js": [
+      "Build a small Next.js app with SSR/ISR + caching; deploy it.",
+      "Add a performance pass: Web Vitals + bundle analysis."
+    ],
+    "Startup experience": [
+      "Reframe with proxies: shipped projects, ownership scope, iteration speed.",
+      "Collect 2–3 “startup-style” stories with measurable impact."
+    ],
+    "Kubernetes": [
+      "Learn just enough: deploy a containerized app + read logs/metrics.",
+      "Be ready to discuss tradeoffs, not just YAML."
+    ],
+    "Frontend architecture": [
+      "Prepare a short architecture talk-track: design system, state, performance.",
+      "Write a 1–2 page “frontend RFC” sample."
+    ],
+    "Frontend performance": [
+      "Create a repeatable perf checklist and apply it to a demo app.",
+      "Be ready with profiling screenshots + before/after metrics."
+    ],
+    "Testing": [
+      "Increase testing depth: unit + integration + component tests.",
+      "Practice testing async UI + mocks."
+    ]
+  };
+
+  const ul = document.createElement("ul");
+  ul.className = "list";
+  ul.style.marginTop = "6px";
+
+  topGaps.slice(0,5).forEach((g,i)=>{
+    const li = document.createElement("li");
+    const steps = library[g.gap] || ["Create a focused mini-project that proves this capability.", "Write a concise story: what you did, why, and results."];
+    li.innerHTML = `<b>${escapeHtml(g.gap)}</b> <span class="pill">priority #${i+1}</span><br/>
+      <span class="muted">${escapeHtml(steps[0])}</span><br/>
+      <span class="muted">${escapeHtml(steps[1])}</span>`;
+    li.style.marginBottom = "10px";
+    ul.appendChild(li);
+  });
+
+  UI.prep_plan.innerHTML = "";
+  UI.prep_plan.appendChild(ul);
+}
+
+function escapeHtml(s){
+  return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+}
+
+function renderAll(data){
+  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+  if(!jobs.length){
+    UI.status.textContent = "No jobs found in input.";
+    return;
+  }
+
+  // --- Gap stats (weighted) ---
+  const gapStats = buildGapStats(jobs);
+  const gapByName = new Map(gapStats.map(g=>[g.gap, g]));
+
+  // --- KPIs ---
+  const salaries = jobs.map(salaryMid).filter(Number.isFinite);
+  const medSal = median(salaries);
+  UI.k_jobs.textContent = String(jobs.length);
+  UI.k_median_salary.textContent = medSal ? `$${Math.round(medSal/1000)}k` : "—";
+  UI.k_top_gap.textContent = gapStats[0] ? gapStats[0].gap : "—";
+
+  // --- Clustering / embedding ---
+  const { X } = vectorizeJobs(jobs);
+  const pts2 = pca2D(X);
+
+  // choose k with a simple heuristic: sqrt(n/2), capped
+  const k = Math.max(3, Math.min(6, Math.round(Math.sqrt(jobs.length/2))));
+  const km = kmeans(pts2, k, 25);
+  const labels = km.labels;
+
+  // cluster realism ranking
+  const clusters = Array.from({length:k}, (_,ci)=>{
+    const js = jobs.filter((_,i)=>labels[i]===ci);
+    const realism = clusterRealismScore(js, gapByName);
+    return { cluster: ci, n: js.length, jobs: js, ...realism };
+  }).sort((a,b)=>b.score-a.score);
+
+  const bestCluster = clusters[0];
+  UI.k_cluster.textContent = bestCluster ? `Cluster ${bestCluster.cluster} (fit≈${Math.round(bestCluster.avgFit)})` : "—";
+
+  // =====================
+  // 1) Top Weighted Gaps
+  // =====================
+  const topN = 10;
+  const top = gapStats.slice(0, topN);
+  Plotly.newPlot("chart_gaps", [{
+    type: "bar",
+    x: top.map(g=>g.score),
+    y: top.map(g=>g.gap),
+    orientation: "h",
+    hovertemplate:
+      "<b>%{y}</b><br>" +
+      "Weighted score: %{x:.2f}<br>" +
+      "Must-rate: %{customdata[0]}<br>" +
+      "Missing-rate: %{customdata[1]}<extra></extra>",
+    customdata: top.map(g=>[pct(g.urgency), pct(g.missingRate)])
+  }], {
+    margin: {l: 140, r: 16, t: 10, b: 30},
+    xaxis: {title: "Weighted gap score"},
+    yaxis: {automargin:true}
+  }, {displayModeBar: false});
+
+  UI.gaps_hint.textContent =
+    top[0] ? `Top gap "${top[0].gap}" is missing in ${pct(top[0].missingRate)} of relevant requirement mentions.` : "";
+
+  // Click a gap bar → highlight clusters that demand it most
+  const gapsDiv = document.getElementById("chart_gaps");
+  gapsDiv.on("plotly_click", (ev)=>{
+    const gap = ev?.points?.[0]?.y;
+    if(!gap) return;
+
+    // demand per cluster: must-have mentions where candidate missing
+    const demand = Array.from({length:k}, ()=>({mustMissing:0, mustTotal:0}));
+    for(let i=0;i<jobs.length;i++){
+      const ci = labels[i];
+      for(const r of (jobs[i].requirements||[])){
+        if(normalizeGapName(r.gap) !== gap) continue;
+        if(String(r.strength).toLowerCase()==="must"){
+          demand[ci].mustTotal += 1;
+          if(r.candidate_has === false) demand[ci].mustMissing += 1;
+        }
+      }
+    }
+    const ranked = demand.map((d,ci)=>({
+      cluster: ci,
+      rate: d.mustTotal ? d.mustMissing/d.mustTotal : 0,
+      mustTotal: d.mustTotal
+    })).sort((a,b)=>b.rate-a.rate);
+
+    UI.cluster_hint.innerHTML =
+      `<span class="pill">Selected gap: <b>${escapeHtml(gap)}</b></span>` +
+      `<span class="pill">Most impacted cluster: <b>${ranked[0].cluster}</b> (${pct(ranked[0].rate)} must-missing)</span>`;
+    // also re-render cluster chart with emphasis
+    renderClusterChart(jobs, pts2, labels, clusters, ranked[0].cluster);
+  });
+
+  // ======================
+  // 2) Gap Priority Matrix
+  // ======================
+  Plotly.newPlot("chart_gap_priority", [{
+    type: "scatter",
+    mode: "markers+text",
+    x: top.map(g=>g.urgency),
+    y: top.map(g=>g.importance),
+    text: top.map(g=>g.gap),
+    textposition: "top center",
+    marker: { size: top.map(g=>10 + 25*g.missingRate) },
+    hovertemplate:
+      "<b>%{text}</b><br>" +
+      "Urgency (must-rate): %{x:.2f}<br>" +
+      "Importance: %{y:.2f}<br>" +
+      "Missing-rate: %{customdata}<extra></extra>",
+    customdata: top.map(g=>pct(g.missingRate))
+  }], {
+    margin: {l: 45, r: 10, t: 10, b: 45},
+    xaxis: {title:"Urgency (must-have frequency)", range:[0,1]},
+    yaxis: {title:"Importance (normalized weight)", range:[0,1]}
+  }, {displayModeBar:false});
+
+  // ======================
+  // 3) Role Cluster Scatter
+  // ======================
+  renderClusterChart(jobs, pts2, labels, clusters, bestCluster?.cluster);
+
+  // ======================
+  // 4) Salary view by cluster
+  // ======================
+  const salaryTraces = [];
+  for(const c of clusters){
+    const vals = c.jobs.map(salaryMid).filter(Number.isFinite);
+    if(!vals.length) continue;
+    salaryTraces.push({
+      type: "box",
+      name: `Cluster ${c.cluster}`,
+      y: vals,
+      boxpoints: false
+    });
+  }
+
+  // optional trend line if dates exist (overall)
+  const dated = jobs
+    .map(j => ({d: j.date ? new Date(j.date) : null, s: salaryMid(j)}))
+    .filter(x=>x.d && Number.isFinite(x.s))
+    .sort((a,b)=>a.d-b.d);
+
+  if(dated.length >= 6){
+    salaryTraces.push({
+      type: "scatter",
+      mode: "lines+markers",
+      name: "Trend (mid)",
+      y: dated.map(x=>x.s),
+      x: dated.map(x=>x.d.toISOString().slice(0,10)),
+      yaxis: "y2"
+    });
+  }
+
+  Plotly.newPlot("chart_salary", salaryTraces, {
+    margin: {l: 55, r: 55, t: 10, b: 40},
+    yaxis: {title: "Salary (USD)"},
+    yaxis2: dated.length >= 6
+      ? {title: "Trend", overlaying:"y", side:"right", showgrid:false}
+      : undefined,
+    xaxis: {title: dated.length >= 6 ? "Date (trend only)" : ""}
+  }, {displayModeBar:false});
+
+  // ======================
+  // 5) Calibration chart
+  // ======================
+  // Bubble: x=fit, y=confidence, size=outcomeScore shifted, color=channel
+  const channels = [...new Set(jobs.map(j=>j.strategy?.channel || "unknown"))];
+  const traces = channels.map(ch=>{
+    const js = jobs.filter(j=>(j.strategy?.channel||"unknown")===ch);
+    return {
+      type:"scatter",
+      mode:"markers",
+      name: ch,
+      x: js.map(j=>Number.isFinite(j.fit)?j.fit:60),
+      y: js.map(j=>Number.isFinite(j.confidence)?j.confidence:60),
+      marker: {
+        size: js.map(j=>12 + 6*Math.max(0, outcomeScore(j.outcome?.stage))),
+        opacity: 0.8
+      },
+      customdata: js.map(j=>[j.title, j.company?.name, j.outcome?.stage || "none"]),
+      hovertemplate:
+        "<b>%{customdata[0]}</b><br>" +
+        "%{customdata[1]}<br>" +
+        "Fit: %{x:.0f}, Conf: %{y:.0f}<br>" +
+        "Outcome: %{customdata[2]}<extra></extra>"
+    };
+  });
+
+  Plotly.newPlot("chart_calibration", traces, {
+    margin: {l: 45, r: 10, t: 10, b: 45},
+    xaxis: {title:"Fit", range:[0,100]},
+    yaxis: {title:"Confidence", range:[0,100]},
+    shapes: [
+      // quadrant guides
+      {type:"line", x0:70, x1:70, y0:0, y1:100, line:{width:1}},
+      {type:"line", x0:0, x1:100, y0:75, y1:75, line:{width:1}},
+    ],
+    annotations: [
+      {x:85,y:88,text:"High fit/high conf", showarrow:false, font:{size:12}, opacity:0.7},
+      {x:35,y:88,text:"Low fit/high conf (optimism risk)", showarrow:false, font:{size:12}, opacity:0.7},
+      {x:85,y:40,text:"High fit/low conf (underselling)", showarrow:false, font:{size:12}, opacity:0.7},
+    ]
+  }, {displayModeBar:false});
+
+  // ======================
+  // 6) Prep Plan
+  // ======================
+  renderPrepPlan(gapStats);
+
+  UI.status.textContent = `Rendered ${jobs.length} jobs. Clusters: ${k}.`;
+}
+
+function renderClusterChart(jobs, pts2, labels, clusters, emphasizeCluster){
+  // Compute hover + cluster legend
+  const k = clusters.length;
+  const traces = [];
+  for(const c of clusters){
+    const xs = [], ys = [], custom = [];
+    for(let i=0;i<jobs.length;i++){
+      if(labels[i] !== c.cluster) continue;
+      xs.push(pts2[i][0]);
+      ys.push(pts2[i][1]);
+      custom.push([jobs[i].title, jobs[i].company?.name || "—", jobs[i].company?.domain || "—", jobs[i].fit, jobs[i].confidence]);
+    }
+    traces.push({
+      type:"scatter",
+      mode:"markers",
+      name:`Cluster ${c.cluster} (n=${c.n})`,
+      x: xs,
+      y: ys,
+      marker: {
+        size: xs.map((_,idx)=>{
+          const fit = custom[idx][3]; // fit
+          return 8 + 10*(Number.isFinite(fit)?fit/100:0.6);
+        }),
+        opacity: (emphasizeCluster==null ? 0.85 : (c.cluster===emphasizeCluster ? 0.95 : 0.25)),
+        line: {width: (c.cluster===emphasizeCluster ? 2 : 0)}
+      },
+      customdata: custom,
+      hovertemplate:
+        "<b>%{customdata[0]}</b><br>" +
+        "%{customdata[1]} · %{customdata[2]}<br>" +
+        "Fit: %{customdata[3]:.0f}, Conf: %{customdata[4]:.0f}<extra></extra>"
+    });
+  }
+
+  Plotly.newPlot("chart_clusters", traces, {
+    margin: {l: 35, r: 10, t: 10, b: 35},
+    xaxis: {title:"Embedding X", zeroline:false},
+    yaxis: {title:"Embedding Y", zeroline:false},
+    showlegend: true,
+    legend: {orientation:"h"}
+  }, {displayModeBar:false});
+
+  const best = clusters[0];
+  UI.cluster_hint.textContent = best
+    ? `Most realistic target cluster: Cluster ${best.cluster} (avg fit≈${Math.round(best.avgFit)}).`
+    : "";
+}
+
+// ==============================
+// Example data generator (25 jobs)
+// ==============================
+function exampleDataset(){
+  const cand = {
+    id: "cand_017",
+    known_skills: ["React","TypeScript","GraphQL","Frontend architecture","Frontend performance"],
+    constraints: { remote_only: true, salary_min: 160000 }
+  };
+
+  const roles = [
+    {title:"Senior Frontend Engineer", domain:"B2B SaaS", stage:"Series B", base:["React","TypeScript","GraphQL"]},
+    {title:"Frontend Platform Engineer", domain:"DevTools", stage:"Series A", base:["React","TypeScript","Next.js"]},
+    {title:"Staff UI Engineer", domain:"FinTech", stage:"Public", base:["React","TypeScript","Performance"]},
+    {title:"Full Stack Engineer", domain:"Enterprise", stage:"Private", base:["React","TypeScript","Java","Spring Boot"]},
+    {title:"Senior Web Engineer", domain:"E-commerce", stage:"Series C", base:["React","TypeScript","Next.js"]},
+  ];
+
+  const gapPool = [
+    {gap:"Next.js", strength:"must", p:0.55},
+    {gap:"Startup experience", strength:"nice", p:0.35},
+    {gap:"Kubernetes", strength:"nice", p:0.35},
+    {gap:"Frontend performance", strength:"must", p:0.30},
+    {gap:"Testing", strength:"must", p:0.28},
+    {gap:"GraphQL", strength:"nice", p:0.25},
+    {gap:"Security", strength:"nice", p:0.18},
+    {gap:"Java/Spring", strength:"must", p:0.18},
+    {gap:"Frontend architecture", strength:"nice", p:0.22},
+    {gap:"Modern CSS", strength:"nice", p:0.20},
+  ];
+
+  function hasSkill(g){
+    const n = normalizeGapName(g);
+    return cand.known_skills.map(normalizeGapName).includes(n) ||
+           cand.known_skills.map(x=>String(x).toLowerCase()).includes(String(g).toLowerCase());
+  }
+
+  function rand(a,b){ return a + Math.random()*(b-a); }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  const jobs = [];
+  for(let i=1;i<=25;i++){
+    const r = pick(roles);
+    const remote = Math.random() < 0.75 ? "Remote" : "Hybrid";
+    const baseSalary = r.title.includes("Staff") ? rand(200000, 270000) :
+                       r.title.includes("Platform") ? rand(180000, 240000) :
+                       r.title.includes("Full Stack") ? rand(160000, 220000) :
+                       rand(165000, 235000);
+
+    const reqs = [];
+    for(const g of gapPool){
+      if(Math.random() < g.p){
+        const candHas = hasSkill(g.gap);
+        // downgrade some "must" to "nice" randomly
+        const strength = (Math.random() < 0.15) ? "nice" : g.strength;
+        reqs.push({gap:g.gap, strength, candidate_has: candHas});
+      }
+    }
+
+    // ensure some structure
+    if(!reqs.find(x=>normalizeGapName(x.gap)==="Next.js") && Math.random()<0.55){
+      reqs.push({gap:"Next.js", strength:"must", candidate_has: hasSkill("Next.js")});
+    }
+
+    // fit heuristic: penalize must-missing gaps & constraint mismatch
+    let fit = 78;
+    for(const req of reqs){
+      const missing = req.candidate_has === false;
+      if(missing && String(req.strength).toLowerCase()==="must") fit -= 12;
+      if(missing && String(req.strength).toLowerCase()!=="must") fit -= 6;
+    }
+    if(remote==="Hybrid" && cand.constraints.remote_only) fit -= 20;
+    fit = Math.max(10, Math.min(95, fit + rand(-6, 6)));
+
+    const confidence = Math.max(20, Math.min(95, fit + rand(-10, 10)));
+
+    const outcomeStages = ["none","applied","screen","interview","rejection","offer"];
+    const stage = (Math.random()<0.55) ? "none" : pick(outcomeStages);
+    const channel = (Math.random()<0.35) ? "cold_apply" : (Math.random()<0.55 ? "hiring_manager_outreach" : "recruiter_inbound");
+
+    jobs.push({
+      id: `job_${String(i).padStart(3,"0")}`,
+      date: `2026-01-${String(Math.min(30, i)).padStart(2,"0")}`,
+      title: r.title,
+      company: { name: `Company${i}`, stage: r.stage, domain: r.domain, location_policy: remote },
+      salary: { min: Math.round(baseSalary*0.92/1000)*1000, max: Math.round(baseSalary*1.08/1000)*1000, currency:"USD" },
+      stack: Array.from(new Set(r.base.concat(["React","TypeScript"]))),
+      requirements: reqs,
+      fit: Math.round(fit),
+      confidence: Math.round(confidence),
+      strategy: { channel },
+      outcome: { stage }
+    });
+  }
+
+  return { candidate: cand, jobs };
+}
+
+// Wiring
+$("#btnExample").addEventListener("click", ()=>{
+  UI.input.value = JSON.stringify(exampleDataset(), null, 2);
+  UI.status.textContent = "Loaded example.";
+});
+
+$("#btnRender").addEventListener("click", ()=>{
+  const r = safeJsonParse(UI.input.value.trim());
+  if(!r.ok){
+    UI.status.textContent = "Invalid JSON: " + r.error;
+    return;
+  }
+  renderAll(r.value);
+});
+
+// Boot with example
+UI.input.value = JSON.stringify(exampleDataset(), null, 2);
+renderAll(exampleDataset());
+</script>
+</body>
+</html>

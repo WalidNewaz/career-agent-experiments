@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Decision Analytics Report — case_017_041</title>
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.08);
+      --stroke: rgba(255,255,255,0.12);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.70);
+      --faint: rgba(255,255,255,0.55);
+      --good: #66e3a1;
+      --warn: #ffd166;
+      --bad: #ff6b6b;
+      --info: #7aa7ff;
+      --chip: rgba(255,255,255,0.10);
+      --shadow: 0 18px 50px rgba(0,0,0,0.45);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --radius: 14px;
+    }
+
+    *{ box-sizing: border-box; }
+    html,body{ height: 100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(900px 700px at 12% 12%, rgba(122,167,255,0.22), transparent 55%),
+        radial-gradient(900px 700px at 85% 22%, rgba(102,227,161,0.18), transparent 55%),
+        radial-gradient(800px 600px at 50% 95%, rgba(255,209,102,0.10), transparent 55%),
+        linear-gradient(180deg, #070b16 0%, #0b1020 60%, #080b16 100%);
+      overflow-x:hidden;
+    }
+
+    a{ color: inherit; }
+    button, input{
+      font: inherit;
+      color: inherit;
+    }
+
+    .app{
+      display:grid;
+      grid-template-columns: 320px 1fr 420px;
+      gap: 16px;
+      padding: 18px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    header{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+    }
+
+    .titleBlock{ display:flex; flex-direction:column; gap: 6px; }
+    .titleRow{
+      display:flex; gap: 10px; align-items:center; flex-wrap:wrap;
+    }
+    h1{
+      font-size: 16px;
+      letter-spacing: 0.2px;
+      margin:0;
+      font-weight: 640;
+    }
+    .subtitle{
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .pillRow{ display:flex; gap: 8px; flex-wrap:wrap; margin-top: 2px; }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .pill b{ color: var(--text); font-weight: 650; }
+    .dot{
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--info);
+      box-shadow: 0 0 0 4px rgba(122,167,255,0.14);
+    }
+    .dot.good{ background: var(--good); box-shadow: 0 0 0 4px rgba(102,227,161,0.14); }
+    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 4px rgba(255,209,102,0.14); }
+    .dot.bad { background: var(--bad);  box-shadow: 0 0 0 4px rgba(255,107,107,0.14); }
+
+    .actions{
+      display:flex; gap: 10px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.05);
+      cursor:pointer;
+      transition: transform .04s ease, background .15s ease, border-color .15s ease;
+      font-size: 12.5px;
+      color: var(--text);
+    }
+    .btn:hover{ background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.secondary{ color: var(--muted); }
+    .btn.danger{ border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.08); }
+    .btn.good{ border-color: rgba(102,227,161,0.35); background: rgba(102,227,161,0.08); }
+    .btn .k{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--faint);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.18);
+    }
+
+    /* Panels */
+    .panel{
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.04);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+    .panelHeader{
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .panelHeader h2{
+      margin:0;
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+    }
+    .panelHeader .meta{
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .panelBody{ padding: 12px; }
+
+    /* Left nav */
+    .nav{
+      position: sticky;
+      top: 104px;
+      height: calc(100vh - 124px);
+      overflow:auto;
+    }
+    .nav .section{
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav .section:last-child{ border-bottom: none; }
+    .nav a{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      text-decoration:none;
+      padding: 8px 8px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25;
+      cursor:pointer;
+    }
+    .nav a:hover{
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.10);
+    }
+    .nav a.active{
+      background: rgba(122,167,255,0.12);
+      color: var(--text);
+      border-color: rgba(122,167,255,0.22);
+    }
+    .nav .badge{
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.10);
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      margin-left:auto;
+      white-space:nowrap;
+    }
+
+    /* Main content */
+    .main{
+      min-width: 0;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .card{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 1200px){
+      .app{ grid-template-columns: 300px 1fr; }
+      .evidencePane{ grid-column: 1 / -1; }
+    }
+    @media (max-width: 860px){
+      .app{ grid-template-columns: 1fr; }
+      .nav{ position: relative; top: 0; height: auto; }
+      header{ position: relative; top: 0; }
+      .twoCol{ grid-template-columns: 1fr; }
+    }
+
+    .kv{
+      display:grid;
+      grid-template-columns: 160px 1fr;
+      gap: 6px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .kv b{ color: var(--text); font-weight: 600; }
+    .kv .k{ color: var(--faint); }
+
+    /* Chips + evidence trace */
+    .chips{ display:flex; flex-wrap:wrap; gap: 8px; margin-top: 8px; }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      font-size: 12px;
+      color: var(--muted);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .04s ease, background .15s ease, border-color .15s ease;
+    }
+    .chip:hover{ background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.22); color: var(--text); }
+    .chip:active{ transform: translateY(1px); }
+    .chip .tag{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,0.72);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+    }
+
+    .labelRow{
+      display:flex; gap: 10px; flex-wrap:wrap; align-items:center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .label{
+      display:inline-flex; align-items:center; gap: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: var(--muted);
+    }
+    .label .dot{ width: 7px; height: 7px; box-shadow:none; }
+    .label.good .dot{ background: var(--good); }
+    .label.warn .dot{ background: var(--warn); }
+    .label.bad  .dot{ background: var(--bad); }
+
+    .prose{
+      margin-top: 10px;
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .prose ul{ margin: 8px 0 0 18px; padding:0; }
+    .prose li{ margin: 6px 0; }
+    .prose b{ color: var(--text); font-weight: 650; }
+
+    /* Coverage bar */
+    .meter{
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 999px;
+      overflow:hidden;
+      background: rgba(255,255,255,0.05);
+      height: 12px;
+    }
+    .meter > div{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(122,167,255,0.9), rgba(102,227,161,0.9));
+      transition: width .6s ease;
+    }
+    .meterRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .meterRow b{ color: var(--text); font-weight: 650; }
+
+    /* Evidence pane */
+    .evidencePane{
+      position: sticky;
+      top: 104px;
+      height: calc(100vh - 124px);
+      overflow:auto;
+    }
+    .searchRow{
+      display:flex; gap: 10px; padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+    .searchRow input{
+      width: 100%;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.22);
+      outline: none;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .searchRow input:focus{
+      border-color: rgba(122,167,255,0.45);
+      box-shadow: 0 0 0 4px rgba(122,167,255,0.14);
+    }
+
+    .evidenceList{ padding: 10px 12px 16px; display:flex; flex-direction:column; gap: 10px; }
+    .eItem{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      padding: 10px 10px 10px;
+      transition: background .15s ease, border-color .15s ease, transform .08s ease;
+    }
+    .eItem:hover{ background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.16); }
+    .eItem.highlight{
+      border-color: rgba(255,209,102,0.55);
+      box-shadow: 0 0 0 4px rgba(255,209,102,0.12);
+      background: rgba(255,209,102,0.06);
+      transform: translateY(-1px);
+    }
+    .eHead{
+      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .eId{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.18);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .eSrc{
+      font-size: 11.5px;
+      color: var(--faint);
+      text-align:right;
+    }
+    .eClaim{
+      font-size: 12.5px;
+      color: var(--text);
+      font-weight: 620;
+      margin: 2px 0 6px;
+      line-height: 1.25;
+    }
+    .eSnippet{
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,0.72);
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 8px 10px;
+      border-radius: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Modal */
+    .modalBackdrop{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 999;
+    }
+    .modalBackdrop.open{ display:flex; }
+    .modal{
+      width: min(900px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(13,18,35,0.92);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+      overflow:hidden;
+      backdrop-filter: blur(12px);
+    }
+    .modalHeader{
+      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .modalHeader h3{ margin:0; font-size: 13px; font-weight: 650; }
+    .modalBody{
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,0.80);
+      background: rgba(0,0,0,0.22);
+      max-height: 70vh;
+      overflow:auto;
+      white-space: pre;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.45);
+      color: rgba(255,255,255,0.88);
+      font-size: 12.5px;
+      display:none;
+      z-index: 999;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+    }
+    .toast.show{ display:block; }
+    .muted{ color: var(--muted); }
+    .small{ font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="panel">
+      <div class="titleBlock">
+        <div class="titleRow">
+          <h1>Decision Analytics Report</h1>
+          <span class="pill"><span class="dot info"></span><b id="caseId"></b></span>
+          <span class="pill"><span class="dot warn" id="verdictDot"></span><b id="verdict"></b></span>
+          <span class="pill"><span class="dot info"></span><b id="scenarioTag"></b></span>
+        </div>
+        <div class="subtitle" id="headerSubtitle"></div>
+        <div class="pillRow">
+          <span class="pill"><span class="dot good"></span>Remote alignment</span>
+          <span class="pill"><span class="dot warn"></span>Next.js gap</span>
+          <span class="pill"><span class="dot info"></span>Design system uncertainty</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" id="btnCopyLink" title="Copy link to current section"><span>Copy section link</span><span class="k">L</span></button>
+        <button class="btn secondary" id="btnExportJSON" title="Export current data as JSON"><span>Export JSON</span><span class="k">J</span></button>
+        <button class="btn danger" id="btnClearHighlights" title="Clear evidence highlights"><span>Clear highlights</span><span class="k">Esc</span></button>
+      </div>
+    </header>
+
+    <!-- Left: navigation -->
+    <aside class="panel nav" id="navPane" aria-label="Sections">
+      <div class="panelHeader">
+        <h2>Report Sections</h2>
+        <div class="meta"><span id="navCompleteness"></span>% complete</div>
+      </div>
+      <div class="section" id="navLinks"></div>
+
+      <div class="section">
+        <div class="small">Quick filters</div>
+        <div class="chips" style="margin-top:10px">
+          <div class="chip" data-filter="fatal"><span class="tag">risk</span>Fatal blockers</div>
+          <div class="chip" data-filter="unknown"><span class="tag">unc</span>Uncertainties</div>
+          <div class="chip" data-filter="evidence"><span class="tag">ev</span>Evidence-backed</div>
+        </div>
+        <div class="small" style="margin-top:10px">
+          Tip: Click any evidence chip to jump + highlight in the ledger.
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center: main content -->
+    <main class="main" id="main">
+      <div class="grid">
+
+        <!-- Snapshot -->
+        <section class="panel" id="sec_snapshot" data-title="Snapshot">
+          <div class="panelHeader">
+            <h2>Snapshot</h2>
+            <div class="meta">Brief + constraints (no persuasion)</div>
+          </div>
+          <div class="panelBody">
+            <div class="twoCol">
+              <div class="card" id="briefCard"></div>
+              <div class="card" id="signalsCard"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 1 Coverage -->
+        <section class="panel" id="sec_coverage" data-title="1. Decision Coverage Analysis">
+          <div class="panelHeader">
+            <h2>1. Decision Coverage Analysis</h2>
+            <div class="meta">What’s evaluated vs missing</div>
+          </div>
+          <div class="panelBody">
+            <div class="card" id="coverageCard"></div>
+          </div>
+        </section>
+
+        <!-- 2 Confidence -->
+        <section class="panel" id="sec_confidence" data-title="2. Confidence Calibration Review">
+          <div class="panelHeader">
+            <h2>2. Confidence Calibration Review</h2>
+            <div class="meta">Over/under-confidence checks</div>
+          </div>
+          <div class="panelBody">
+            <div class="card" id="confidenceCard"></div>
+          </div>
+        </section>
+
+        <!-- 3 Gap severity -->
+        <section class="panel" id="sec_gaps" data-title="3. Gap Severity & Risk Analysis">
+          <div class="panelHeader">
+            <h2>3. Gap Severity &amp; Risk Analysis</h2>
+            <div class="meta">Ranked by decision impact</div>
+          </div>
+          <div class="panelBody">
+            <div class="card" id="gapsCard"></div>
+          </div>
+        </section>
+
+        <!-- 4 Bias -->
+        <section class="panel" id="sec_bias" data-title="4. Anti-Confirmation Bias Check">
+          <div class="panelHeader">
+            <h2>4. Anti-Confirmation Bias Check</h2>
+            <div class="meta">Reasons not to apply</div>
+          </div>
+          <div class="panelBody">
+            <div class="card" id="biasCard"></div>
+          </div>
+        </section>
+
+        <!-- 5 Plan -->
+        <section class="panel" id="sec_plan" data-title="5. Actionable Clarification Plan">
+          <div class="panelHeader">
+            <h2>5. Actionable Clarification Plan</h2>
+            <div class="meta">Smallest set of high-yield actions</div>
+          </div>
+          <div class="panelBody">
+            <div class="card" id="planCard"></div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Right: Evidence Ledger -->
+    <aside class="panel evidencePane" id="evidencePane" aria-label="Evidence Ledger">
+      <div class="panelHeader" style="position: sticky; top: 0; z-index: 11;">
+        <h2>Evidence Ledger</h2>
+        <div class="meta"><span id="eCount"></span> items</div>
+      </div>
+      <div class="searchRow">
+        <input id="eSearch" placeholder="Search evidence: id, claim, snippet, source..." />
+      </div>
+      <div class="evidenceList" id="eList"></div>
+    </aside>
+  </div>
+
+  <!-- Modal for export -->
+  <div class="modalBackdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-label="Export JSON">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3>Export JSON</h3>
+        <button class="btn secondary" id="btnCloseModal">Close</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ----------------------------
+    // DATA (synthetic fixture-based)
+    // ----------------------------
+    const DATA = {
+      meta: {
+        case_id: "case_017_041",
+        scenario_tag: "stretch_fit_missing_nextjs",
+        verdict: "consider",
+        salary_min: 160000,
+        timezone: "America/Denver",
+        generated_at: new Date().toISOString()
+      },
+      job: {
+        id: "jd_041",
+        job_title: "Senior Frontend Engineer",
+        company: "StartupX (fictional)",
+        company_size: "51–200",
+        stage: "Series B",
+        domain: "B2B SaaS",
+        location_policy: "Remote (US)",
+        tech_stack: ["React", "TypeScript", "Next.js", "GraphQL"],
+        role_theme: ["frontend_architecture", "design_system"],
+        requirements_rigor: "medium",
+        posting_style: "startup"
+      },
+      candidate: {
+        id: "cand_017",
+        archetype: "senior_frontend_engineer",
+        seniority: "senior",
+        years_experience: 8,
+        domain: "FinTech",
+        company_background: "enterprise",
+        tech_focus: ["React", "TypeScript", "GraphQL", "Performance"],
+        strength_profile: ["frontend_architecture", "mentorship"],
+        gap_profile: ["no_nextjs", "limited_startup_experience"],
+        preferences: ["remote"]
+      },
+      decision_brief: {
+        decision_goal: "Decide whether to apply and how to position candidacy",
+        primary_channel_expected: "hiring_manager_outreach",
+        verdict_expected: "consider",
+        confidence_stated: 0.72,         // synthetic
+        confidence_recommended_range: [0.50, 0.62],
+        decision_completeness_pct: 55,
+        alignments: [
+          { text: "React + TypeScript overlap (core stack match)", evidence_ids: ["E-002","E-007"] },
+          { text: "GraphQL overlap (core API layer match)", evidence_ids: ["E-002","E-007"] },
+          { text: "Frontend architecture strength aligns with role theme (but outcomes unknown)", evidence_ids: ["E-003","E-008"] },
+          { text: "Remote preference matches role location policy", evidence_ids: ["E-006","E-010"] }
+        ],
+        gaps: [
+          {
+            id: "G-001",
+            title: "Next.js experience is missing (explicit stack requirement)",
+            impact: "high",
+            classification: "potential_fatal_blocker",
+            disguised_uncertainty: false,
+            evidence_ids: ["E-004","E-007"]
+          },
+          {
+            id: "G-002",
+            title: "Design system ownership not evidenced (role explicitly values it)",
+            impact: "high",
+            classification: "disguised_uncertainty",
+            disguised_uncertainty: true,
+            evidence_ids: ["E-008"]
+          },
+          {
+            id: "G-003",
+            title: "Limited startup experience vs Series B context",
+            impact: "medium_high",
+            classification: "mitigatable_with_narrative",
+            disguised_uncertainty: false,
+            evidence_ids: ["E-005","E-009"]
+          }
+        ],
+        unknowns: [
+          "Design system depth: tokens, governance, accessibility, adoption metrics",
+          "Actual Next.js requirements: App Router / SSR / RSC / edge / migration vs greenfield",
+          "Compensation band for the role",
+          "Proof-of-impact artifacts: metrics, shipped outcomes, portfolio",
+          "Interview format and screening filters"
+        ],
+        top_missing_inputs: [
+          { text: "Clarify Next.js depth + candidate adjacent evidence / ramp proof", reason: "Next.js may be a hard filter", tag: "fatal" },
+          { text: "Design system ownership evidence (or confirm scope is light)", reason: "Role theme explicitly includes design_system", tag: "unknown" },
+          { text: "Proof-of-impact artifacts (2–3 quantified stories)", reason: "Current brief lacks outcome evidence", tag: "unknown" }
+        ]
+      },
+      analytics_report: {
+        coverage: {
+          fully_evaluated: [
+            { text: "Core stack overlap: React / TypeScript / GraphQL", evidence_ids: ["E-002","E-007"] },
+            { text: "Explicit Next.js platform gap", evidence_ids: ["E-004","E-007"] },
+            { text: "Remote alignment", evidence_ids: ["E-006","E-010"] },
+            { text: "Coarse seniority plausibility (8 YOE, senior tag)", evidence_ids: ["E-001"] }
+          ],
+          partially_evaluated: [
+            { text: "Frontend architecture fit (alignment present, but outcomes unknown)", evidence_ids: ["E-003","E-008"] },
+            { text: "Startup readiness (context mismatch risk unquantified)", evidence_ids: ["E-005","E-009"] },
+            { text: "Compensation fit (salary floor known; band unknown)", evidence_ids: ["E-012"] }
+          ],
+          missing_weak: [
+            "Design system ownership evidence (candidate side)",
+            "Next.js adjacency skills and deployment familiarity",
+            "Proof-of-work artifacts (portfolio, metrics, shipped outcomes)",
+            "Execution signals: ambiguity handling, cross-functional delivery",
+            "Interview process constraints and hard filters"
+          ]
+        },
+        confidence: {
+          review: [
+            "Fixture’s expected ‘high confidence’ is not supported given major unknowns (design system depth, Next.js depth, compensation band).",
+            "Moderate confidence is more appropriate: overlap is strong, but decision hinges on unverified dimensions."
+          ],
+          overconfidence_signs: [
+            "Treating frontend_architecture strength as equivalent to design_system ownership (unsupported).",
+            "Assuming Next.js is easy to pick up without adjacent proof (unsupported).",
+            "Downplaying startup context risk without delivery/ownership evidence."
+          ],
+          underconfidence_signs: [
+            "Next.js gap could be mitigated if role’s usage is shallow or team accepts a ramp (unknown).",
+            "Startup experience could be offset by strong shipping/ownership evidence (unknown)."
+          ]
+        },
+        risks: {
+          ranked_gaps_by_impact: [
+            {
+              title: "Next.js gap",
+              decision_impact: "high",
+              bucket: "fatal_or_near_fatal",
+              why: "Explicit in stack; may be used as a screen.",
+              evidence_ids: ["E-004","E-007"]
+            },
+            {
+              title: "Design system experience",
+              decision_impact: "high",
+              bucket: "disguised_uncertainty",
+              why: "Role theme includes design_system; candidate evidence absent.",
+              evidence_ids: ["E-008"]
+            },
+            {
+              title: "Limited startup experience",
+              decision_impact: "medium_high",
+              bucket: "mitigatable",
+              why: "Depends on pace/ambiguity tolerance expectations.",
+              evidence_ids: ["E-005","E-009"]
+            }
+          ]
+        },
+        bias: {
+          reasons_not_to_apply: [
+            { text: "Next.js may be a screening filter; candidate explicitly lacks it.", evidence_ids: ["E-004","E-007"] },
+            { text: "Design system is emphasized; candidate evidence absent.", evidence_ids: ["E-008"] },
+            { text: "Series B pace/ambiguity may stress someone with limited startup exposure.", evidence_ids: ["E-005","E-009"] },
+            { text: "Compensation band unknown vs $160k floor (risk of mismatch).", evidence_ids: ["E-012"] }
+          ],
+          positivity_bias_signals: [
+            "Over-weighting stack overlap while under-weighting platform (Next.js) as a gate.",
+            "Assuming mentorship is valued without job evidence.",
+            "Treating remote match as overall fit."
+          ],
+          skeptical_interpretation:
+            "This is a Next.js + design-system platform role in a Series B environment. The candidate’s overlap (React/GraphQL) may be superficial unless they can prove design-system leadership and a credible Next.js ramp."
+        },
+        plan: {
+          questions_to_ask: [
+            { q: "How central is Next.js, and which features do you rely on (App Router, SSR, RSC, edge, ISR, migrations)? Is Next.js production experience a hard requirement?", signals: ["Validates hard filter vs rampability"], tag: "fatal" },
+            { q: "What does 'design system' mean here: maintaining, scaling, or creating? Expectations around tokens, governance, accessibility, adoption?", signals: ["Distinguishes core responsibility vs minor"], tag: "unknown" },
+            { q: "What’s the compensation band for this role?", signals: ["Validates time ROI and fit vs salary floor"], tag: "unknown" }
+          ],
+          research_actions: [
+            "Review public product UI for evidence of a mature component system.",
+            "Look for stack signals: Vercel/Next-specific references in posts, docs, or repos."
+          ],
+          candidate_side_signals: [
+            "Prepare 2 mini case studies with quantified outcomes (perf and architecture).",
+            "Build a small Next.js artifact demonstrating routing + SSR/SSG + caching patterns.",
+            "Inventory any component library work that maps to design-system responsibilities."
+          ]
+        }
+      },
+      evidence_ledger: [
+        { evidence_id: "E-001", claim_supported: "Candidate is senior FE, 8 YOE", snippet: "seniority: senior; years_experience: 8", source: "fixture:cand_017" },
+        { evidence_id: "E-002", claim_supported: "Candidate focus includes React/TS/GraphQL/Performance", snippet: "tech_focus: React, TypeScript, GraphQL, Performance", source: "fixture:cand_017" },
+        { evidence_id: "E-003", claim_supported: "Candidate strengths are FE architecture + mentorship", snippet: "strength_profile: frontend_architecture, mentorship", source: "fixture:cand_017" },
+        { evidence_id: "E-004", claim_supported: "Candidate lacks Next.js", snippet: "gap_profile: no_nextjs", source: "fixture:cand_017" },
+        { evidence_id: "E-005", claim_supported: "Candidate has limited startup experience", snippet: "gap_profile: ... limited_startup_experience", source: "fixture:cand_017" },
+        { evidence_id: "E-006", claim_supported: "Candidate prefers remote", snippet: "preferences: remote", source: "fixture:cand_017" },
+        { evidence_id: "E-007", claim_supported: "Job requires React/TS/Next.js/GraphQL", snippet: "tech_stack: React, TypeScript, Next.js, GraphQL", source: "fixture:jd_041" },
+        { evidence_id: "E-008", claim_supported: "Job emphasizes FE architecture + design system", snippet: "role_theme: frontend_architecture, design_system", source: "fixture:jd_041" },
+        { evidence_id: "E-009", claim_supported: "Job is Series B startup context", snippet: "stage: Series B; posting_style: startup; company_size: 51-200", source: "fixture:jd_041" },
+        { evidence_id: "E-010", claim_supported: "Role location policy is Remote (US)", snippet: "location_policy: Remote (US)", source: "fixture:jd_041" },
+        { evidence_id: "E-011", claim_supported: "Fixture expected: verdict consider + top gap Next.js", snippet: "expected: verdict: consider; expected_top_gaps: Next.js", source: "fixture:case_017_041" },
+        { evidence_id: "E-012", claim_supported: "Salary floor constraint exists", snippet: "prefs_override: salary_min: 160000", source: "fixture:case_017_041" }
+      ],
+      history: [
+        {
+          at: "2026-01-24",
+          case_id: "case_017_041",
+          verdict: "consider",
+          confidence: 0.72,
+          top_gaps: ["Next.js", "startup experience"],
+          notes: "Baseline synthetic brief; unknowns remain high."
+        }
+      ]
+    };
+
+    // ----------------------------
+    // UTILITIES
+    // ----------------------------
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    function escapeHTML(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function toast(msg){
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      window.clearTimeout(toast._t);
+      toast._t = window.setTimeout(()=> t.classList.remove("show"), 1600);
+    }
+
+    function verdictDotClass(verdict){
+      // Minimal: consider => warn; apply => good; no => bad
+      const v = String(verdict || "").toLowerCase();
+      if (v.includes("apply") || v.includes("yes")) return "good";
+      if (v.includes("no") || v.includes("skip") || v.includes("reject")) return "bad";
+      return "warn";
+    }
+
+    // Evidence highlight manager
+    const EvidenceUI = {
+      lastHighlighted: new Set(),
+      clear(){
+        for (const id of this.lastHighlighted){
+          const el = document.getElementById("evidence_" + id);
+          if (el) el.classList.remove("highlight");
+        }
+        this.lastHighlighted.clear();
+      },
+      jump(ids){
+        if (!ids || !ids.length) return;
+        this.clear();
+        // Focus the first item, highlight all
+        ids.forEach(id=>{
+          const el = document.getElementById("evidence_" + id);
+          if (el){
+            el.classList.add("highlight");
+            this.lastHighlighted.add(id);
+          }
+        });
+        const first = document.getElementById("evidence_" + ids[0]);
+        if (first){
+          first.scrollIntoView({behavior:"smooth", block:"center"});
+          toast("Highlighted: " + ids.join(", "));
+        }
+      }
+    };
+
+    function evidenceChips(evidenceIds){
+      if (!evidenceIds || !evidenceIds.length) return `<span class="muted small">No evidence linked</span>`;
+      const chips = evidenceIds.map(id =>
+        `<span class="chip" data-eids="${escapeHTML(id)}"><span class="tag">${escapeHTML(id)}</span>Jump to evidence</span>`
+      ).join("");
+      return `<div class="chips">${chips}</div>`;
+    }
+
+    function renderList(items, opts={}){
+      const { withEvidence=false } = opts;
+      return `
+        <ul>
+          ${items.map(it=>{
+            if (typeof it === "string") return `<li>${escapeHTML(it)}</li>`;
+            const text = escapeHTML(it.text || it.title || it.q || "");
+            const ev = withEvidence ? evidenceChips(it.evidence_ids || []) : "";
+            const tag = it.tag ? `<span class="label ${escapeHTML(it.tag)}"><span class="dot"></span>${escapeHTML(it.tag)}</span>` : "";
+            return `<li>
+              ${text}
+              ${tag}
+              ${withEvidence ? ev : ""}
+            </li>`;
+          }).join("")}
+        </ul>
+      `;
+    }
+
+    function renderLabels(labels){
+      // labels: [{type, text}]
+      return `
+        <div class="labelRow">
+          ${labels.map(l=>{
+            const cls = l.type;
+            return `<span class="label ${cls}">
+              <span class="dot ${cls}"></span>${escapeHTML(l.text)}
+            </span>`;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    // ----------------------------
+    // RENDER: NAV
+    // ----------------------------
+    function buildNav(){
+      const sections = $$("main section.panel");
+      const nav = $("#navLinks");
+      nav.innerHTML = sections.map(sec=>{
+        const id = sec.id;
+        const title = sec.getAttribute("data-title") || id;
+        return `
+          <a href="#${escapeHTML(id)}" data-target="${escapeHTML(id)}">
+            <span>${escapeHTML(title)}</span>
+            <span class="badge">${escapeHTML(id.replace("sec_",""))}</span>
+          </a>
+        `;
+      }).join("");
+
+      // Active state
+      function setActive(){
+        const fromHash = (location.hash || "").replace("#","");
+        const target = fromHash && document.getElementById(fromHash) ? fromHash : "sec_snapshot";
+        $$("#navLinks a").forEach(a=>{
+          a.classList.toggle("active", a.dataset.target === target);
+        });
+      }
+      window.addEventListener("hashchange", setActive);
+      setActive();
+
+      // Smooth scroll
+      nav.addEventListener("click", (e)=>{
+        const a = e.target.closest("a[data-target]");
+        if (!a) return;
+        e.preventDefault();
+        const id = a.dataset.target;
+        const el = document.getElementById(id);
+        if (el){
+          history.replaceState(null, "", "#" + id);
+          el.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      });
+    }
+
+    // ----------------------------
+    // RENDER: HEADER
+    // ----------------------------
+    function renderHeader(){
+      $("#caseId").textContent = DATA.meta.case_id;
+      $("#scenarioTag").textContent = DATA.meta.scenario_tag;
+      $("#verdict").textContent = DATA.meta.verdict;
+      const dot = $("#verdictDot");
+      dot.classList.remove("good","warn","bad");
+      dot.classList.add(verdictDotClass(DATA.meta.verdict));
+
+      $("#headerSubtitle").textContent =
+        `${DATA.job.job_title} @ ${DATA.job.company} • ${DATA.job.location_policy} • Stack: ${DATA.job.tech_stack.join(", ")}`;
+      $("#navCompleteness").textContent = DATA.decision_brief.decision_completeness_pct;
+    }
+
+    // ----------------------------
+    // RENDER: BRIEF + SIGNALS
+    // ----------------------------
+    function renderSnapshot(){
+      const b = DATA.decision_brief;
+
+      $("#briefCard").innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:650; font-size:13px;">Decision Brief</div>
+            <div class="small">Generated from fixture data (unknowns not assumed).</div>
+          </div>
+          <div class="pill">
+            <span class="dot ${b.decision_completeness_pct >= 70 ? "good" : b.decision_completeness_pct >= 50 ? "warn" : "bad"}"></span>
+            Completeness <b>${b.decision_completeness_pct}%</b>
+          </div>
+        </div>
+
+        <div class="meter" aria-label="Decision completeness">
+          <div id="completenessBar"></div>
+        </div>
+        <div class="meterRow">
+          <span class="muted">Coverage estimate</span>
+          <span><b>${b.decision_completeness_pct}%</b> (synthetic)</span>
+        </div>
+
+        <div class="kv" style="margin-top:10px;">
+          <div class="k">Decision goal</div><div><b>${escapeHTML(b.decision_goal)}</b></div>
+          <div class="k">Expected channel</div><div><b>${escapeHTML(b.primary_channel_expected)}</b></div>
+          <div class="k">Salary floor</div><div><b>$${Number(DATA.meta.salary_min).toLocaleString()}</b></div>
+          <div class="k">Stated confidence</div><div><b>${Math.round(b.confidence_stated*100)}%</b> (synthetic)</div>
+          <div class="k">Recommended range</div><div><b>${Math.round(b.confidence_recommended_range[0]*100)}%–${Math.round(b.confidence_recommended_range[1]*100)}%</b></div>
+        </div>
+
+        <div class="prose">
+          <b>Key alignments (evidence-linked)</b>
+          ${renderList(b.alignments.map(x=>({text:x.text, evidence_ids:x.evidence_ids})), {withEvidence:true})}
+        </div>
+
+        <div class="prose">
+          <b>Top unknowns</b>
+          ${renderList(b.unknowns)}
+        </div>
+      `;
+
+      $("#signalsCard").innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:650; font-size:13px;">Signals &amp; Constraints</div>
+            <div class="small">Designed for clarity + control.</div>
+          </div>
+          <button class="btn secondary" id="btnJumpToEvidence">Open evidence ledger</button>
+        </div>
+
+        ${renderLabels([
+          {type:"good", text:"Stack overlap (React/TS/GraphQL)"},
+          {type:"warn", text:"Next.js is explicit requirement"},
+          {type:"info", text:"Design system scope unknown"},
+        ])}
+
+        <div class="prose" style="margin-top:12px;">
+          <b>Gaps (ranked by decision impact)</b>
+          <ul>
+            ${b.gaps.map(g=>{
+              const cls = g.classification.includes("fatal") ? "bad" : (g.disguised_uncertainty ? "warn" : "info");
+              const tag = g.classification.includes("fatal") ? "fatal" : (g.disguised_uncertainty ? "unknown" : "evidence");
+              return `
+                <li>
+                  <b>${escapeHTML(g.title)}</b>
+                  <div class="labelRow" style="margin-top:6px;">
+                    <span class="label ${cls}"><span class="dot ${cls}"></span>${escapeHTML(g.impact.replaceAll("_"," "))}</span>
+                    <span class="label ${tag}"><span class="dot"></span>${escapeHTML(tag)}</span>
+                    <span class="label"><span class="dot info"></span>${escapeHTML(g.classification.replaceAll("_"," "))}</span>
+                  </div>
+                  ${evidenceChips(g.evidence_ids)}
+                </li>
+              `;
+            }).join("")}
+          </ul>
+        </div>
+
+        <div class="prose">
+          <b>Top missing inputs (highest ROI)</b>
+          <ul>
+            ${b.top_missing_inputs.map(x=>`
+              <li data-tag="${escapeHTML(x.tag)}">
+                <b>${escapeHTML(x.text)}</b>
+                <div class="small">${escapeHTML(x.reason)}</div>
+              </li>
+            `).join("")}
+          </ul>
+        </div>
+      `;
+
+      // Set bar
+      const bar = $("#completenessBar");
+      requestAnimationFrame(()=> bar.style.width = b.decision_completeness_pct + "%");
+
+      $("#btnJumpToEvidence").addEventListener("click", ()=>{
+        $("#evidencePane").scrollIntoView({behavior:"smooth", block:"start"});
+        $("#eSearch").focus();
+      });
+    }
+
+    // ----------------------------
+    // RENDER: COVERAGE
+    // ----------------------------
+    function renderCoverage(){
+      const c = DATA.analytics_report.coverage;
+      const completeness = DATA.decision_brief.decision_completeness_pct;
+
+      $("#coverageCard").innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:650; font-size:13px;">Coverage map</div>
+            <div class="small">Critical dimensions grouped by support level.</div>
+          </div>
+          <span class="pill">
+            <span class="dot ${completeness >= 70 ? "good" : completeness >= 50 ? "warn" : "bad"}"></span>
+            Completeness <b>${completeness}%</b>
+          </span>
+        </div>
+
+        <div class="prose">
+          <b>Fully evaluated</b>
+          ${renderList(c.fully_evaluated.map(x=>({text:x.text, evidence_ids:x.evidence_ids})), {withEvidence:true})}
+        </div>
+
+        <div class="prose">
+          <b>Partially evaluated</b>
+          ${renderList(c.partially_evaluated.map(x=>({text:x.text, evidence_ids:x.evidence_ids})), {withEvidence:true})}
+        </div>
+
+        <div class="prose">
+          <b>Missing / weak support</b>
+          ${renderList(c.missing_weak)}
+        </div>
+
+        <div class="prose">
+          <b>Top 3 missing inputs (confidence uplift)</b>
+          ${renderList(DATA.decision_brief.top_missing_inputs.map(x=>({text:x.text})))}
+        </div>
+      `;
+    }
+
+    // ----------------------------
+    // RENDER: CONFIDENCE
+    // ----------------------------
+    function renderConfidence(){
+      const b = DATA.decision_brief;
+      const cf = DATA.analytics_report.confidence;
+
+      $("#confidenceCard").innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:650; font-size:13px;">Calibration</div>
+            <div class="small">Checks whether confidence matches evidence coverage.</div>
+          </div>
+          <span class="pill">
+            <span class="dot info"></span>
+            Stated <b>${Math.round(b.confidence_stated*100)}%</b> → Suggested <b>${Math.round(b.confidence_recommended_range[0]*100)}–${Math.round(b.confidence_recommended_range[1]*100)}%</b>
+          </span>
+        </div>
+
+        <div class="prose">
+          <b>Review</b>
+          ${renderList(cf.review)}
+        </div>
+
+        <div class="prose">
+          <b>Potential overconfidence signals</b>
+          ${renderList(cf.overconfidence_signs)}
+        </div>
+
+        <div class="prose">
+          <b>Potential underconfidence signals</b>
+          ${renderList(cf.underconfidence_signs)}
+        </div>
+
+        <div class="prose">
+          <b>Confidence-sensitive unknowns</b>
+          ${renderList(DATA.decision_brief.unknowns)}
+        </div>
+      `;
+    }
+
+    // ----------------------------
+    // RENDER: GAPS
+    // ----------------------------
+    function renderGaps(){
+      const r = DATA.analytics_report.risks.ranked_gaps_by_impact;
+
+      $("#gapsCard").innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:650; font-size:13px;">Impact-ranked gaps</div>
+            <div class="small">Severity is based on decision impact, not surface importance.</div>
+          </div>
+          <span class="pill"><span class="dot warn"></span><b>${r.length}</b> items</span>
+        </div>
+
+        <div class="prose">
+          <ul>
+            ${r.map((g, idx)=>{
+              const bucket = g.bucket;
+              const cls = bucket.includes("fatal") ? "bad" : bucket.includes("disguised") ? "warn" : "info";
+              const tag = bucket.includes("fatal") ? "fatal" : bucket.includes("disguised") ? "unknown" : "evidence";
+              return `
+                <li data-tag="${escapeHTML(tag)}">
+                  <b>#${idx+1} ${escapeHTML(g.title)}</b>
+                  <div class="labelRow" style="margin-top:6px;">
+                    <span class="label ${cls}"><span class="dot ${cls}"></span>${escapeHTML(g.decision_impact)}</span>
+                    <span class="label ${tag}"><span class="dot"></span>${escapeHTML(tag)}</span>
+                    <span class="label"><span class="dot info"></span>${escapeHTML(bucket.replaceAll("_"," "))}</span>
+                  </div>
+                  <div class="small" style="margin-top:6px;">${escapeHTML(g.why)}</div>
+                  ${evidenceChips(g.evidence_ids)}
+                </li>
+              `;
+            }).join("")}
+          </ul>
+        </div>
+
+        <div class="prose">
+          <b>Disguised uncertainties to flag explicitly</b>
+          ${renderList([
+            "Mentorship value: job does not explicitly state it (do not assume).",
+            "Salary fit: band unknown vs candidate floor.",
+            "‘Requirements rigor: medium’ does not indicate whether Next.js is a hard gate."
+          ])}
+        </div>
+      `;
+    }
+
+    // ----------------------------
+    // RENDER: BIAS
+    // ----------------------------
+    function renderBias(){
+      const b = DATA.analytics_report.bias;
+
+      $("#biasCard").innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:650; font-size:13px;">Anti-confirmation bias</div>
+            <div class="small">Strongest reasons not to apply + skeptical fit read.</div>
+          </div>
+          <span class="pill"><span class="dot bad"></span>Be skeptical</span>
+        </div>
+
+        <div class="prose">
+          <b>Strongest reasons not to apply</b>
+          ${renderList(b.reasons_not_to_apply.map(x=>({text:x.text, evidence_ids:x.evidence_ids})), {withEvidence:true})}
+        </div>
+
+        <div class="prose">
+          <b>Where positivity bias may appear</b>
+          ${renderList(b.positivity_bias_signals)}
+        </div>
+
+        <div class="prose">
+          <b>Deliberately skeptical interpretation</b>
+          <div class="card" style="margin-top:8px; background: rgba(255,107,107,0.06); border-color: rgba(255,107,107,0.18);">
+            ${escapeHTML(b.skeptical_interpretation)}
+          </div>
+        </div>
+      `;
+    }
+
+    // ----------------------------
+    // RENDER: PLAN
+    // ----------------------------
+    function renderPlan(){
+      const p = DATA.analytics_report.plan;
+
+      $("#planCard").innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:650; font-size:13px;">High-yield clarification plan</div>
+            <div class="small">Smallest set of actions to raise decision quality.</div>
+          </div>
+          <span class="pill"><span class="dot info"></span>Minimize effort</span>
+        </div>
+
+        <div class="prose">
+          <b>Questions to ask (recruiter / hiring manager)</b>
+          <ul>
+            ${p.questions_to_ask.map(item=>`
+              <li data-tag="${escapeHTML(item.tag)}">
+                <b>${escapeHTML(item.q)}</b>
+                <div class="small" style="margin-top:6px;">
+                  Signals: ${escapeHTML(item.signals.join(" • "))}
+                </div>
+              </li>
+            `).join("")}
+          </ul>
+        </div>
+
+        <div class="prose">
+          <b>Research actions (1–2 hours)</b>
+          ${renderList(p.research_actions)}
+        </div>
+
+        <div class="prose">
+          <b>Candidate-side validation signals</b>
+          ${renderList(p.candidate_side_signals)}
+        </div>
+      `;
+    }
+
+    // ----------------------------
+    // RENDER: EVIDENCE LEDGER
+    // ----------------------------
+    function renderEvidenceLedger(){
+      const list = DATA.evidence_ledger;
+      $("#eCount").textContent = list.length;
+
+      const eList = $("#eList");
+      eList.innerHTML = list.map(e=>{
+        return `
+          <div class="eItem" id="evidence_${escapeHTML(e.evidence_id)}" data-eid="${escapeHTML(e.evidence_id)}" tabindex="0">
+            <div class="eHead">
+              <span class="eId">${escapeHTML(e.evidence_id)}</span>
+              <span class="eSrc">${escapeHTML(e.source)}</span>
+            </div>
+            <div class="eClaim">${escapeHTML(e.claim_supported)}</div>
+            <div class="eSnippet">${escapeHTML(e.snippet)}</div>
+          </div>
+        `;
+      }).join("");
+
+      // Search
+      $("#eSearch").addEventListener("input", (ev)=>{
+        const q = ev.target.value.trim().toLowerCase();
+        $$(".eItem", eList).forEach(item=>{
+          const eid = item.dataset.eid.toLowerCase();
+          const text = item.textContent.toLowerCase();
+          const hit = !q || eid.includes(q) || text.includes(q);
+          item.style.display = hit ? "" : "none";
+        });
+      });
+
+      // Click to copy evidence id
+      eList.addEventListener("click", (ev)=>{
+        const item = ev.target.closest(".eItem");
+        if (!item) return;
+        const id = item.dataset.eid;
+        navigator.clipboard?.writeText(id).then(()=> toast("Copied: " + id)).catch(()=>{});
+      });
+    }
+
+    // ----------------------------
+    // WIRE EVIDENCE CHIPS
+    // ----------------------------
+    function wireEvidenceChips(){
+      document.body.addEventListener("click", (ev)=>{
+        const chip = ev.target.closest(".chip[data-eids]");
+        if (!chip) return;
+        const raw = chip.getAttribute("data-eids") || "";
+        // data-eids may contain a single id; keep format extensible
+        const ids = raw.split(",").map(s=>s.trim()).filter(Boolean);
+        EvidenceUI.jump(ids);
+      });
+    }
+
+    // ----------------------------
+    // FILTERS (left quick filters)
+    // ----------------------------
+    function wireQuickFilters(){
+      $("#navPane").addEventListener("click", (ev)=>{
+        const chip = ev.target.closest(".chip[data-filter]");
+        if (!chip) return;
+        const filter = chip.dataset.filter;
+        // Apply filter by highlighting list items in main content by data-tag
+        const tags = {
+          fatal: ["fatal"],
+          unknown: ["unknown"],
+          evidence: ["evidence"]
+        }[filter] || [];
+
+        // Clear prior temporary outlines
+        $$("[data-tag]").forEach(el=>{
+          el.style.outline = "";
+          el.style.outlineOffset = "";
+        });
+
+        if (tags.length){
+          const targets = $$(`[data-tag="${tags[0]}"]`);
+          targets.forEach(el=>{
+            el.style.outline = "2px solid rgba(122,167,255,0.45)";
+            el.style.outlineOffset = "6px";
+          });
+          if (targets[0]) targets[0].scrollIntoView({behavior:"smooth", block:"center"});
+          toast(`Filtered: ${filter} (${targets.length})`);
+        }
+      });
+    }
+
+    // ----------------------------
+    // EXPORT JSON MODAL
+    // ----------------------------
+    function wireExport(){
+      const modal = $("#modalBackdrop");
+      const body = $("#modalBody");
+      $("#btnExportJSON").addEventListener("click", ()=>{
+        body.textContent = JSON.stringify(DATA, null, 2);
+        modal.classList.add("open");
+      });
+      $("#btnCloseModal").addEventListener("click", ()=> modal.classList.remove("open"));
+      modal.addEventListener("click", (ev)=>{
+        if (ev.target === modal) modal.classList.remove("open");
+      });
+      window.addEventListener("keydown", (ev)=>{
+        if (ev.key === "Escape") modal.classList.remove("open");
+      });
+    }
+
+    // ----------------------------
+    // COPY SECTION LINK
+    // ----------------------------
+    function wireCopyLink(){
+      $("#btnCopyLink").addEventListener("click", ()=>{
+        // Determine nearest section in viewport
+        const secs = $$("main section.panel");
+        let best = secs[0];
+        let bestTop = Infinity;
+        secs.forEach(sec=>{
+          const r = sec.getBoundingClientRect();
+          if (r.top >= 0 && r.top < bestTop){
+            best = sec; bestTop = r.top;
+          }
+        });
+        const url = new URL(location.href);
+        url.hash = best.id;
+        navigator.clipboard?.writeText(url.toString()).then(()=> toast("Copied link to " + best.id)).catch(()=>{});
+      });
+    }
+
+    // ----------------------------
+    // CLEAR HIGHLIGHTS
+    // ----------------------------
+    function wireClear(){
+      $("#btnClearHighlights").addEventListener("click", ()=>{
+        EvidenceUI.clear();
+        toast("Cleared highlights");
+      });
+      window.addEventListener("keydown", (ev)=>{
+        if (ev.key === "Escape"){
+          EvidenceUI.clear();
+        }
+        if (ev.key.toLowerCase() === "l" && (ev.metaKey || ev.ctrlKey)){
+          // allow default browser behavior; no-op
+        }
+        if (ev.key.toLowerCase() === "l" && !ev.metaKey && !ev.ctrlKey){
+          // quick key L copies link
+          $("#btnCopyLink").click();
+        }
+        if (ev.key.toLowerCase() === "j" && !ev.metaKey && !ev.ctrlKey){
+          // quick key J opens export
+          $("#btnExportJSON").click();
+        }
+      });
+    }
+
+    // ----------------------------
+    // INIT
+    // ----------------------------
+    function init(){
+      renderHeader();
+      buildNav();
+      renderSnapshot();
+      renderCoverage();
+      renderConfidence();
+      renderGaps();
+      renderBias();
+      renderPlan();
+      renderEvidenceLedger();
+      wireEvidenceChips();
+      wireQuickFilters();
+      wireExport();
+      wireCopyLink();
+      wireClear();
+
+      // If URL hash is present, scroll smoothly
+      if (location.hash){
+        const el = document.getElementById(location.hash.replace("#",""));
+        if (el) setTimeout(()=> el.scrollIntoView({behavior:"smooth", block:"start"}), 60);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

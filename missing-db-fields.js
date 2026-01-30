@@ -37,6 +37,36 @@
       {"label":"Role rigor", "value":"Medium (startup posting style)"},
       {"label":"Time-to-credibility", "value":"2–3 weeks for Next.js artifact + interview narratives"}
     ],
+    "unknowns": [
+      {"text":"Does the team treat Next.js as a hard requirement or a preference?", "evidence_ids":[]},
+      {"text":"Exact interview loop focus (system design vs framework trivia).", "evidence_ids":[]}
+    ],
+    "assumptions": [
+      {"text":"Candidate can ramp on Next.js quickly due to strong React + architecture background.", "evidence_ids":["evi_005"]},
+      {"text":"Hiring manager values mentorship and design systems beyond feature delivery.", "evidence_ids":["evi_002"]}
+    ],
+    "missing_info": [
+      {"text":"Comp band (base/equity) and leveling expectations.", "evidence_ids":["evi_006"]},
+      {"text":"Whether role includes ownership of Next.js SSR/ISR patterns day-1.", "evidence_ids":["evi_003"]}
+    ],
+    "engagement_strategy": {
+      "primary_path": {
+        "description": "Hiring manager outreach",
+        "rationale": ""
+      },
+      "secondary_path": {
+        "description": "Employee referral",
+        "rationale": ""
+      },
+      "fallback_path": {
+        "description": "Optimized application",
+        "rationale": ""
+      },
+      "rationale": [
+        "Front-door applications may be crowded; direct outreach increases probability of review.",
+        "Missing Next.js is a gap best addressed via narrative and quick portfolio proof."
+      ]
+    }
   },
 
 }

@@ -889,7 +889,7 @@
         </section>
 
         <!-- CLAIMS -->
-        <section id="claims" aria-label="Key claims">
+        <!-- <section id="claims" aria-label="Key claims">
           <div class="card">
             <div class="hd">
               <h3>Key claims</h3>
@@ -912,7 +912,7 @@
               </details>
             </div>
           </div>
-        </section>
+        </section> -->
 
         <!-- UNKNOWNS & ASSUMPTIONS -->
         <section id="unknowns" aria-label="Unknowns and assumptions">
@@ -944,7 +944,7 @@
         </section>
 
         <!-- RESEARCH PLAN -->
-        <section id="research_plan" aria-label="Research plan">
+        <!-- <section id="research_plan" aria-label="Research plan">
           <div class="card">
             <div class="hd">
               <h3>Research plan</h3>
@@ -978,10 +978,10 @@
               </details>
             </div>
           </div>
-        </section>
+        </section> -->
 
         <!-- FOLLOW-UP QUESTIONS -->
-        <section id="followups" aria-label="Follow-up questions">
+        <!-- <section id="followups" aria-label="Follow-up questions">
           <div class="card">
             <div class="hd">
               <h3>Follow-up questions</h3>
@@ -990,6 +990,33 @@
             <div class="bd">
               <div class="qa" id="followupQA"></div>
               <p class="footnote">Answers are not saved; this is an inline mock UI to support review and decision control.</p>
+            </div>
+          </div>
+        </section> -->
+
+        <!-- ENGAGEMENT STRATEGY -->
+        <section id="evidence" aria-label="Evidence ledger">
+          <div class="card">
+            <div class="hd">
+              <h3>Engagement Strategy</h3>
+            </div>
+          </div>
+        </section>
+
+        <!-- POSITIONING ANGLE -->
+        <section id="evidence" aria-label="Evidence ledger">
+          <div class="card">
+            <div class="hd">
+              <h3>Positioning Angle</h3>
+            </div>
+          </div>
+        </section>
+
+        <!-- RECOMMENDED NEXT ACTIONS -->
+        <section id="evidence" aria-label="Evidence ledger">
+          <div class="card">
+            <div class="hd">
+              <h3>Recommended Next Actions</h3>
             </div>
           </div>
         </section>
@@ -1051,7 +1078,7 @@
         </section>
 
         <!-- RUN METADATA -->
-        <section id="run" aria-label="Run metadata">
+        <!-- <section id="run" aria-label="Run metadata">
           <div class="card">
             <div class="hd">
               <h3>Run metadata</h3>
@@ -1088,10 +1115,10 @@
               </details>
             </div>
           </div>
-        </section>
+        </section> -->
 
         <!-- RAW JSON -->
-        <section id="raw" aria-label="Raw JSON">
+        <!-- <section id="raw" aria-label="Raw JSON">
           <div class="card">
             <div class="hd">
               <h3>Raw JSON</h3>
@@ -1133,7 +1160,7 @@
               </details>
             </div>
           </div>
-        </section>
+        </section> -->
 
       </div>
     </main>
@@ -1499,6 +1526,18 @@
           {"title":"If team is flexible on Next.js and values architecture/mentorship", "impact":"strongly_positive", "evidence_ids":["evi_001","evi_002"]},
           {"title":"If Next.js is non-negotiable day-1", "impact":"strongly_negative", "evidence_ids":["evi_003"]},
           {"title":"If startup context requires cross-functional scrappiness", "impact":"negative", "evidence_ids":["evi_004"]}
+        ],
+        "unknowns": [
+          {"text":"Does the team treat Next.js as a hard requirement or a preference?", "evidence_ids":[]},
+          {"text":"Exact interview loop focus (system design vs framework trivia).", "evidence_ids":[]}
+        ],
+        "assumptions": [
+          {"text":"Candidate can ramp on Next.js quickly due to strong React + architecture background.", "evidence_ids":["evi_005"]},
+          {"text":"Hiring manager values mentorship and design systems beyond feature delivery.", "evidence_ids":["evi_002"]}
+        ],
+        "missing_info": [
+          {"text":"Comp band (base/equity) and leveling expectations.", "evidence_ids":["evi_006"]},
+          {"text":"Whether role includes ownership of Next.js SSR/ISR patterns day-1.", "evidence_ids":["evi_003"]}
         ],
         "engagement_strategy": {
           "primary_path": "hiring_manager_outreach",
@@ -2174,7 +2213,7 @@
     }
 
     function renderEvidence(){
-      const items = data.evidence_ledger?.items || [];
+      const items = data.evidence_journal?.items || [];
       $("#navEvidence").textContent = `${items.length} items`;
       $("#evidenceVerboseCount").textContent = `${items.length} items`;
 
@@ -2195,12 +2234,12 @@
           </td>
           <td>
             <div class="evi-snippet">${escapeHtml(it.snippet || "")}</div>
-            <div class="muted2" style="margin-top:6px;">${escapeHtml(it.created_at ? fmt.iso(it.created_at) : "")}</div>
+            <div class="muted2" style="margin-top:6px;">${escapeHtml(it.retrieved_at ? fmt.iso(it.retrieved_at) : "")}</div>
           </td>
           <td>
-            <div class="evi-source">${escapeHtml(it.source?.label || "—")}</div>
-            <div class="muted2" style="margin-top:4px;">Type: ${escapeHtml(it.source?.type || "—")}</div>
-            <div class="muted2">Ref: <span style="font-family:var(--mono)">${escapeHtml(it.source?.ref || "—")}</span></div>
+            <!-- <div class="evi-source">${escapeHtml(it.source_uri || "—")}</div> -->
+            <div class="muted2" style="margin-top:4px;">Type: ${escapeHtml(it.source_type || "—")}</div>
+            <div class="muted2">Ref: <span style="font-family:var(--mono)">${escapeHtml(it.source_uri || "—")}</span></div>
           </td>
         `;
         tr.tabIndex = 0;
@@ -2224,9 +2263,9 @@
         div.innerHTML = `
           <p class="title">
             <span><span class="pill" style="font-family:var(--mono)">${escapeHtml(it.evidence_id || "—")}</span></span>
-            <span class="pill">${escapeHtml((it.source?.type || "—").toUpperCase())}</span>
+            <span class="pill">${escapeHtml((it.source_type || "—").toUpperCase())}</span>
           </p>
-          <p class="muted" style="margin:0">${escapeHtml(it.source?.label || "—")}</p>
+          <!-- <p class="muted" style="margin:0">${escapeHtml(it.source?.label || "—")}</p> -->
           <div style="margin-top:10px;">
             <pre aria-label="Full snippet for ${escapeHtml(it.evidence_id || "")}">${escapeHtml(it.snippet || "")}</pre>
           </div>
@@ -2319,10 +2358,10 @@
         <p style="margin:0 0 10px;">${escapeHtml(it.snippet || "")}</p>
         <div class="hr"></div>
         <div class="muted" style="font-size:12px;">
-          <div><strong>Source:</strong> ${escapeHtml(it.source?.label || "—")}</div>
-          <div><strong>Type:</strong> ${escapeHtml(it.source?.type || "—")}</div>
-          <div><strong>Ref:</strong> <span style="font-family:var(--mono)">${escapeHtml(it.source?.ref || "—")}</span></div>
-          <div><strong>Created:</strong> ${escapeHtml(it.created_at ? fmt.iso(it.created_at) : "—")}</div>
+          <!-- <div><strong>Source:</strong> ${escapeHtml(it.source?.label || "—")}</div> -->
+          <div><strong>Type:</strong> ${escapeHtml(it.source_type || "—")}</div>
+          <div><strong>Ref:</strong> <span style="font-family:var(--mono)">${escapeHtml(it.source_uri || "—")}</span></div>
+          <div><strong>Created:</strong> ${escapeHtml(it.retrieved_at ? fmt.iso(it.retrieved_at) : "—")}</div>
           <div style="margin-top:8px;"><strong>Tags:</strong> ${(it.tags || []).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join(" ") || "<span class='muted2'>—</span>"}</div>
         </div>
       `;
@@ -2538,13 +2577,13 @@
       renderOverview();
       renderFitAssessment();
       renderReasonsNot();
-      renderClaims();
+      // renderClaims();
       renderUnknowns();
-      renderResearchPlan();
-      renderFollowups();
+      // renderResearchPlan();
+      // renderFollowups();
       renderEvidence();
-      renderRunMetadata();
-      renderRawJson();
+      // renderRunMetadata();
+      // renderRawJson();
       setupActiveNav();
 
       $("#clearHighlightBtn").addEventListener("click", ()=> clearEvidenceHighlight());

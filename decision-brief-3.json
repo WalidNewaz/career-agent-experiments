@@ -114,7 +114,11 @@
       {
         "evidence_id":"evi_001",
         "snippet":"Candidate has 8 years of enterprise React/TypeScript with performance focus; aligns with frontend architecture role theme.",
-        "source": {"type":"profile","label":"Candidate profile summary","ref":"cand_017"},
+        "source": {
+          "type":"profile",
+          "label":"Candidate profile summary",
+          "ref":"cand_017"
+        },
         "tags":["fit","frontend_architecture","performance"],
         "created_at":"2026-01-27T18:40:00-07:00"
       },
