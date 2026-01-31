@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Analyzing resume</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+
+    /* Onboarding strip */
+    .strip{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.42);
+      backdrop-filter: blur(10px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .steps{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .step{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .step .n{
+      width:18px; height:18px; border-radius: 7px;
+      display:flex; align-items:center; justify-content:center;
+      font-family: var(--mono);
+      font-size: 11px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+    }
+    .step.active{
+      border-color: rgba(110,231,255,.35);
+      background: rgba(110,231,255,.08);
+      color: rgba(232,238,252,.92);
+    }
+    .step.active .n{
+      border-color: rgba(110,231,255,.45);
+      background: rgba(110,231,255,.14);
+    }
+    .eta{
+      color: var(--muted2);
+      font-size: 13px;
+    }
+
+    /* Center content */
+    .panel{
+      margin-top: 16px;
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(10px);
+    }
+    .center{
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding: 18px 8px;
+    }
+    h1{
+      margin: 10px 0 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    /* Spinner */
+    .spinner{
+      width: 56px; height: 56px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.03);
+      display:grid;
+      place-items:center;
+      position:relative;
+      overflow:hidden;
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+    }
+    .spinner:before{
+      content:"";
+      position:absolute; inset:-40%;
+      background: conic-gradient(from 0deg, rgba(110,231,255,.0), rgba(110,231,255,.65), rgba(167,139,250,.55), rgba(110,231,255,.0));
+      animation: spin 1.05s linear infinite;
+    }
+    .spinner:after{
+      content:"";
+      position:absolute; inset:8px;
+      border-radius: 999px;
+      background: rgba(11,18,32,.86);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    @keyframes spin{to{transform: rotate(360deg)}}
+
+    /* Progress bar */
+    .progressWrap{
+      margin-top: 16px;
+      width: min(680px, 100%);
+    }
+    .bar{
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(110,231,255,.85), rgba(167,139,250,.75));
+      transition: width .35s ease;
+    }
+    .barMeta{
+      margin-top: 8px;
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+
+    /* Step statuses */
+    .status{
+      margin-top: 14px;
+      width: min(760px, 100%);
+      display:grid;
+      gap: 10px;
+      text-align:left;
+    }
+    .item{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .left{
+      display:flex; align-items:flex-start; gap: 10px;
+    }
+    .badge{
+      width: 24px; height: 24px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      font-weight: 900;
+      font-family: var(--mono);
+      color: rgba(232,238,252,.86);
+      flex: 0 0 auto;
+      margin-top: 1px;
+    }
+    .badge.done{
+      border-color: rgba(52,211,153,.45);
+      background: rgba(52,211,153,.12);
+    }
+    .badge.doing{
+      border-color: rgba(110,231,255,.45);
+      background: rgba(110,231,255,.12);
+    }
+    .title{
+      font-weight: 850;
+      font-size: 13px;
+      color: rgba(232,238,252,.92);
+    }
+    .desc{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      line-height: 1.45;
+    }
+    .right{
+      color: var(--muted2);
+      font-size: 12px;
+      white-space: nowrap;
+      font-family: var(--mono);
+    }
+
+    /* Explainability callout */
+    details{
+      margin-top: 16px;
+      width: min(760px, 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      overflow:hidden;
+      text-align:left;
+    }
+    summary{
+      cursor:pointer;
+      padding: 12px 12px;
+      list-style:none;
+      font-weight: 850;
+      color: rgba(232,238,252,.90);
+      font-size: 13px;
+    }
+    summary::-webkit-details-marker{display:none}
+    .detailsBody{
+      padding: 0 12px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+      white-space:nowrap;
+    }
+
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="01_landing.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Analyzing</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <!-- Onboarding strip -->
+    <div class="strip" aria-label="Onboarding progress">
+      <div class="steps">
+        <span class="step"><span class="n">1</span>Account</span>
+        <span class="step active"><span class="n">2</span>Resume</span>
+        <span class="step"><span class="n">3</span>Results</span>
+        <span class="step"><span class="n">4</span>Confirm</span>
+        <span class="step"><span class="n">5</span>Done</span>
+      </div>
+      <div class="eta">Running analysis…</div>
+    </div>
+
+    <!-- Center panel -->
+    <main class="panel center" aria-label="Analyzing resume">
+      <div class="spinner" aria-hidden="true"></div>
+
+      <h1>Analyzing your resume</h1>
+      <p class="sub">
+        We’re extracting structure (roles/dates), skills, seniority signals, and evidence strength.
+        We don’t rewrite your claims or invent credentials. Uncertainty is labeled explicitly.
+      </p>
+
+      <div class="progressWrap" aria-label="Progress">
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <i id="barFill"></i>
+        </div>
+        <div class="barMeta">
+          <span id="pct">0%</span>
+          <span id="eta">~8s remaining</span>
+        </div>
+      </div>
+
+      <div class="status" aria-label="Status steps">
+        <div class="item" id="s1">
+          <div class="left">
+            <div class="badge doing" id="b1">…</div>
+            <div>
+              <div class="title">Parsing roles and dates</div>
+              <div class="desc">Segmenting experience into a timeline and identifying missing dates.</div>
+            </div>
+          </div>
+          <div class="right" id="r1">running</div>
+        </div>
+
+        <div class="item" id="s2">
+          <div class="left">
+            <div class="badge" id="b2">2</div>
+            <div>
+              <div class="title">Extracting skills and tools</div>
+              <div class="desc">Normalizing skills (React vs React.js) and linking them to evidence.</div>
+            </div>
+          </div>
+          <div class="right" id="r2">queued</div>
+        </div>
+
+        <div class="item" id="s3">
+          <div class="left">
+            <div class="badge" id="b3">3</div>
+            <div>
+              <div class="title">Evaluating evidence strength</div>
+              <div class="desc">Detecting outcomes, specificity, and measurable impact signals.</div>
+            </div>
+          </div>
+          <div class="right" id="r3">queued</div>
+        </div>
+
+        <div class="item" id="s4">
+          <div class="left">
+            <div class="badge" id="b4">4</div>
+            <div>
+              <div class="title">Finding gaps and uncertainties</div>
+              <div class="desc">Flagging missing evidence and ambiguous claims that affect confidence.</div>
+            </div>
+          </div>
+          <div class="right" id="r4">queued</div>
+        </div>
+      </div>
+
+      <details>
+        <summary>What does “uncertainty” mean here?</summary>
+        <div class="detailsBody">
+          <p style="margin:0 0 10px;">
+            Uncertainty is not a judgment. It’s a signal that the resume text doesn’t provide enough structure or evidence
+            to support a conclusion confidently.
+          </p>
+          <ul style="margin:0; padding-left: 18px;">
+            <li><span class="kbd">Missing dates</span> → harder to interpret seniority and progression</li>
+            <li><span class="kbd">Vague bullets</span> → unclear scope (“worked on…”, “responsible for…”)</li>
+            <li><span class="kbd">No outcomes</span> → limited evidence of impact</li>
+          </ul>
+        </div>
+      </details>
+
+      <div style="margin-top: 16px; color: var(--muted2); font-size: 12px;">
+        Prototype behavior: this screen auto-advances to results in a few seconds.
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">Analysis readiness, not “hireability.”</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    // Mock analysis pipeline: progress + step completion + auto-advance.
+    const barFill = document.getElementById('barFill');
+    const pctEl = document.getElementById('pct');
+    const etaEl = document.getElementById('eta');
+    const progressBar = document.querySelector('[role="progressbar"]');
+
+    function setStep(stepIdx, state){
+      // state: 'queued' | 'running' | 'done'
+      const b = document.getElementById('b'+stepIdx);
+      const r = document.getElementById('r'+stepIdx);
+
+      if(state === 'queued'){
+        b.className = 'badge';
+        b.textContent = String(stepIdx);
+        r.textContent = 'queued';
+      } else if(state === 'running'){
+        b.className = 'badge doing';
+        b.textContent = '…';
+        r.textContent = 'running';
+      } else if(state === 'done'){
+        b.className = 'badge done';
+        b.textContent = '✓';
+        r.textContent = 'done';
+      }
+    }
+
+    function setProgress(pct, etaText){
+      const clamped = Math.max(0, Math.min(100, pct));
+      barFill.style.width = clamped + '%';
+      pctEl.textContent = clamped + '%';
+      etaEl.textContent = etaText || '';
+      progressBar.setAttribute('aria-valuenow', String(clamped));
+    }
+
+    // Persist mock results so results page has something deterministic.
+    function writeMockResults(){
+      const raw = localStorage.getItem('cb_mock_resume_raw') || '';
+      const hasDates = /\b(20\d{2}|19\d{2})\b/.test(raw);
+      const rawLen = raw.length;
+
+      // Simple heuristic scores.
+      const structureScore = Math.min(95, Math.max(35,
+        (hasDates ? 65 : 45) + Math.round(Math.min(30, rawLen / 200))
+      ));
+      const evidenceScore = Math.min(92, Math.max(30,
+        (/(improv|reduc|increas|cut|saved|grew|%|\bms\b|\bs\b|\busers\b|\bthroughput\b|\bROI\b)/i.test(raw) ? 62 : 42) +
+        Math.round(Math.min(25, rawLen / 260))
+      ));
+
+      const readinessLabel =
+        (structureScore >= 78 && evidenceScore >= 70) ? 'Strong' :
+        (structureScore >= 60 && evidenceScore >= 55) ? 'Fair' : 'Needs clarification';
+
+      const results = {
+        generatedAtISO: new Date().toISOString(),
+        scores: {
+          structure: structureScore,
+          evidence_strength: evidenceScore,
+          readiness_label: readinessLabel
+        },
+        signals: {
+          seniority: [
+            { label: "Scope ownership (architecture / design)", confidence: "medium" },
+            { label: "Mentorship / collaboration indicators", confidence: "medium" },
+            { label: "Leadership evidence (people/process)", confidence: "low" }
+          ],
+          domain: [
+            { label: "B2B SaaS / FinTech indicators", confidence: "medium" },
+            { label: "Enterprise environment signals", confidence: "medium" }
+          ]
+        },
+        strengths: [
+          { text: "Strong frontend stack signals (React/TypeScript) with repeated usage in experience.", confidence: "high" },
+          { text: "Some architecture ownership language present; suggests senior-level scope.", confidence: "medium" }
+        ],
+        gaps: [
+          { text: "Dates missing or inconsistent in at least one role (reduces confidence in progression).", confidence: "medium" },
+          { text: "Outcomes/metrics are sparse in some bullets (limits evidence strength).", confidence: "medium" },
+          { text: "Leadership/strategy evidence is unclear (if targeting Staff/Architect roles).", confidence: "low" }
+        ],
+        uncertainties: [
+          { text: "Exact months for transitions are unclear in parts of the timeline.", confidence: "medium" },
+          { text: "Official titles vs functional lead roles may need confirmation.", confidence: "low" }
+        ],
+        top_improvements: [
+          "Add month/year dates for each role",
+          "Convert 2–3 responsibility bullets into outcome bullets",
+          "Clarify scope (ownership, scale, stakeholders) for senior-level claims"
+        ]
+      };
+
+      try { localStorage.setItem('cb_mock_resume_results', JSON.stringify(results)); }
+      catch (_) {}
+    }
+
+    function runMock(){
+      // Reset steps
+      setStep(1,'running'); setStep(2,'queued'); setStep(3,'queued'); setStep(4,'queued');
+      setProgress(8, '~8s remaining');
+
+      setTimeout(()=>{ setProgress(22, '~7s remaining'); }, 600);
+
+      setTimeout(()=>{
+        setStep(1,'done');
+        setStep(2,'running');
+        setProgress(40, '~5s remaining');
+      }, 1600);
+
+      setTimeout(()=>{ setProgress(55, '~4s remaining'); }, 2400);
+
+      setTimeout(()=>{
+        setStep(2,'done');
+        setStep(3,'running');
+        setProgress(68, '~3s remaining');
+      }, 3200);
+
+      setTimeout(()=>{
+        setProgress(82, '~2s remaining');
+      }, 4100);
+
+      setTimeout(()=>{
+        setStep(3,'done');
+        setStep(4,'running');
+        setProgress(92, '~1s remaining');
+      }, 5100);
+
+      setTimeout(()=>{
+        setStep(4,'done');
+        setProgress(100, 'complete');
+        writeMockResults();
+      }, 6400);
+
+      setTimeout(()=>{
+        window.location.href = '05_results.html';
+      }, 7200);
+    }
+
+    // init
+    updateTrialPill();
+    runMock();
+  </script>
+</body>
+</html>

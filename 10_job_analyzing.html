@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Generating preview</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 980px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+
+    /* Panel */
+    .panel{
+      margin-top: 16px;
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    .progressWrap{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(110,231,255,.85), rgba(167,139,250,.75));
+      transition: width .3s ease;
+    }
+    .row{
+      margin-top: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .mono{font-family: var(--mono)}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      font-family: var(--mono);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--warn);
+      box-shadow: 0 0 0 4px rgba(251,191,36,.10);
+    }
+    .dot.good{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+    .dot.bad{background: var(--bad); box-shadow:0 0 0 4px rgba(251,113,133,.10)}
+
+    .steps{
+      margin-top: 12px;
+      display:grid;
+      gap: 10px;
+    }
+    .step{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .stepLeft{
+      display:flex; gap: 10px; align-items:flex-start;
+      max-width: 78ch;
+    }
+    .badge{
+      width:28px; height:28px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: var(--mono);
+      font-weight: 900;
+      color: rgba(232,238,252,.88);
+      flex: 0 0 auto;
+    }
+    .badge.good{border-color: rgba(52,211,153,.45); background: rgba(52,211,153,.12)}
+    .badge.fair{border-color: rgba(251,191,36,.40); background: rgba(251,191,36,.10)}
+    .badge.poor{border-color: rgba(251,113,133,.40); background: rgba(251,113,133,.10)}
+
+    .t{font-weight: 950; font-size: 13px}
+    .d{margin-top:4px; color: var(--muted); font-size: 12px; line-height:1.5}
+    .status{
+      color: var(--muted2);
+      font-size: 12px;
+      font-family: var(--mono);
+      white-space:nowrap;
+      padding-top: 2px;
+    }
+
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+    .btnLink{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .btnLink:hover{transform: translateY(-1px); transition:.15s ease; background: rgba(255,255,255,.06)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="07_done.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Generating preview</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <main class="panel" aria-label="Analyzing job placeholder">
+      <h1>Generating Decision Brief preview…</h1>
+      <p class="sub">
+        This is a lightweight placeholder screen. In production, we’ll show evidence links, explicit uncertainties,
+        and the assumptions used to compute fit and gaps.
+      </p>
+
+      <div class="progressWrap" aria-label="Progress">
+        <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+        <div class="row">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <span class="chip" id="jobChip"><span class="dot"></span>job: loaded</span>
+            <span class="chip" id="profileChip"><span class="dot"></span>profile: loaded</span>
+            <span class="chip" id="prefsChip"><span class="dot"></span>prefs: optional</span>
+          </div>
+          <div class="mono" id="pct">0%</div>
+        </div>
+      </div>
+
+      <div class="steps" aria-label="What we are doing">
+        <div class="step" id="s1">
+          <div class="stepLeft">
+            <div class="badge" id="b1">1</div>
+            <div>
+              <div class="t">Extract requirements and signals</div>
+              <div class="d">Identify must-haves, years, stack, scope, and seniority cues from the pasted job text.</div>
+            </div>
+          </div>
+          <div class="status" id="st1">queued</div>
+        </div>
+
+        <div class="step" id="s2">
+          <div class="stepLeft">
+            <div class="badge" id="b2">2</div>
+            <div>
+              <div class="t">Map to resume evidence (not claims)</div>
+              <div class="d">Link job requirements to the strongest available resume evidence. Missing evidence stays explicit.</div>
+            </div>
+          </div>
+          <div class="status" id="st2">queued</div>
+        </div>
+
+        <div class="step" id="s3">
+          <div class="stepLeft">
+            <div class="badge" id="b3">3</div>
+            <div>
+              <div class="t">Identify gaps and risks</div>
+              <div class="d">Separate “fixable gaps” (learnable) from “structural risks” (constraints, seniority mismatch).</div>
+            </div>
+          </div>
+          <div class="status" id="st3">queued</div>
+        </div>
+
+        <div class="step" id="s4">
+          <div class="stepLeft">
+            <div class="badge" id="b4">4</div>
+            <div>
+              <div class="t">Calibrate uncertainty</div>
+              <div class="d">If job text is short or resume is vague, the preview will show lower confidence and explicit unknowns.</div>
+            </div>
+          </div>
+          <div class="status" id="st4">queued</div>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>Boundary:</b> This preview is decision-support. It does not generate deceptive content, and it does not verify truth.
+        Employers verify. Uncertainty is explicit.
+      </div>
+
+      <div class="row" style="margin-top:14px;">
+        <a class="btnLink" href="09_job_intake.html">Cancel <span aria-hidden="true">←</span></a>
+        <span class="pill" id="nextPill">Next: Preview brief</span>
+      </div>
+    </main>
+
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">We show assumptions and uncertainty on purpose.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    function escapeHtml(s){
+      return String(s || '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function hasLocal(key){
+      try { return localStorage.getItem(key) !== null; } catch(_) { return false; }
+    }
+
+    function setChip(id, ok, text){
+      const el = document.getElementById(id);
+      const dotClass = ok ? 'good' : 'bad';
+      el.innerHTML = `<span class="dot ${ok ? 'good' : 'bad'}"></span>${escapeHtml(text)}`;
+    }
+
+    function markStep(n, state){
+      const badge = document.getElementById('b'+n);
+      const status = document.getElementById('st'+n);
+      badge.className = 'badge';
+      if(state === 'running'){
+        badge.classList.add('fair'); status.textContent = 'running…';
+      } else if(state === 'done'){
+        badge.classList.add('good'); badge.textContent = '✓'; status.textContent = 'done';
+      } else {
+        status.textContent = 'queued';
+      }
+    }
+
+    function setProgress(p){
+      const pct = Math.max(0, Math.min(100, p));
+      document.getElementById('barFill').style.width = pct + '%';
+      document.getElementById('pct').textContent = pct + '%';
+    }
+
+    function buildMockDecisionBrief(){
+      // Pull inputs if available
+      const jobRaw = localStorage.getItem('cb_mock_job_raw') || '';
+      let meta = {};
+      try { meta = JSON.parse(localStorage.getItem('cb_mock_job_meta') || '{}'); } catch(_) {}
+      let prefs = null;
+      try { prefs = JSON.parse(localStorage.getItem('cb_mock_preferences') || 'null'); } catch(_) {}
+      let profile = null;
+      try { profile = JSON.parse(localStorage.getItem('cb_mock_profile_confirmed') || 'null'); } catch(_) {}
+      let resumeRes = null;
+      try { resumeRes = JSON.parse(localStorage.getItem('cb_mock_resume_results') || 'null'); } catch(_) {}
+
+      // Simple heuristics for preview verdict/confidence
+      const len = jobRaw.length;
+      const shortPenalty = len < 800 ? 18 : (len < 1400 ? 8 : 0);
+      const structure = resumeRes?.scores?.structure ?? 68;
+      const evidence = resumeRes?.scores?.evidence_strength ?? 61;
+
+      const baseConfidence = Math.max(25, Math.min(85, Math.round((structure*0.55 + evidence*0.45) - shortPenalty)));
+      const confidenceBand = baseConfidence >= 75 ? 'High' : (baseConfidence >= 55 ? 'Medium' : 'Low');
+
+      // Very rough verdict:
+      // if prefs say remote but job text suggests on-site -> caution
+      const prefMode = (prefs?.workMode || '').toLowerCase();
+      const jobLower = jobRaw.toLowerCase();
+      const jobOnsite = jobLower.includes('on-site') || jobLower.includes('onsite') || jobLower.includes('in office');
+      const modeMismatch = prefMode === 'remote' && jobOnsite;
+
+      const verdict = modeMismatch ? 'Caution' : (baseConfidence >= 60 ? 'Consider' : 'Explore');
+
+      const brief = {
+        generatedAtISO: new Date().toISOString(),
+        input: {
+          job: { title: meta.title || 'Unknown', company: meta.company || 'Unknown', url: meta.url || null },
+          notes: meta.notes || null,
+          jobTextLengthChars: len
+        },
+        snapshot: {
+          verdict,
+          confidence: { score: baseConfidence, band: confidenceBand },
+          topSignals: [
+            "Stack match: partial",
+            "Seniority signals: uncertain",
+            "Constraints: " + (prefs ? "known" : "unknown")
+          ],
+          topGaps: [
+            "Missing explicit evidence for ownership/impact (from resume bullets)",
+            "Ambiguity in timeline/scope reduces seniority confidence",
+            "Missing or unclear requirement mapping for 1–2 must-haves"
+          ],
+          uncertainties: [
+            len < 800 ? "Job description is short; requirements may be incomplete." : null,
+            !profile ? "Profile confirmations missing; seniority calibration is weaker." : null,
+            !prefs ? "Preferences not set; feasibility checks have unknowns." : null
+          ].filter(Boolean),
+          suggestedStrategy: [
+            "If applying, target evidence-backed bullets (scope + outcome).",
+            "If constraints mismatch, treat as low priority unless flexibility changes.",
+            "Ask 2 clarification questions early (work mode, scope, seniority expectations)."
+          ]
+        },
+        trace: {
+          used: {
+            cb_mock_job_raw: !!jobRaw,
+            cb_mock_job_meta: !!meta,
+            cb_mock_preferences: !!prefs,
+            cb_mock_profile_confirmed: !!profile,
+            cb_mock_resume_results: !!resumeRes
+          }
+        }
+      };
+
+      try { localStorage.setItem('cb_mock_decision_brief_preview', JSON.stringify(brief)); } catch(_) {}
+    }
+
+    function simulate(){
+      updateTrialPill();
+
+      const hasJob = hasLocal('cb_mock_job_raw') && (localStorage.getItem('cb_mock_job_raw') || '').trim().length > 0;
+      const hasProfile = hasLocal('cb_mock_profile_confirmed');
+      const hasPrefs = hasLocal('cb_mock_preferences');
+
+      setChip('jobChip', hasJob, `job: ${hasJob ? 'loaded' : 'missing'}`);
+      setChip('profileChip', hasProfile, `profile: ${hasProfile ? 'loaded' : 'missing'}`);
+      // prefs are optional
+      document.getElementById('prefsChip').innerHTML =
+        `<span class="dot ${hasPrefs ? 'good' : ''}"></span>prefs: ${hasPrefs ? 'loaded' : 'optional'}`;
+
+      // If job missing, stop and suggest going back
+      if(!hasJob){
+        markStep(1,'queued'); markStep(2,'queued'); markStep(3,'queued'); markStep(4,'queued');
+        setProgress(10);
+        document.getElementById('nextPill').textContent = 'Next: (blocked — missing job text)';
+        setTimeout(() => {
+          alert('No job text found. Please go back and paste a job description.');
+          window.location.href = '09_job_intake.html';
+        }, 900);
+        return;
+      }
+
+      // Run a timed sequence
+      const seq = [
+        { t: 200,  p: 18, s: 1, state: 'running' },
+        { t: 650,  p: 34, s: 1, state: 'done' },
+        { t: 720,  p: 38, s: 2, state: 'running' },
+        { t: 1250, p: 56, s: 2, state: 'done' },
+        { t: 1320, p: 60, s: 3, state: 'running' },
+        { t: 1750, p: 76, s: 3, state: 'done' },
+        { t: 1820, p: 80, s: 4, state: 'running' },
+        { t: 2200, p: 96, s: 4, state: 'done' },
+      ];
+
+      // init
+      [1,2,3,4].forEach(n => markStep(n,'queued'));
+      setProgress(6);
+
+      seq.forEach(item => {
+        setTimeout(() => {
+          // keep previous steps done
+          if(item.s > 1){
+            for(let i=1;i<item.s;i++) markStep(i,'done');
+          }
+          markStep(item.s, item.state);
+          setProgress(item.p);
+        }, item.t);
+      });
+
+      // Build mock brief near end and then navigate
+      setTimeout(() => {
+        buildMockDecisionBrief();
+        setProgress(100);
+      }, 2300);
+
+      setTimeout(() => {
+        window.location.href = '11_job_brief_preview.html';
+      }, 2600);
+    }
+
+    simulate();
+  </script>
+</body>
+</html>

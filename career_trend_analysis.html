@@ -192,6 +192,31 @@ const UI = {
   prep_plan: $("#prep_plan"),
 };
 
+function paddedRange(vals, padFrac=0.15){
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const span = (max - min) || 1;
+  return [min - span*padFrac, max + span*padFrac];
+}
+
+function jitter(points, amount=0.02){
+  const xs = points.map(p=>p[0]);
+  const ys = points.map(p=>p[1]);
+  const xSpan = (Math.max(...xs)-Math.min(...xs)) || 1;
+  const ySpan = (Math.max(...ys)-Math.min(...ys)) || 1;
+
+  return points.map(([x,y]) => [
+    x + (Math.random()-0.5)*amount*xSpan,
+    y + (Math.random()-0.5)*amount*ySpan
+  ]);
+}
+
+
+// const xr = paddedRange(allX);
+// const yr = paddedRange(allY);
+//
+// layout.xaxis = {range: xr, zeroline:false};
+// layout.yaxis = {range: yr, zeroline:false};
+
 function safeJsonParse(txt){
   try { return {ok:true, value: JSON.parse(txt)}; }
   catch(e){ return {ok:false, error: e.message || String(e)}; }
@@ -584,11 +609,17 @@ function renderAll(data){
   // ======================
   // 2) Gap Priority Matrix
   // ======================
+  const gpx = paddedRange(top.map(g=>g.urgency));
+  const gpy = paddedRange(top.map(g=>g.importance));
+  // console.log("urgency", top.map(g=>g.urgency))
+  // console.log("gpx", gpx)
   Plotly.newPlot("chart_gap_priority", [{
     type: "scatter",
     mode: "markers+text",
     x: top.map(g=>g.urgency),
     y: top.map(g=>g.importance),
+    // x: gpx,
+    // y: gpy,
     text: top.map(g=>g.gap),
     textposition: "top center",
     marker: { size: top.map(g=>10 + 25*g.missingRate) },
@@ -600,8 +631,10 @@ function renderAll(data){
     customdata: top.map(g=>pct(g.missingRate))
   }], {
     margin: {l: 45, r: 10, t: 10, b: 45},
-    xaxis: {title:"Urgency (must-have frequency)", range:[0,1]},
-    yaxis: {title:"Importance (normalized weight)", range:[0,1]}
+    // xaxis: {title:"Urgency (must-have frequency)", range:[0,1]},
+    // yaxis: {title:"Importance (normalized weight)", range:[0,1]}
+    xaxis: {title:"Urgency (must-have frequency)", range:gpx},
+    yaxis: {title:"Importance (normalized weight)", range:gpy}
   }, {displayModeBar:false});
 
   // ======================
@@ -704,8 +737,9 @@ function renderClusterChart(jobs, pts2, labels, clusters, emphasizeCluster){
   // Compute hover + cluster legend
   const k = clusters.length;
   const traces = [];
+  let xs = [], ys = [], custom = [];
   for(const c of clusters){
-    const xs = [], ys = [], custom = [];
+    xs = [], ys = [], custom = [];
     for(let i=0;i<jobs.length;i++){
       if(labels[i] !== c.cluster) continue;
       xs.push(pts2[i][0]);
@@ -718,6 +752,8 @@ function renderClusterChart(jobs, pts2, labels, clusters, emphasizeCluster){
       name:`Cluster ${c.cluster} (n=${c.n})`,
       x: xs,
       y: ys,
+      // x: paddedRange(xs),
+      // y: paddedRange(ys),
       marker: {
         size: xs.map((_,idx)=>{
           const fit = custom[idx][3]; // fit
@@ -736,8 +772,8 @@ function renderClusterChart(jobs, pts2, labels, clusters, emphasizeCluster){
 
   Plotly.newPlot("chart_clusters", traces, {
     margin: {l: 35, r: 10, t: 10, b: 35},
-    xaxis: {title:"Embedding X", zeroline:false},
-    yaxis: {title:"Embedding Y", zeroline:false},
+    xaxis: {title:"Embedding X", zeroline:false, range: paddedRange(xs)},
+    yaxis: {title:"Embedding Y", zeroline:false, range: paddedRange(ys)},
     showlegend: true,
     legend: {orientation:"h"}
   }, {displayModeBar:false});

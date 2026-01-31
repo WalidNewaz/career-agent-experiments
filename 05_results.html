@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Resume results</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+
+    /* Onboarding strip */
+    .strip{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.42);
+      backdrop-filter: blur(10px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .steps{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .step{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .step .n{
+      width:18px; height:18px; border-radius: 7px;
+      display:flex; align-items:center; justify-content:center;
+      font-family: var(--mono);
+      font-size: 11px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+    }
+    .step.active{
+      border-color: rgba(110,231,255,.35);
+      background: rgba(110,231,255,.08);
+      color: rgba(232,238,252,.92);
+    }
+    .step.active .n{
+      border-color: rgba(110,231,255,.45);
+      background: rgba(110,231,255,.14);
+    }
+    .eta{
+      color: var(--muted2);
+      font-size: 13px;
+    }
+
+    /* Sections */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    /* Summary header */
+    .summaryTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .readiness{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      min-width: 260px;
+    }
+    .badge{
+      width: 34px; height: 34px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: var(--mono);
+      font-weight: 900;
+      color: rgba(232,238,252,.88);
+      flex: 0 0 auto;
+    }
+    .badge.good{border-color: rgba(52,211,153,.45); background: rgba(52,211,153,.12)}
+    .badge.fair{border-color: rgba(251,191,36,.40); background: rgba(251,191,36,.10)}
+    .badge.poor{border-color: rgba(251,113,133,.40); background: rgba(251,113,133,.10)}
+    .readiness .k{font-size: 12px; color: var(--muted2)}
+    .readiness .v{font-size: 14px; font-weight: 900}
+
+    .meters{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      min-width: 320px;
+      flex: 1;
+    }
+    @media (max-width: 520px){
+      .meters{grid-template-columns: 1fr; min-width: unset; width:100%}
+    }
+    .meter{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .meter .top{
+      display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+    }
+    .meter .label{font-weight: 850; font-size: 13px}
+    .meter .val{font-family: var(--mono); color: rgba(232,238,252,.86); font-size: 12px}
+    .bar{
+      margin-top: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(110,231,255,.85), rgba(167,139,250,.75));
+      transition: width .4s ease;
+    }
+    .meter .hint{
+      margin-top: 8px;
+      color: var(--muted2);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    /* Sections list */
+    .sectionTitle{
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(232,238,252,.82);
+    }
+    .sectionCard{
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .items{
+      margin-top: 10px;
+      display:grid;
+      gap: 10px;
+    }
+    .item{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+    }
+    .itemTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .itemText{
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(232,238,252,.90);
+      font-weight: 750;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
+    }
+    .dot.high{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+    .dot.medium{background: var(--warn); box-shadow:0 0 0 4px rgba(251,191,36,.10)}
+    .dot.low{background: var(--bad); box-shadow:0 0 0 4px rgba(251,113,133,.10)}
+
+    details{
+      margin-top: 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      overflow:hidden;
+    }
+    summary{
+      cursor:pointer;
+      padding: 10px 10px;
+      list-style:none;
+      font-weight: 850;
+      color: rgba(232,238,252,.86);
+      font-size: 12px;
+    }
+    summary::-webkit-details-marker{display:none}
+    .detailsBody{
+      padding: 0 10px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* Right rail */
+    .railCard{
+      padding: 16px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 400px at 15% 0%, rgba(110,231,255,.10), transparent 55%),
+        radial-gradient(700px 450px at 90% 10%, rgba(167,139,250,.10), transparent 55%),
+        rgba(12,23,43,.62);
+    }
+    .railCard h2{
+      margin:0;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .25px;
+      color: rgba(232,238,252,.84);
+      font-weight: 900;
+    }
+    .railCard p{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .list{
+      margin: 12px 0 0;
+      padding: 0;
+      list-style:none;
+      display:grid;
+      gap: 10px;
+    }
+    .li{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+    }
+    .num{
+      width: 24px; height: 24px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: var(--mono);
+      font-weight: 900;
+      font-size: 12px;
+      color: rgba(232,238,252,.86);
+      flex: 0 0 auto;
+      margin-top: 1px;
+    }
+    .li b{display:block; font-size: 13px}
+    .li span{display:block; margin-top: 2px; font-size: 12px; color: var(--muted); line-height: 1.45}
+
+    .ctaRow{
+      margin-top: 12px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 800;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+    .muted{color: var(--muted)}
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+      white-space:nowrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="01_landing.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Resume results</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <!-- Onboarding strip -->
+    <div class="strip" aria-label="Onboarding progress">
+      <div class="steps">
+        <span class="step"><span class="n">1</span>Account</span>
+        <span class="step"><span class="n">2</span>Resume</span>
+        <span class="step active"><span class="n">3</span>Results</span>
+        <span class="step"><span class="n">4</span>Confirm</span>
+        <span class="step"><span class="n">5</span>Done</span>
+      </div>
+      <div class="eta">Review what we inferred, then confirm.</div>
+    </div>
+
+    <div class="grid" aria-label="Results layout">
+      <!-- Left: main results -->
+      <main class="panel" aria-label="Resume analysis results">
+        <h1>Your resume analysis</h1>
+        <p class="sub">
+          These scores describe <b>analysis readiness</b> — how confidently the system can reason from your resume text.
+          They are not a “hireability” rating. Uncertainty stays visible so you can make controlled decisions.
+        </p>
+
+        <div class="summaryTop" aria-label="Summary">
+          <div class="readiness" aria-label="Readiness label">
+            <div class="badge" id="readinessBadge">R</div>
+            <div>
+              <div class="k">Profile readiness</div>
+              <div class="v" id="readinessLabel">—</div>
+              <div class="k" id="generatedAt" style="margin-top:2px;">—</div>
+            </div>
+          </div>
+
+          <div class="meters" aria-label="Score meters">
+            <div class="meter">
+              <div class="top">
+                <div class="label">Structure</div>
+                <div class="val"><span id="structureVal">—</span>/100</div>
+              </div>
+              <div class="bar"><i id="structureBar"></i></div>
+              <div class="hint">Roles + dates clarity. Missing timelines reduce confidence.</div>
+            </div>
+
+            <div class="meter">
+              <div class="top">
+                <div class="label">Evidence strength</div>
+                <div class="val"><span id="evidenceVal">—</span>/100</div>
+              </div>
+              <div class="bar"><i id="evidenceBar"></i></div>
+              <div class="hint">Outcomes + specificity. “Did X” beats “responsible for Y”.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sections injected by JS -->
+        <div class="sectionCard" style="margin-top: 14px;" aria-label="Seniority & scope">
+          <div class="sectionTitle">Seniority & scope signals</div>
+          <div class="items" id="seniorityList"></div>
+        </div>
+
+        <div class="sectionCard" aria-label="Domain indicators">
+          <div class="sectionTitle">Industry / domain indicators</div>
+          <div class="items" id="domainList"></div>
+        </div>
+
+        <div class="sectionCard" aria-label="Strengths">
+          <div class="sectionTitle">Strengths</div>
+          <div class="items" id="strengthsList"></div>
+        </div>
+
+        <div class="sectionCard" aria-label="Gaps">
+          <div class="sectionTitle">Gaps & missing evidence</div>
+          <div class="items" id="gapsList"></div>
+        </div>
+
+        <div class="sectionCard" aria-label="Uncertainty">
+          <div class="sectionTitle">Uncertainties to confirm</div>
+          <div class="items" id="uncertaintiesList"></div>
+        </div>
+
+        <div class="note" aria-label="Guidance note">
+          <b>How to use this:</b> Treat “gaps” as levers to increase decision confidence. You can proceed with uncertainty,
+          but your future job-fit analysis will be more accurate if you confirm timeline and scope.
+        </div>
+      </main>
+
+      <!-- Right: next steps / trial rail -->
+      <aside class="panel" aria-label="Next steps">
+        <div class="railCard">
+          <h2>Next step</h2>
+          <p>
+            Confirm the structured interpretation. We’ll ask you to verify only the fields that matter most for decision quality
+            (titles, companies, dates, current role).
+          </p>
+
+          <div class="ctaRow">
+            <a class="btn primary" href="06_confirm.html">
+              Review & confirm profile <span aria-hidden="true">→</span>
+            </a>
+            <a class="btn" href="03_resume_intake.html">Edit resume text</a>
+          </div>
+
+          <div class="note">
+            <b>Why confirm?</b> In later analyses, small timeline errors can distort seniority and fit conclusions.
+            Confirmation gives you control over what the system believes.
+          </div>
+        </div>
+
+        <div class="sectionCard" style="margin-top: 12px;">
+          <div class="sectionTitle">Top improvements (fastest wins)</div>
+          <ul class="list" id="improvementsList"></ul>
+        </div>
+
+        <div class="sectionCard" style="margin-top: 12px;">
+          <div class="sectionTitle">Model boundary</div>
+          <div class="muted" style="margin-top:8px; font-size: 13px; line-height: 1.55;">
+            We don’t verify truth. We do flag when claims lack supporting evidence or when the text is too ambiguous to
+            support a strong conclusion.
+          </div>
+          <div style="margin-top:10px; color: var(--muted2); font-size: 12px;">
+            Tip: If you’re targeting Staff/Architect roles, add explicit scope indicators:
+            <span class="kbd">ownership</span>, <span class="kbd">scale</span>, <span class="kbd">stakeholders</span>.
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">Clarity, confidence, and control — not persuasion.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    function dotClass(conf){
+      const c = (conf || '').toLowerCase();
+      if(c === 'high') return 'dot high';
+      if(c === 'medium') return 'dot medium';
+      return 'dot low';
+    }
+
+    function whyText(sectionKey){
+      const map = {
+        seniority: "Seniority signals influence what roles are plausible targets and how strict job requirements should be interpreted.",
+        domain: "Domain indicators affect how transferable your experience is to similar industries and how a hiring team may read your background.",
+        strengths: "Strengths are evidence-backed claims you can rely on in downstream fit analysis and positioning.",
+        gaps: "Gaps are missing evidence or missing structure that reduce decision confidence and often drive rejection risk in strict roles.",
+        uncertainties: "Uncertainties are items we could not infer confidently. Confirming them reduces fragile assumptions in later job decisions."
+      };
+      return map[sectionKey] || "This affects how confidently the system can reason from your inputs.";
+    }
+
+    function itemTemplate(text, confidence, sectionKey){
+      const conf = (confidence || 'low').toLowerCase();
+      const label = conf.charAt(0).toUpperCase() + conf.slice(1);
+      return `
+        <div class="item">
+          <div class="itemTop">
+            <div class="itemText">${escapeHtml(text)}</div>
+            <span class="chip"><span class="${dotClass(conf)}"></span>${label}</span>
+          </div>
+          <details>
+            <summary>Why it matters</summary>
+            <div class="detailsBody">${whyText(sectionKey)}</div>
+          </details>
+        </div>
+      `;
+    }
+
+    function escapeHtml(s){
+      return String(s || '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function setMeter(barId, valId, value){
+      const v = Math.max(0, Math.min(100, Number(value || 0)));
+      document.getElementById(valId).textContent = String(v);
+      document.getElementById(barId).style.width = v + '%';
+    }
+
+    function setReadiness(label){
+      const el = document.getElementById('readinessLabel');
+      const badge = document.getElementById('readinessBadge');
+      el.textContent = label || '—';
+
+      const l = String(label || '').toLowerCase();
+      badge.className = 'badge';
+      if(l.includes('strong')){
+        badge.classList.add('good'); badge.textContent = '✓';
+      } else if(l.includes('fair')){
+        badge.classList.add('fair'); badge.textContent = '≈';
+      } else {
+        badge.classList.add('poor'); badge.textContent = '!';
+      }
+    }
+
+    function render(){
+      // Fallback if user lands here directly.
+      const fallback = {
+        generatedAtISO: new Date().toISOString(),
+        scores: { structure: 68, evidence_strength: 61, readiness_label: "Fair" },
+        signals: {
+          seniority: [
+            { label: "Scope ownership language present (medium)", confidence: "medium" },
+            { label: "Leadership evidence unclear (low)", confidence: "low" }
+          ],
+          domain: [
+            { label: "General web engineering signals", confidence: "medium" }
+          ]
+        },
+        strengths: [
+          { text: "Modern frontend stack signals present (React/TypeScript).", confidence: "high" }
+        ],
+        gaps: [
+          { text: "Some roles missing dates or clear progression markers.", confidence: "medium" },
+          { text: "Outcomes/metrics are sparse in several bullets.", confidence: "medium" }
+        ],
+        uncertainties: [
+          { text: "Exact title/scope for current role needs confirmation.", confidence: "low" }
+        ],
+        top_improvements: [
+          "Add month/year dates for each role",
+          "Convert 2–3 bullets into outcome bullets",
+          "Clarify scope (ownership, scale, stakeholders)"
+        ]
+      };
+
+      let data = fallback;
+      try {
+        const raw = localStorage.getItem('cb_mock_resume_results');
+        if(raw) data = JSON.parse(raw);
+      } catch (_) {}
+
+      // Summary
+      setReadiness(data?.scores?.readiness_label);
+      setMeter('structureBar', 'structureVal', data?.scores?.structure);
+      setMeter('evidenceBar', 'evidenceVal', data?.scores?.evidence_strength);
+
+      const ts = data?.generatedAtISO ? new Date(data.generatedAtISO) : new Date();
+      document.getElementById('generatedAt').textContent =
+        `Generated: ${ts.toLocaleString()}`;
+
+      // Lists
+      const seniority = (data?.signals?.seniority || []).map(x =>
+        itemTemplate(x.label, x.confidence, 'seniority')
+      ).join('');
+      document.getElementById('seniorityList').innerHTML = seniority || `<div class="muted">No signals detected.</div>`;
+
+      const domain = (data?.signals?.domain || []).map(x =>
+        itemTemplate(x.label, x.confidence, 'domain')
+      ).join('');
+      document.getElementById('domainList').innerHTML = domain || `<div class="muted">No domain indicators detected.</div>`;
+
+      const strengths = (data?.strengths || []).map(x =>
+        itemTemplate(x.text, x.confidence, 'strengths')
+      ).join('');
+      document.getElementById('strengthsList').innerHTML = strengths || `<div class="muted">No strengths extracted.</div>`;
+
+      const gaps = (data?.gaps || []).map(x =>
+        itemTemplate(x.text, x.confidence, 'gaps')
+      ).join('');
+      document.getElementById('gapsList').innerHTML = gaps || `<div class="muted">No gaps identified.</div>`;
+
+      const uncs = (data?.uncertainties || []).map(x =>
+        itemTemplate(x.text, x.confidence, 'uncertainties')
+      ).join('');
+      document.getElementById('uncertaintiesList').innerHTML = uncs || `<div class="muted">No uncertainties listed.</div>`;
+
+      // Improvements
+      const improvements = (data?.top_improvements || []).slice(0, 5);
+      document.getElementById('improvementsList').innerHTML = improvements.map((t, i) => `
+        <li class="li">
+          <div class="num">${i+1}</div>
+          <div>
+            <b>${escapeHtml(t)}</b>
+            <span>Improves downstream decision confidence.</span>
+          </div>
+        </li>
+      `).join('') || `<li class="muted">No suggestions.</li>`;
+    }
+
+    updateTrialPill();
+    render();
+  </script>
+</body>
+</html>

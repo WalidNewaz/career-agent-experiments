@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Trends (placeholder)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+
+    /* Layout */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Head */
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    /* Cards */
+    .card{
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .sectionTitle{
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(232,238,252,.82);
+    }
+    .mini{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      margin-top: 10px;
+    }
+    .k{font-size: 12px; color: var(--muted2)}
+    .v{margin-top:4px; font-size: 13px; line-height:1.55; color: rgba(232,238,252,.88)}
+    ul{margin:8px 0 0; padding-left:18px}
+    li{margin: 4px 0; color: rgba(232,238,252,.86); line-height:1.55}
+    .mono{font-family: var(--mono)}
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+      white-space:nowrap;
+    }
+
+    /* Simple list blocks */
+    .blockList{
+      margin-top: 10px;
+      display:grid;
+      gap: 10px;
+    }
+    .block{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+    }
+
+    /* Tiny sparkline */
+    .spark{
+      margin-top: 10px;
+      width: 100%;
+      height: 64px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      overflow:hidden;
+      position: relative;
+    }
+    .spark canvas{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+
+    /* Buttons */
+    .ctaRow{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 850;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+
+    .toast{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      max-width: 460px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,26,46,.85);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      color: rgba(232,238,252,.92);
+      font-size: 13px;
+      line-height: 1.5;
+      display:none;
+    }
+
+    .empty{
+      margin-top: 10px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="07_done.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Trends (placeholder)</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <main class="panel" aria-label="Trends">
+        <h1>Trends (early signal)</h1>
+        <p class="sub">
+          These are lightweight summaries derived from your saved briefs. They’re only as good as your inputs.
+          We keep uncertainty explicit and avoid “optimistic spin.”
+        </p>
+
+        <div class="card" aria-label="Repeating gaps">
+          <div class="sectionTitle">Repeating gaps</div>
+          <div class="mini">
+            <div class="k">Top repeating gaps (counted across saved briefs)</div>
+            <div class="v" id="gapsSummary">—</div>
+          </div>
+          <div class="blockList" id="gapsBlocks"></div>
+          <div class="note">
+            <b>Interpretation:</b> If the same gap repeats across multiple target roles, it’s likely a real bottleneck
+            (either evidence missing in the resume, or an actual skill/experience gap).
+          </div>
+        </div>
+
+        <div class="card" aria-label="Constraint mismatch">
+          <div class="sectionTitle">Constraint mismatch signals</div>
+          <div class="mini">
+            <div class="k">What we detected (heuristic)</div>
+            <div class="v" id="constraintsSummary">—</div>
+          </div>
+          <div class="blockList" id="constraintsBlocks"></div>
+          <div class="note">
+            <b>Interpretation:</b> Repeating mismatches usually mean either (1) preferences are too strict for the chosen roles,
+            or (2) you’re targeting roles that don’t match your constraints. Either way, it’s a controllable decision lever.
+          </div>
+        </div>
+
+        <div class="card" aria-label="Confidence movement">
+          <div class="sectionTitle">Confidence movement</div>
+          <div class="mini">
+            <div class="k">Summary (scores from saved briefs)</div>
+            <div class="v" id="confidenceSummary">—</div>
+          </div>
+          <div class="spark" aria-label="Confidence sparkline">
+            <canvas id="spark" width="900" height="160"></canvas>
+          </div>
+          <div class="mini">
+            <div class="k">Last 5 confidence scores</div>
+            <div class="v mono" id="last5">—</div>
+          </div>
+          <div class="note">
+            <b>Interpretation:</b> Falling confidence often means input quality is low (short job text, missing preferences),
+            or repeated uncertainty isn’t being resolved. Improving evidence and confirming constraints should stabilize confidence.
+          </div>
+        </div>
+
+        <div class="ctaRow">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn primary" href="09_job_intake.html">Analyze another job <span aria-hidden="true">→</span></a>
+            <a class="btn" href="03_resume_intake.html">Refine resume</a>
+            <a class="btn" href="08_preferences.html">Adjust preferences</a>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <span class="pill" id="countPill">0 briefs used</span>
+          </div>
+        </div>
+
+        <div class="note">
+          <b>Boundary:</b> Trends are for decision clarity — not “confidence theater.” Employer verification remains the final check.
+        </div>
+      </main>
+
+      <!-- RIGHT RAIL -->
+      <aside class="panel" aria-label="How to use trends">
+        <div class="card" style="margin-top:0;">
+          <div class="sectionTitle">How to use this page</div>
+          <div class="mini">
+            <div class="v" style="margin-top:0;">
+              Use trends to choose what to fix next:
+              <ul>
+                <li><b>Repeating gaps</b> → strengthen evidence or upskill.</li>
+                <li><b>Repeating mismatches</b> → update preferences or target roles.</li>
+                <li><b>Unstable confidence</b> → improve input quality and resolve unknowns.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Data quality">
+          <div class="sectionTitle">Data quality</div>
+          <div class="mini">
+            <div class="k">Coverage</div>
+            <div class="v" id="coverage">—</div>
+            <div class="k" style="margin-top:10px;">Common missing inputs (heuristic)</div>
+            <div class="v" id="missingInputs">—</div>
+          </div>
+          <div class="note">
+            Better inputs → better trends. No persuasion, just clearer uncertainty.
+          </div>
+        </div>
+
+        <div class="card" aria-label="If empty">
+          <div class="sectionTitle">If this is empty</div>
+          <div class="mini">
+            <div class="v" style="margin-top:0;">
+              You’ll need at least <span class="kbd">2</span> saved briefs for meaningful patterns.
+              Generate a brief from a job description and click <b>Save</b>.
+            </div>
+          </div>
+          <div style="margin-top:10px;">
+            <a class="btn primary" href="09_job_intake.html">Go analyze a job</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">Small trends, big clarity.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    function escapeHtml(s){
+      return String(s || '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2200);
+    }
+
+    function loadSaved(){
+      try{
+        const raw = localStorage.getItem('cb_mock_saved_briefs') || '[]';
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch(_) {
+        return [];
+      }
+    }
+
+    function countTop(map, n){
+      return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n);
+    }
+
+    function renderRepeatingGaps(saved){
+      const counts = new Map();
+      const examples = new Map();
+
+      saved.forEach(it => {
+        const gaps = it?.brief?.snapshot?.topGaps || [];
+        gaps.forEach(g => {
+          const key = String(g || '').trim();
+          if(!key) return;
+          counts.set(key, (counts.get(key) || 0) + 1);
+          if(!examples.has(key)){
+            const job = it?.brief?.input?.job || {};
+            examples.set(key, `${job.title || 'Role'} @ ${job.company || 'Company'}`);
+          }
+        });
+      });
+
+      const top = countTop(counts, 6);
+      const summary = top.length
+        ? top.slice(0,3).map(([k,v]) => `${k} (${v}×)`).join(' • ')
+        : '—';
+
+      document.getElementById('gapsSummary').textContent = summary;
+
+      const blocks = document.getElementById('gapsBlocks');
+      blocks.innerHTML = top.length ? top.map(([k,v]) => {
+        const ex = examples.get(k) || '—';
+        return `
+          <div class="block">
+            <div class="k">Gap</div>
+            <div class="v"><b>${escapeHtml(k)}</b></div>
+            <div class="k" style="margin-top:10px;">Count</div>
+            <div class="v"><span class="kbd">${v}×</span></div>
+            <div class="k" style="margin-top:10px;">Example occurrence</div>
+            <div class="v">${escapeHtml(ex)}</div>
+          </div>
+        `;
+      }).join('') : `<div class="empty">No gaps found yet. Save a few briefs first.</div>`;
+    }
+
+    function detectMismatchSignals(brief){
+      // Heuristic: verdict=caution OR notes contain strong constraint language OR job title contains onsite/hybrid OR url/notes mention visa.
+      const verdict = (brief?.snapshot?.verdict || '').toLowerCase();
+      const notes = (brief?.input?.notes || '').toLowerCase();
+      const title = (brief?.input?.job?.title || '').toLowerCase();
+
+      const signals = [];
+      if(verdict.includes('caution')) signals.push('Verdict flagged as caution (possible feasibility mismatch).');
+      if(notes.includes('must') && (notes.includes('remote') || notes.includes('salary') || notes.includes('sponsorship') || notes.includes('visa')))
+        signals.push('Notes include hard constraints (must-remote / salary floor / sponsorship).');
+      if(title.includes('on-site') || title.includes('onsite')) signals.push('Role appears on-site (may conflict with remote preference).');
+      if(title.includes('hybrid')) signals.push('Role appears hybrid (may conflict with remote preference).');
+      if(notes.includes('no relocate') || notes.includes('willing to relocate') || notes.includes('relocate')) signals.push('Relocation constraint noted.');
+      return signals;
+    }
+
+    function renderConstraints(saved){
+      const blocks = document.getElementById('constraintsBlocks');
+      if(!saved.length){
+        document.getElementById('constraintsSummary').textContent = '—';
+        blocks.innerHTML = `<div class="empty">No data yet. Save briefs to see mismatch signals.</div>`;
+        return;
+      }
+
+      let flagged = 0;
+      const rows = saved.map(it => {
+        const b = it?.brief;
+        const job = b?.input?.job || {};
+        const sigs = detectMismatchSignals(b);
+        if(sigs.length) flagged += 1;
+        return { it, b, job, sigs };
+      }).filter(x => x.sigs.length);
+
+      document.getElementById('constraintsSummary').innerHTML =
+        `${flagged} of ${saved.length} briefs show mismatch signals (heuristic).`;
+
+      blocks.innerHTML = rows.length ? rows.slice(0,6).map(x => {
+        const title = x.job.title || 'Role';
+        const company = x.job.company || 'Company';
+        const savedAt = x.it?.savedAtISO ? new Date(x.it.savedAtISO).toLocaleString() : '—';
+        return `
+          <div class="block">
+            <div class="k">Brief</div>
+            <div class="v"><b>${escapeHtml(title)}</b> @ <b>${escapeHtml(company)}</b></div>
+            <div class="k" style="margin-top:10px;">Signals</div>
+            <div class="v">
+              <ul>${x.sigs.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
+            </div>
+            <div class="k" style="margin-top:10px;">Saved</div>
+            <div class="v mono">${escapeHtml(savedAt)}</div>
+          </div>
+        `;
+      }).join('') : `<div class="empty">No mismatch signals detected yet.</div>`;
+    }
+
+    function renderConfidence(saved){
+      const scores = saved.map(it => Number(it?.brief?.snapshot?.confidence?.score ?? NaN)).filter(x => !Number.isNaN(x));
+      const summaryEl = document.getElementById('confidenceSummary');
+      const last5El = document.getElementById('last5');
+
+      if(!scores.length){
+        summaryEl.textContent = '—';
+        last5El.textContent = '—';
+        drawSparkline([]);
+        return;
+      }
+
+      const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+      const min = Math.min(...scores);
+      const max = Math.max(...scores);
+
+      summaryEl.innerHTML = `Avg <span class="kbd">${avg}</span> • Range <span class="kbd">${min}–${max}</span> • n=<span class="kbd">${scores.length}</span>`;
+
+      const last5 = scores.slice(0,5); // saved briefs stored newest-first in our prototype
+      last5El.textContent = last5.join('  •  ');
+
+      // Draw sparkline in chronological order (oldest → newest)
+      const chronological = [...scores].reverse();
+      drawSparkline(chronological);
+    }
+
+    function drawSparkline(data){
+      const canvas = document.getElementById('spark');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Clear
+      ctx.clearRect(0,0,w,h);
+
+      // Background grid
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = 'rgba(255,255,255,.08)';
+      ctx.lineWidth = 1;
+      for(let i=1;i<=3;i++){
+        const y = Math.round((h/4)*i) + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(10, y);
+        ctx.lineTo(w-10, y);
+        ctx.stroke();
+      }
+
+      if(!data.length){
+        ctx.fillStyle = 'rgba(232,238,252,.60)';
+        ctx.font = '12px ' + getComputedStyle(document.documentElement).getPropertyValue('--sans');
+        ctx.fillText('No confidence data yet', 16, 22);
+        return;
+      }
+
+      const min = Math.min(...data);
+      const max = Math.max(...data);
+      const span = Math.max(1, max - min);
+
+      const padX = 14;
+      const padY = 14;
+      const xStep = (w - padX*2) / Math.max(1, data.length - 1);
+
+      const points = data.map((v, i) => {
+        const x = padX + i * xStep;
+        const t = (v - min) / span;
+        const y = (h - padY) - t * (h - padY*2);
+        return {x,y,v};
+      });
+
+      // Line
+      ctx.strokeStyle = 'rgba(110,231,255,.70)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for(let i=1;i<points.length;i++){
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.stroke();
+
+      // Points
+      ctx.fillStyle = 'rgba(167,139,250,.70)';
+      points.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      // Labels (min/max)
+      ctx.fillStyle = 'rgba(232,238,252,.70)';
+      ctx.font = '12px ' + getComputedStyle(document.documentElement).getPropertyValue('--mono');
+      ctx.fillText(String(min), 14, h-10);
+      ctx.fillText(String(max), 14, 18);
+    }
+
+    function renderDataQuality(saved){
+      const coverageEl = document.getElementById('coverage');
+      const missingEl = document.getElementById('missingInputs');
+
+      if(!saved.length){
+        coverageEl.textContent = '—';
+        missingEl.textContent = '—';
+        return;
+      }
+
+      let prefsMissing = 0;
+      let profileMissing = 0;
+      let shortJob = 0;
+
+      saved.forEach(it => {
+        const used = it?.brief?.trace?.used || {};
+        if(!used.cb_mock_preferences) prefsMissing += 1;
+        if(!used.cb_mock_profile_confirmed) profileMissing += 1;
+        const len = Number(it?.brief?.input?.jobTextLengthChars ?? 0);
+        if(len < 900) shortJob += 1;
+      });
+
+      coverageEl.innerHTML = `
+        Saved briefs used: <span class="kbd">${saved.length}</span><br/>
+        Preferences present in: <span class="kbd">${saved.length - prefsMissing}</span> •
+        Profile confirmed in: <span class="kbd">${saved.length - profileMissing}</span> •
+        Adequate job text in: <span class="kbd">${saved.length - shortJob}</span>
+      `;
+
+      const parts = [];
+      if(prefsMissing) parts.push(`Preferences missing in ${prefsMissing}`);
+      if(profileMissing) parts.push(`Profile unconfirmed in ${profileMissing}`);
+      if(shortJob) parts.push(`Short job text in ${shortJob}`);
+      missingEl.textContent = parts.length ? parts.join(' • ') : 'No common missing inputs detected.';
+    }
+
+    function init(){
+      updateTrialPill();
+
+      const saved = loadSaved();
+      document.getElementById('countPill').textContent = `${saved.length} briefs used`;
+
+      renderRepeatingGaps(saved);
+      renderConstraints(saved);
+      renderConfidence(saved);
+      renderDataQuality(saved);
+
+      if(saved.length < 2){
+        toast('Tip: Save at least 2 briefs for clearer patterns.');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

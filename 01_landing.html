@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Decision Support for Job Seekers</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --card:#0f1d35;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .nav a{
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: .15s ease;
+    }
+    .nav a:hover{
+      border-color: var(--stroke);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 650;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
+    }
+    .dot.purple{background: var(--brand2); box-shadow:0 0 0 4px rgba(167,139,250,.10)}
+    .dot.green{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+
+    /* Sections */
+    .section{margin-top: 22px}
+    .hero{
+      margin-top: 18px;
+      display:grid; gap: 18px;
+      grid-template-columns: 1.15fr .85fr;
+      align-items: stretch;
+    }
+    @media (max-width: 900px){
+      .hero{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(10px);
+    }
+    .h1{
+      font-size: 40px;
+      line-height: 1.08;
+      margin: 0;
+      letter-spacing: -0.6px;
+    }
+    @media (max-width: 520px){
+      .h1{font-size: 32px}
+    }
+    .subhead{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 62ch;
+    }
+    .bullets{
+      margin: 16px 0 0;
+      padding: 0;
+      list-style:none;
+      display:grid; gap: 12px;
+    }
+    .bullets li{
+      display:flex; gap: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+    }
+    .icon{
+      width: 30px; height: 30px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      display:flex; align-items:center; justify-content:center;
+      font-family: var(--mono);
+      color: rgba(232,238,252,.75);
+      flex: 0 0 auto;
+    }
+    .bullets b{display:block; margin-bottom: 2px}
+    .bullets span{color: var(--muted); font-size: 14px; line-height: 1.45}
+
+    .ctaRow{
+      margin-top: 16px;
+      display:flex; gap: 10px; flex-wrap: wrap;
+      align-items:center;
+    }
+    .fineprint{
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted2);
+    }
+
+    /* Decision Brief preview card */
+    .previewCard{
+      height: 100%;
+      display:flex; flex-direction:column;
+      gap: 14px;
+      padding: 18px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(800px 400px at 20% 0%, rgba(110,231,255,.10), transparent 55%),
+        radial-gradient(700px 450px at 80% 10%, rgba(167,139,250,.10), transparent 55%),
+        rgba(12,23,43,.62);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .previewTitle{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px;
+    }
+    .previewTitle h3{
+      margin:0; font-size: 14px; letter-spacing:.25px; color: rgba(232,238,252,.85);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .kv .k{color: var(--muted); font-size: 12px}
+    .kv .v{font-weight: 750; font-size: 13px; color: rgba(232,238,252,.92)}
+    .bar{
+      height: 10px;
+      width: 160px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+    .bar > i{
+      display:block; height:100%;
+      width: 68%;
+      background: linear-gradient(90deg, rgba(110,231,255,.85), rgba(167,139,250,.75));
+    }
+    .grid2{
+      display:grid; gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      margin-right: 8px;
+      margin-top: 8px;
+    }
+    .small{font-size: 12px; color: var(--muted2); line-height: 1.45}
+
+    /* Trust strip */
+    .trustStrip{
+      margin-top: 18px;
+      display:flex; gap: 10px; flex-wrap: wrap;
+      justify-content:flex-start;
+    }
+
+    /* How it works */
+    .sectionTitle{
+      font-size: 16px;
+      font-weight: 850;
+      margin: 0 0 10px;
+      letter-spacing: .2px;
+    }
+    .muted{color: var(--muted)}
+    .cards3{
+      display:grid; gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 900px){
+      .cards3{grid-template-columns: 1fr}
+    }
+    .card{
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .card .num{
+      font-family: var(--mono);
+      font-weight: 800;
+      color: rgba(232,238,252,.85);
+      opacity:.9;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      margin-bottom: 10px;
+    }
+    .card h4{margin:0 0 6px; font-size: 15px}
+    .card p{margin:0; color: var(--muted); font-size: 14px; line-height: 1.5}
+
+    /* Trial section */
+    .trialGrid{
+      display:grid; gap: 12px;
+      grid-template-columns: 1.2fr .8fr;
+      align-items: stretch;
+    }
+    @media (max-width: 900px){
+      .trialGrid{grid-template-columns: 1fr}
+    }
+    .list{
+      margin: 10px 0 0;
+      padding: 0;
+      list-style:none;
+      display:grid; gap: 10px;
+    }
+    .list li{
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      display:flex; gap: 10px;
+      align-items:flex-start;
+    }
+    .tick{
+      width: 20px; height: 20px;
+      border-radius: 7px;
+      border: 1px solid rgba(52,211,153,.45);
+      background: rgba(52,211,153,.12);
+      display:flex; align-items:center; justify-content:center;
+      font-size: 12px;
+      color: rgba(232,238,252,.90);
+      flex: 0 0 auto;
+      margin-top: 1px;
+    }
+    .note{
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    .footer{
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <div style="font-size:15px;">ClarityBrief</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:650;">Decision support for job seekers</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Top navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="02_register.html" class="btn" style="padding:9px 12px;">Sign in</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="section hero" aria-label="Hero">
+      <div class="panel">
+        <div class="chip">
+          <span class="dot"></span>
+          <span>Evidence-backed career decisions</span>
+        </div>
+
+        <h1 class="h1" style="margin-top:12px;">
+          Decide which jobs are worth your time — using evidence, not gut feel.
+        </h1>
+
+        <p class="subhead">
+          ClarityBrief turns your resume into a structured career profile, then helps you evaluate opportunities with
+          <b>clarity</b>, <b>confidence</b>, and <b>control</b>. No embellishment. No black-box “hireability” scores.
+        </p>
+
+        <ul class="bullets" aria-label="Core benefits">
+          <li>
+            <div class="icon">DB</div>
+            <div>
+              <b>Decision Briefs</b>
+              <span>Get a one-page, explainable snapshot of what the system knows, what it’s unsure about, and why it matters.</span>
+            </div>
+          </li>
+          <li>
+            <div class="icon">EV</div>
+            <div>
+              <b>Evidence-backed fit</b>
+              <span>We map claims to evidence from your resume. Uncertainty is explicit — so you can act with control.</span>
+            </div>
+          </li>
+          <li>
+            <div class="icon">GX</div>
+            <div>
+              <b>Gaps & strategy</b>
+              <span>Identify high-leverage gaps and practical next steps that improve decision quality — not fabricated optimism.</span>
+            </div>
+          </li>
+        </ul>
+
+        <div class="ctaRow">
+          <a class="btn primary" href="02_register.html" aria-label="Try it free">
+            Try it free — analyze your resume
+            <span aria-hidden="true">→</span>
+          </a>
+          <a class="btn" href="#example" aria-label="See an example">
+            See an example
+          </a>
+        </div>
+
+        <div class="fineprint">
+          Text-only intake (no file uploads). You can edit anything we infer. Scores describe <b>analysis readiness</b>, not personal worth.
+        </div>
+
+        <div class="trustStrip" aria-label="Trust badges">
+          <span class="chip"><span class="dot green"></span>Paste text only</span>
+          <span class="chip"><span class="dot purple"></span>Edit anything</span>
+          <span class="chip"><span class="dot"></span>Uncertainty is explicit</span>
+        </div>
+      </div>
+
+      <!-- Decision Brief Preview -->
+      <aside class="previewCard" aria-label="Decision Brief Preview">
+        <div class="previewTitle">
+          <h3>Decision Brief Preview</h3>
+          <span class="pill">Example (mock)</span>
+        </div>
+
+        <div class="kv">
+          <div>
+            <div class="k">Target role</div>
+            <div class="v">Senior Frontend Engineer</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="k">Confidence</div>
+            <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
+              <div class="bar" aria-label="Confidence meter"><i></i></div>
+              <div class="v" style="font-size:12px;">High</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2" aria-label="Key tiles">
+          <div class="kv">
+            <div>
+              <div class="k">Fit summary</div>
+              <div class="v">Consider</div>
+            </div>
+            <div class="pill" style="border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.10); color:rgba(232,238,252,.88);">
+              Medium risk
+            </div>
+          </div>
+          <div class="kv">
+            <div>
+              <div class="k">Top gap</div>
+              <div class="v">Next.js evidence</div>
+            </div>
+            <div class="pill" style="border-color:rgba(251,113,133,.35); background:rgba(251,113,133,.10); color:rgba(232,238,252,.88);">
+              Missing
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="example">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div>
+              <div style="font-weight:850;">What we know (evidence)</div>
+              <div class="small">Derived from resume bullets and timeline.</div>
+            </div>
+            <span class="pill">Traceable</span>
+          </div>
+          <div class="tag"><span class="dot green" style="width:7px;height:7px;"></span>React/TypeScript depth</div>
+          <div class="tag"><span class="dot green" style="width:7px;height:7px;"></span>Design system ownership</div>
+          <div class="tag"><span class="dot" style="width:7px;height:7px;"></span>Performance work (medium)</div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div>
+              <div style="font-weight:850;">What’s uncertain</div>
+              <div class="small">We don’t guess silently. We label unknowns.</div>
+            </div>
+            <span class="pill">Explicit</span>
+          </div>
+          <div class="tag"><span class="dot purple" style="width:7px;height:7px;"></span>Seniority scope (needs confirm)</div>
+          <div class="tag"><span class="dot purple" style="width:7px;height:7px;"></span>Leadership evidence (low)</div>
+        </div>
+
+        <div class="small" style="margin-top:4px;">
+          This preview shows the style of output you’ll get after you paste your resume text and confirm the structured interpretation.
+        </div>
+      </aside>
+    </section>
+
+    <!-- How it works -->
+    <section class="section panel" id="how-it-works" aria-label="How it works">
+      <h2 class="sectionTitle">How it works</h2>
+      <p class="muted" style="margin:0 0 14px; max-width: 78ch;">
+        You provide evidence (your resume text). We create a structured profile, surface uncertainty, and help you reason about job decisions.
+        The goal is <b>better decisions</b> — not embellishment.
+      </p>
+
+      <div class="cards3" aria-label="Three steps">
+        <div class="card">
+          <div class="num">1</div>
+          <h4>Paste your resume</h4>
+          <p>Text-only intake. We focus on roles, dates, skills, and seniority signals — not formatting.</p>
+        </div>
+        <div class="card">
+          <div class="num">2</div>
+          <h4>Get a profile + readiness scores</h4>
+          <p>We show what’s strong, what’s missing, and what’s uncertain — so you control the next steps.</p>
+        </div>
+        <div class="card">
+          <div class="num">3</div>
+          <h4>Make decisions with a Decision Brief</h4>
+          <p>When you’re ready, evaluate opportunities using evidence-backed fit, gaps, risks, and strategy.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trial preview -->
+    <section class="section panel" aria-label="7-day trial preview">
+      <h2 class="sectionTitle">What you’ll get in the 7-day trial</h2>
+      <div class="trialGrid">
+        <div>
+          <p class="muted" style="margin:0; max-width: 78ch;">
+            Start with a free resume analysis. During the trial, you can iterate on your profile and see how improvements change clarity and confidence.
+          </p>
+
+          <ul class="list" aria-label="Trial features">
+            <li>
+              <div class="tick" aria-hidden="true">✓</div>
+              <div>
+                <div style="font-weight:800;">Resume analysis & readiness scoring</div>
+                <div class="small">Structure, seniority signals, evidence strength, and missing context.</div>
+              </div>
+            </li>
+            <li>
+              <div class="tick" aria-hidden="true">✓</div>
+              <div>
+                <div style="font-weight:800;">Profile refinement (you control edits)</div>
+                <div class="small">Confirm what’s true, correct what’s wrong, and keep uncertainty visible.</div>
+              </div>
+            </li>
+            <li>
+              <div class="tick" aria-hidden="true">✓</div>
+              <div>
+                <div style="font-weight:800;">Guided next steps (no fabrication)</div>
+                <div class="small">Suggestions target evidence quality and clarity — not embellished claims.</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="note" aria-label="Important note">
+          <div style="font-weight:850; margin-bottom: 6px;">What we won’t do</div>
+          <ul style="margin:0; padding-left: 18px; color: var(--muted);">
+            <li>Invent experience, titles, or credentials</li>
+            <li>Produce “hireability” predictions</li>
+            <li>Hide uncertainty behind a single score</li>
+          </ul>
+          <div style="margin-top:10px; color: var(--muted2); font-size: 13px;">
+            The employer is the final verifier. We focus on decision quality and evidence clarity.
+          </div>
+        </aside>
+      </div>
+
+      <div class="ctaRow" style="margin-top: 14px;">
+        <a class="btn primary" href="02_register.html">Try it free — analyze your resume <span aria-hidden="true">→</span></a>
+        <a class="btn" href="#how-it-works">Learn how it works</a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">
+          Decision support for job seekers — clarity, confidence, and control.
+        </div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#how-it-works">How it works</a>
+        <a href="#example">Example output</a>
+        <a href="02_register.html">Sign in</a>
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

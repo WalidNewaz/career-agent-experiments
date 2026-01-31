@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Paste resume</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .nav a{
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: .15s ease;
+    }
+    .nav a:hover{
+      border-color: var(--stroke);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+
+    /* Onboarding strip */
+    .strip{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.42);
+      backdrop-filter: blur(10px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .steps{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .step{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .step .n{
+      width:18px; height:18px; border-radius: 7px;
+      display:flex; align-items:center; justify-content:center;
+      font-family: var(--mono);
+      font-size: 11px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+    }
+    .step.active{
+      border-color: rgba(110,231,255,.35);
+      background: rgba(110,231,255,.08);
+      color: rgba(232,238,252,.92);
+    }
+    .step.active .n{
+      border-color: rgba(110,231,255,.45);
+      background: rgba(110,231,255,.14);
+    }
+    .eta{
+      color: var(--muted2);
+      font-size: 13px;
+    }
+
+    /* Main layout */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 72ch;
+    }
+
+    /* Input */
+    .toolbar{
+      margin-top: 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 750;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+    .btn.ghost{
+      border-color: rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      color: rgba(232,238,252,.85);
+      font-weight: 700;
+      padding: 10px 12px;
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+    .textarea{
+      margin-top: 12px;
+      width:100%;
+      min-height: 360px;
+      resize: vertical;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      outline:none;
+      line-height: 1.45;
+      font-size: 13px;
+      font-family: var(--mono);
+      transition: .15s ease;
+    }
+    .textarea:focus{
+      border-color: rgba(110,231,255,.45);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
+    }
+    .metaRow{
+      margin-top: 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 12px;
+    }
+    .inlineAlert{
+      margin-top: 10px;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .inlineAlert b{color: rgba(232,238,252,.88)}
+    .inlineAlert.warn{
+      border-color: rgba(251,191,36,.22);
+      background: rgba(251,191,36,.06);
+    }
+
+    /* Right rail */
+    .railTitle{
+      margin:0 0 10px;
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(232,238,252,.82);
+    }
+    .bul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    details{
+      margin-top: 12px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    summary{
+      cursor:pointer;
+      padding: 12px 12px;
+      list-style:none;
+      font-weight: 800;
+      color: rgba(232,238,252,.90);
+      font-size: 13px;
+    }
+    summary::-webkit-details-marker{display:none}
+    .detailsBody{
+      padding: 0 12px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+      white-space:nowrap;
+    }
+
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="01_landing.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Resume intake</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <!-- Onboarding strip -->
+    <div class="strip" aria-label="Onboarding progress">
+      <div class="steps">
+        <span class="step"><span class="n">1</span>Account</span>
+        <span class="step active"><span class="n">2</span>Resume</span>
+        <span class="step"><span class="n">3</span>Results</span>
+        <span class="step"><span class="n">4</span>Confirm</span>
+        <span class="step"><span class="n">5</span>Done</span>
+      </div>
+      <div class="eta">Estimated time: ~2 minutes</div>
+    </div>
+
+    <!-- Main -->
+    <main class="grid" aria-label="Resume intake">
+      <!-- Left: input -->
+      <section class="panel" aria-label="Paste resume">
+        <h1>Paste your resume</h1>
+        <p class="sub">
+          Paste your resume as <b>plain text</b> or <b>Markdown</b>. We’ll extract roles, companies, dates, skills, seniority signals,
+          and evidence strength. We don’t invent credentials or rewrite your claims.
+        </p>
+
+        <div class="toolbar" aria-label="Resume tools">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <button class="btn ghost" type="button" onclick="togglePrefill()">
+              Prefill with sample resume
+            </button>
+            <button class="btn ghost" type="button" onclick="clearText()">
+              Clear
+            </button>
+            <span style="color:var(--muted2); font-size:12px;">
+              Tip: include <span class="kbd">Company</span>, <span class="kbd">Title</span>, <span class="kbd">Dates</span> per role.
+            </span>
+          </div>
+
+          <a class="link" href="#" onclick="alert('No uploads in this prototype. Paste text only.'); return false;">
+            Why no uploads?
+          </a>
+        </div>
+
+        <textarea id="resumeText" class="textarea" placeholder="Paste resume text here…"></textarea>
+
+        <div class="metaRow">
+          <div id="charMeta">0 characters</div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <span style="color:var(--muted2);">No OCR. No file uploads.</span>
+            <span class="pill" style="border-color:rgba(255,255,255,.10); background:rgba(255,255,255,.03);">Text-only intake</span>
+          </div>
+        </div>
+
+        <div id="inlineHint" class="inlineAlert warn" style="display:none;">
+          <b>Not enough structure yet.</b> Add at least one role with a title, company, and dates so the system can reason confidently.
+        </div>
+
+        <div style="margin-top: 14px; display:flex; gap: 10px; flex-wrap: wrap; align-items:center; justify-content:space-between;">
+          <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn primary" type="button" onclick="analyzeResume()">
+              Analyze my resume <span aria-hidden="true">→</span>
+            </button>
+            <a class="btn" href="06_done.html" style="text-align:center;">
+              Skip for now
+            </a>
+          </div>
+          <a class="link" href="02_register.html">Back</a>
+        </div>
+
+        <div class="inlineAlert" style="margin-top: 14px;">
+          <b>How we treat honesty:</b> We can’t verify truth, but we can flag when claims lack supporting evidence or when timelines are unclear.
+          Employers remain the final verifier.
+        </div>
+      </section>
+
+      <!-- Right: tips and examples -->
+      <aside class="panel" aria-label="Guidance">
+        <div class="railTitle">What we analyze</div>
+        <ul class="bul">
+          <li><b>Roles & timeline</b>: titles, companies, dates, overlaps</li>
+          <li><b>Skills</b>: normalized tools and technologies</li>
+          <li><b>Seniority signals</b>: scope, ownership, leadership indicators</li>
+          <li><b>Evidence strength</b>: outcomes vs responsibilities</li>
+          <li><b>Uncertainty</b>: missing dates, vague bullets, unclear scope</li>
+        </ul>
+
+        <div class="railTitle" style="margin-top:14px;">What we don’t do</div>
+        <ul class="bul">
+          <li>Invent experience, titles, or credentials</li>
+          <li>Write embellished bullet points</li>
+          <li>Hide uncertainty behind a single score</li>
+        </ul>
+
+        <details>
+          <summary>Example snippet (good structure)</summary>
+          <div class="detailsBody">
+            <div class="kbd" style="display:inline-block; margin-bottom: 8px;">Copy pattern</div>
+            <pre style="margin:0; white-space:pre-wrap; color: rgba(232,238,252,.82); font-family: var(--mono); font-size: 12px; line-height: 1.45;">
+Senior Frontend Engineer — Acme SaaS (B2B) | Jan 2022 – Present
+- Led design system rollout used by 12 teams; cut UI defects ~25%
+- Improved web performance (LCP) from 3.1s → 1.8s via caching and code splitting
+- Partnered with Product/Design; owned architecture for 3 critical flows
+            </pre>
+          </div>
+        </details>
+
+        <details>
+          <summary>What improves confidence fastest?</summary>
+          <div class="detailsBody">
+            <ol style="margin:0; padding-left: 18px;">
+              <li>Add <b>month/year dates</b> for each role</li>
+              <li>Include 1–2 <b>outcomes</b> (metrics optional)</li>
+              <li>Clarify <b>scope</b>: ownership, scale, collaboration</li>
+            </ol>
+          </div>
+        </details>
+
+        <div class="note">
+          <b>Privacy note:</b> This is a prototype UI. In a real system, your resume text is stored securely and versioned so you can track improvements over time.
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">Decision support, not verification.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const SAMPLE_RESUME = `WALID S NEWAZ
+Denver, CO • walid@example.com • linkedin.com/in/example • github.com/example
+
+SUMMARY
+Senior Full Stack Engineer with 8+ years building React/TypeScript frontends and Java/Spring Boot APIs in FinTech. Focused on frontend architecture, performance, and mentorship.
+
+SKILLS
+React, TypeScript, Redux, GraphQL, Node.js, Java, Spring Boot, REST, PostgreSQL, Docker, AWS
+
+EXPERIENCE
+Senior Full Stack Engineer — FinTechCo | Feb 2021 – Present
+- Led modernization of a React + TypeScript app used by 20k+ users; improved performance and reduced bundle size
+- Designed shared component library and usage guidelines; improved consistency across teams
+- Built Spring Boot services with JWT auth and PostgreSQL; improved reliability via structured logging and tracing
+
+Frontend Engineer — EnterpriseBank | Jun 2018 – Jan 2021
+- Implemented GraphQL client patterns and caching strategy; improved page responsiveness
+- Partnered with Design on UI patterns and accessibility improvements
+- Supported CI/CD improvements and safer deployments with feature flags
+
+Software Engineer — SaaSWorks | Aug 2016 – May 2018
+- Built UI features in React; collaborated with backend to define API contracts
+- Wrote unit tests and improved code quality through reviews
+
+EDUCATION
+B.S. Computer Science — Example University`;
+
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    function setCharMeta(){
+      const t = document.getElementById('resumeText').value || '';
+      document.getElementById('charMeta').textContent = `${t.length.toLocaleString()} characters`;
+      // Heuristic: show warning if too short / no obvious role structure.
+      const hasDates = /\b(20\d{2}|19\d{2})\b/.test(t);
+      const hasRoleCue = /(Experience|EXPERIENCE|Engineer|Developer|Manager|Lead|Director|Intern)/.test(t);
+      const warn = t.trim().length > 0 && !(hasDates && hasRoleCue) && t.trim().length < 500;
+      document.getElementById('inlineHint').style.display = warn ? 'block' : 'none';
+    }
+
+    function togglePrefill(){
+      const el = document.getElementById('resumeText');
+      if(el.value.trim().length === 0) el.value = SAMPLE_RESUME;
+      else if(el.value.trim() === SAMPLE_RESUME.trim()) el.value = '';
+      else el.value = SAMPLE_RESUME;
+      setCharMeta();
+    }
+
+    function clearText(){
+      document.getElementById('resumeText').value = '';
+      setCharMeta();
+    }
+
+    function analyzeResume(){
+      const t = document.getElementById('resumeText').value.trim();
+      if(t.length < 120){
+        alert('Please paste more resume text (at least a few sections/roles).');
+        return;
+      }
+      // Store resume raw text for later screens.
+      try {
+        localStorage.setItem('cb_mock_resume_raw', t);
+      } catch (_) {}
+
+      window.location.href = '04_analyzing.html';
+    }
+
+    // init
+    updateTrialPill();
+    document.getElementById('resumeText').addEventListener('input', setCharMeta);
+    setCharMeta();
+  </script>
+</body>
+</html>

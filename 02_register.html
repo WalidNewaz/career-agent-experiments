@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Create account</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --card:#0f1d35;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar (same visual language as landing) */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .nav a{
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: .15s ease;
+    }
+    .nav a:hover{
+      border-color: var(--stroke);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+
+    /* Onboarding stepper strip */
+    .strip{
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.42);
+      backdrop-filter: blur(10px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .steps{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .step{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .step .n{
+      width:18px; height:18px; border-radius: 7px;
+      display:flex; align-items:center; justify-content:center;
+      font-family: var(--mono);
+      font-size: 11px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+    }
+    .step.active{
+      border-color: rgba(110,231,255,.35);
+      background: rgba(110,231,255,.08);
+      color: rgba(232,238,252,.92);
+    }
+    .step.active .n{
+      border-color: rgba(110,231,255,.45);
+      background: rgba(110,231,255,.14);
+    }
+    .eta{
+      color: var(--muted2);
+      font-size: 13px;
+    }
+
+    /* Main layout */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr 0.9fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    .card{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 400px at 15% 0%, rgba(110,231,255,.10), transparent 55%),
+        radial-gradient(700px 450px at 90% 10%, rgba(167,139,250,.10), transparent 55%),
+        rgba(12,23,43,.62);
+      padding: 18px;
+    }
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 70ch;
+    }
+
+    /* Form */
+    .form{
+      margin-top: 14px;
+      display:grid;
+      gap: 12px;
+    }
+    .field label{
+      display:block;
+      font-size: 13px;
+      color: rgba(232,238,252,.85);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      outline: none;
+      transition: .15s ease;
+    }
+    .input:focus{
+      border-color: rgba(110,231,255,.45);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
+    }
+    .row{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap: wrap;
+    }
+    .check{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .check input{margin-top: 3px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 750;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+    .helper{
+      margin-top: 8px;
+      color: var(--muted2);
+      font-size: 12px;
+    }
+    .divider{
+      margin: 12px 0;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color: var(--muted2);
+      font-size: 12px;
+    }
+    .divider:before, .divider:after{
+      content:"";
+      height:1px;
+      flex: 1;
+      background: rgba(255,255,255,.10);
+    }
+
+    /* Right rail */
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      margin-right: 8px;
+      margin-top: 8px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
+    }
+    .dot.green{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+    .dot.purple{background: var(--brand2); box-shadow:0 0 0 4px rgba(167,139,250,.10)}
+    .railTitle{
+      margin:0 0 10px;
+      font-size: 13px;
+      font-weight: 850;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(232,238,252,.82);
+    }
+    .bul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="01_landing.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Trial onboarding</div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <nav class="nav" aria-label="Top navigation">
+        <a href="01_landing.html">Back to landing</a>
+      </nav>
+    </header>
+
+    <!-- Onboarding strip -->
+    <div class="strip" aria-label="Onboarding progress">
+      <div class="steps">
+        <span class="step active"><span class="n">1</span>Account</span>
+        <span class="step"><span class="n">2</span>Resume</span>
+        <span class="step"><span class="n">3</span>Results</span>
+        <span class="step"><span class="n">4</span>Confirm</span>
+        <span class="step"><span class="n">5</span>Done</span>
+      </div>
+      <div class="eta">Estimated time: ~2 minutes</div>
+    </div>
+
+    <!-- Main -->
+    <main class="grid" aria-label="Registration screen">
+      <!-- Left: form -->
+      <section class="panel" aria-label="Create account">
+        <h1>Create your account</h1>
+        <p class="sub">
+          Start a 7-day trial. Paste your resume as text, get an analysis, and review what the system inferred.
+          You can edit anything — uncertainty is shown explicitly.
+        </p>
+
+        <form class="form" onsubmit="return goNext(event)">
+          <div class="field">
+            <label for="email">Email</label>
+            <input class="input" id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+            <div class="helper">We use this to save your profile and trial progress.</div>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input class="input" id="password" name="password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required />
+            <div class="helper">8+ characters. (Prototype: no real auth implemented.)</div>
+          </div>
+
+          <div class="check">
+            <input id="consent" type="checkbox" required />
+            <label for="consent">
+              I agree to the <a class="link" href="#" onclick="alert('Placeholder: Terms'); return false;">Terms</a> and
+              <a class="link" href="#" onclick="alert('Placeholder: Privacy'); return false;">Privacy</a>.
+              I understand this tool supports decision-making and does not verify employment claims.
+            </label>
+          </div>
+
+          <div class="row" style="margin-top:4px;">
+            <button class="btn primary" type="submit">
+              Start 7-day trial
+              <span aria-hidden="true">→</span>
+            </button>
+            <a class="link" href="#" onclick="alert('Placeholder: Sign in flow'); return false;">Already have an account? Sign in</a>
+          </div>
+
+          <div class="divider">optional</div>
+
+          <button class="btn" type="button" onclick="alert('Placeholder: magic link');">
+            Email me a magic link (coming soon)
+          </button>
+        </form>
+
+        <div class="note" style="margin-top:14px;">
+          <div style="font-weight:850; margin-bottom:6px;">What happens next</div>
+          <ol class="bul" style="margin:0;">
+            <li>Paste your resume text (no uploads)</li>
+            <li>Get readiness scores + seniority signals</li>
+            <li>Confirm the structured interpretation</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Right: value / trust rail -->
+      <aside class="panel" aria-label="What you'll get">
+        <div class="card">
+          <div class="railTitle">In ~2 minutes you’ll see</div>
+          <ul class="bul">
+            <li><b>Structure score</b> (roles/dates clarity)</li>
+            <li><b>Evidence strength</b> (outcomes vs responsibilities)</li>
+            <li><b>Seniority signals</b> (scope, ownership, leadership)</li>
+            <li><b>Gaps & uncertainties</b> that limit confidence</li>
+          </ul>
+
+          <div style="margin-top:12px;">
+            <span class="chip"><span class="dot green"></span>Paste text only</span>
+            <span class="chip"><span class="dot purple"></span>Edit anything</span>
+            <span class="chip"><span class="dot"></span>Uncertainty is explicit</span>
+          </div>
+
+          <div class="note">
+            <div style="font-weight:850; margin-bottom:6px;">Product boundary</div>
+            We help you improve <b>clarity</b> and <b>decision quality</b>. We don’t invent experience or encourage embellishment.
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">Clarity, confidence, and control — not persuasion.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="01_landing.html">Landing</a>
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Prototype navigation: pretend registration succeeded, then go to resume intake.
+    function goNext(e){
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('password').value;
+      const consent = document.getElementById('consent').checked;
+
+      if(!email || !pw || !consent){
+        alert('Please complete the form.');
+        return false;
+      }
+
+      // Store minimal mock "session" info for later screens (optional).
+      try {
+        localStorage.setItem('cb_mock_user', JSON.stringify({
+          email,
+          trialStartISO: new Date().toISOString(),
+          trialDays: 7
+        }));
+      } catch (_) {}
+
+      window.location.href = '03_resume_intake.html';
+      return false;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Job preferences</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+
+    /* Layout */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    /* Cards + form */
+    .card{
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .sectionTitle{
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(232,238,252,.82);
+    }
+    .fieldGrid{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 680px){
+      .fieldGrid{grid-template-columns: 1fr}
+    }
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: rgba(232,238,252,.85);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .input, select, textarea{
+      width:100%;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      outline: none;
+      transition: .15s ease;
+      font-family: var(--sans);
+    }
+    textarea{
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.45;
+      font-size: 13px;
+    }
+    .input:focus, select:focus, textarea:focus{
+      border-color: rgba(110,231,255,.45);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
+    }
+    .hint{
+      margin-top: 6px;
+      color: var(--muted2);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .row{
+      margin-top: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .chips{
+      display:flex; gap: 8px; flex-wrap: wrap; align-items:center;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      font-family: var(--mono);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--warn);
+      box-shadow: 0 0 0 4px rgba(251,191,36,.10);
+    }
+    .dot.good{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+    .dot.bad{background: var(--bad); box-shadow:0 0 0 4px rgba(251,113,133,.10)}
+
+    /* Buttons */
+    .ctaRow{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 850;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+
+    /* Reflection panel */
+    .warnBox{
+      margin-top: 10px;
+      border-radius: 16px;
+      padding: 12px 12px;
+      border: 1px solid rgba(251,191,36,.25);
+      background: rgba(251,191,36,.07);
+      color: rgba(232,238,252,.88);
+      font-size: 13px;
+      line-height: 1.55;
+      display:none;
+    }
+    .warnBox b{color: rgba(232,238,252,.95)}
+    .warnList{
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: rgba(232,238,252,.85);
+    }
+
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+      white-space:nowrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="07_done.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Job preferences</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <div class="grid">
+      <main class="panel" aria-label="Preferences form">
+        <h1>Set preferences & constraints</h1>
+        <p class="sub">
+          Preferences improve decision quality because they prevent “good fit on paper” outcomes that fail your real constraints.
+          You can leave items blank — we’ll keep uncertainty explicit.
+        </p>
+
+        <div class="card">
+          <div class="sectionTitle">Core constraints (recommended)</div>
+
+          <div class="fieldGrid">
+            <div class="field">
+              <label for="workMode">Work mode <span style="opacity:.7">(required)</span></label>
+              <select id="workMode">
+                <option value="">Select…</option>
+                <option>Remote</option>
+                <option>Hybrid</option>
+                <option>On-site</option>
+                <option>Flexible</option>
+              </select>
+              <div class="hint">Used to filter incompatible roles early.</div>
+            </div>
+
+            <div class="field">
+              <label for="relocate">Willing to relocate?</label>
+              <select id="relocate">
+                <option value="">Select…</option>
+                <option>No</option>
+                <option>Yes</option>
+                <option>Maybe</option>
+              </select>
+              <div class="hint">Relocation changes what “reasonable options” mean.</div>
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div class="field">
+              <label for="locations">Preferred locations (optional)</label>
+              <input class="input" id="locations" placeholder="e.g., Denver, CO; Austin, TX; Remote US" />
+              <div class="hint">Comma/semicolon separated is fine.</div>
+            </div>
+            <div class="field">
+              <label for="visa">Work authorization / visa constraints</label>
+              <select id="visa">
+                <option value="">Select…</option>
+                <option>No restrictions</option>
+                <option>Needs sponsorship</option>
+                <option>Has work authorization (limited)</option>
+                <option>Unknown / prefer not to say</option>
+              </select>
+              <div class="hint">This affects feasibility and strategy.</div>
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div class="field">
+              <label for="salaryMin">Salary floor (USD)</label>
+              <input class="input" id="salaryMin" placeholder="e.g., 160000" inputmode="numeric" />
+              <div class="hint">Used for go/no-go decisions, not negotiation advice.</div>
+            </div>
+            <div class="field">
+              <label for="salaryFlex">Salary flexibility</label>
+              <select id="salaryFlex">
+                <option value="">Select…</option>
+                <option>Not flexible</option>
+                <option>Slightly flexible</option>
+                <option>Flexible for better fit</option>
+              </select>
+              <div class="hint">Helps detect contradictions (e.g., high floor + early-stage preference).</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="chips">
+              <span class="chip" id="reqMode"><span class="dot"></span>work mode</span>
+              <span class="chip" id="confPill"><span class="dot"></span>uncertainty: medium</span>
+            </div>
+            <span class="pill" id="savedPill">Not saved</span>
+          </div>
+
+          <div class="warnBox" id="warnBox">
+            <b>Potential contradictions detected</b>
+            <ul class="warnList" id="warnList"></ul>
+            <div class="hint" style="margin-top:8px;">
+              You can proceed anyway — these are prompts to make assumptions explicit.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="sectionTitle">Role focus</div>
+          <div class="fieldGrid">
+            <div class="field">
+              <label for="roleFocus">Primary role focus</label>
+              <select id="roleFocus">
+                <option value="">Select…</option>
+                <option>Frontend</option>
+                <option>Backend</option>
+                <option>Full-stack</option>
+                <option>Platform / Infrastructure</option>
+                <option>Data / ML</option>
+                <option>Security</option>
+                <option>Leadership / Management</option>
+              </select>
+              <div class="hint">Influences how we interpret requirements and gaps.</div>
+            </div>
+            <div class="field">
+              <label for="seniorityTarget">Target seniority (optional)</label>
+              <select id="seniorityTarget">
+                <option value="">Select…</option>
+                <option>Mid-level</option>
+                <option>Senior</option>
+                <option>Staff</option>
+                <option>Principal</option>
+                <option>Manager</option>
+                <option>Director+</option>
+              </select>
+              <div class="hint">Used to calibrate “strictness” of gaps and evidence requirements.</div>
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div class="field">
+              <label for="mustHave">Must-have keywords (optional)</label>
+              <input class="input" id="mustHave" placeholder="e.g., React, TypeScript, GraphQL" />
+              <div class="hint">A lightweight way to express what matters without over-filtering.</div>
+            </div>
+            <div class="field">
+              <label for="avoid">Avoid (optional)</label>
+              <input class="input" id="avoid" placeholder="e.g., 100% on-site, heavy travel, legacy IE support" />
+              <div class="hint">Used as “risk flags” rather than hard filters unless you mark deal-breakers.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="sectionTitle">Company preferences</div>
+          <div class="fieldGrid">
+            <div class="field">
+              <label for="companyStage">Company stage / size</label>
+              <select id="companyStage">
+                <option value="">Select…</option>
+                <option>Early-stage (Seed/Series A)</option>
+                <option>Growth (Series B/C)</option>
+                <option>Late-stage / Pre-IPO</option>
+                <option>Enterprise</option>
+                <option>No preference</option>
+              </select>
+              <div class="hint">Used for trade-offs: risk tolerance, comp type, scope, speed.</div>
+            </div>
+            <div class="field">
+              <label for="compType">Compensation preference</label>
+              <select id="compType">
+                <option value="">Select…</option>
+                <option>Base-heavy</option>
+                <option>Balanced (base + bonus + equity)</option>
+                <option>Equity upside OK</option>
+                <option>No preference</option>
+              </select>
+              <div class="hint">Useful when comparing offers under uncertainty.</div>
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div class="field">
+              <label for="dealbreakers">Deal-breakers (explicit)</label>
+              <textarea id="dealbreakers" placeholder="e.g., No on-call; No relocation; Salary must be ≥ 160k; Must be remote"></textarea>
+              <div class="hint">These become hard constraints in Decision Briefs.</div>
+            </div>
+            <div class="field">
+              <label for="nicetohave">Nice-to-haves</label>
+              <textarea id="nicetohave" placeholder="e.g., Learning budget; Mentorship; Modern frontend tooling"></textarea>
+              <div class="hint">These influence scoring but won’t block roles by default.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctaRow">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn primary" type="button" onclick="savePrefs(false)">Save preferences</button>
+            <button class="btn" type="button" onclick="savePrefs(true)">Save & continue <span aria-hidden="true">→</span></button>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <a class="link" href="07_done.html">Back</a>
+            <a class="link" href="09_job_intake.html">Skip for now</a>
+          </div>
+        </div>
+
+        <div class="note">
+          <b>Boundary reminder:</b> Preferences are about feasibility and control — not “gaming” hiring.
+          If something is unknown, leave it unknown; the system will carry that uncertainty forward explicitly.
+        </div>
+      </main>
+
+      <aside class="panel" aria-label="Reflection and why it matters">
+        <div class="card" style="margin-top:0;">
+          <div class="sectionTitle">Why preferences matter</div>
+          <div class="hint" style="margin-top:10px; font-size:13px;">
+            A strong resume-to-job fit can still be a bad decision if constraints don’t align.
+            Capturing constraints early reduces wasted applications and improves strategy.
+          </div>
+          <div class="card" style="margin-top:12px; background: rgba(255,255,255,.02);">
+            <div class="sectionTitle">How this changes Decision Briefs</div>
+            <div class="hint" style="margin-top:10px; font-size:13px; line-height:1.6;">
+              <ul style="margin:0; padding-left:18px;">
+                <li><b>Deal-breakers</b> become hard filters (explicit “No”).</li>
+                <li><b>Salary floor</b> becomes a go/no-go constraint (not negotiation coaching).</li>
+                <li><b>Work mode</b> prevents unrealistic suggestions (“just relocate”).</li>
+                <li><b>Visa status</b> changes strategy and feasibility.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px; background: rgba(255,255,255,.02);">
+            <div class="sectionTitle">Saved profile snapshot</div>
+            <div class="hint" style="margin-top:10px; font-size:13px; line-height:1.6;" id="profileSnap">
+              Checking confirmed profile…
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="sectionTitle">Next</div>
+          <div class="hint" style="margin-top:10px; font-size:13px; line-height:1.6;">
+            When you’re ready, paste a job description to generate a <b>preview Decision Brief</b>.
+          </div>
+          <div style="margin-top:12px;">
+            <a class="btn primary" href="09_job_intake.html">Analyze a job (trial) <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">Preferences reduce fragile assumptions.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    function setReqChip(ok){
+      const el = document.getElementById('reqMode');
+      el.innerHTML = `<span class="dot ${ok ? 'good' : ''}"></span>work mode`;
+    }
+
+    function loadExisting(){
+      try{
+        const raw = localStorage.getItem('cb_mock_preferences');
+        if(!raw) return;
+        const p = JSON.parse(raw);
+
+        const set = (id, v) => {
+          const el = document.getElementById(id);
+          if(!el) return;
+          if(el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') el.value = v ?? '';
+        };
+
+        set('workMode', p.workMode);
+        set('relocate', p.relocate);
+        set('locations', p.locations);
+        set('visa', p.visa);
+        set('salaryMin', p.salaryMin);
+        set('salaryFlex', p.salaryFlex);
+        set('roleFocus', p.roleFocus);
+        set('seniorityTarget', p.seniorityTarget);
+        set('mustHave', p.mustHave);
+        set('avoid', p.avoid);
+        set('companyStage', p.companyStage);
+        set('compType', p.compType);
+        set('dealbreakers', p.dealbreakers);
+        set('nicetohave', p.nicetohave);
+
+        document.getElementById('savedPill').textContent = `Saved: ${new Date(p.savedAtISO).toLocaleString()}`;
+      } catch(_) {}
+    }
+
+    function profileSnapshot(){
+      const el = document.getElementById('profileSnap');
+      try{
+        const raw = localStorage.getItem('cb_mock_profile_confirmed');
+        if(!raw){
+          el.innerHTML = `No confirmed profile found. You can still set preferences, but confirmations improve decision quality.`;
+          return;
+        }
+        const p = JSON.parse(raw);
+        const title = p?.current?.title || 'Unknown title';
+        const company = p?.current?.company || 'Unknown company';
+        const start = p?.current?.start || 'Unknown start';
+        el.innerHTML = `
+          Current: <b>${escapeHtml(title)}</b> @ <b>${escapeHtml(company)}</b><br/>
+          Start: <span class="kbd">${escapeHtml(start)}</span><br/>
+          Roles: <b>${Array.isArray(p?.roles) ? p.roles.length : 0}</b> captured
+        `;
+      } catch(_){
+        el.textContent = 'Could not read profile snapshot.';
+      }
+    }
+
+    function escapeHtml(s){
+      return String(s || '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function val(id){ return (document.getElementById(id)?.value || '').trim(); }
+
+    function computeUncertainty(){
+      // Very simple: count how many core fields are missing.
+      const core = ['workMode','salaryMin','visa'].map(id => val(id)).filter(Boolean).length;
+      // 0-3 -> uncertainty high/med/low-ish
+      if(core >= 3) return 'low';
+      if(core === 2) return 'medium';
+      return 'high';
+    }
+
+    function updateStatus(){
+      const modeOk = !!val('workMode');
+      setReqChip(modeOk);
+
+      const u = computeUncertainty();
+      const conf = document.getElementById('confPill');
+      const dotClass = u === 'low' ? 'good' : (u === 'high' ? 'bad' : '');
+      conf.innerHTML = `<span class="dot ${dotClass}"></span>uncertainty: ${u}`;
+    }
+
+    function detectContradictions(p){
+      const warnings = [];
+
+      const mode = (p.workMode || '').toLowerCase();
+      const relocate = (p.relocate || '').toLowerCase();
+      const locs = (p.locations || '').toLowerCase();
+      const stage = (p.companyStage || '').toLowerCase();
+      const salaryMin = Number(String(p.salaryMin || '').replace(/[^0-9]/g,'') || 0);
+      const flex = (p.salaryFlex || '').toLowerCase();
+      const visa = (p.visa || '').toLowerCase();
+      const deal = (p.dealbreakers || '').toLowerCase();
+
+      // 1) Remote-only but also strong on-site signals in dealbreakers/avoid
+      if(mode === 'remote' && deal.includes('on-site') && deal.includes('ok')){
+        warnings.push('Work mode is Remote, but deal-breakers mention on-site as OK. Consider clarifying.');
+      }
+
+      // 2) Remote but location is specific and relocate is No (not a contradiction, but might be overly narrow)
+      if(mode === 'remote' && relocate === 'no' && locs && !locs.includes('remote')){
+        warnings.push('Remote + no relocation + specific city list may overly narrow options. If intentional, ignore.');
+      }
+
+      // 3) High salary floor + early-stage preference + not flexible
+      const early = stage.includes('early') || stage.includes('seed') || stage.includes('series a');
+      if(salaryMin >= 180000 && early && flex.includes('not')){
+        warnings.push('High salary floor + early-stage preference + not flexible can reduce feasible matches. Consider flexibility or stage.');
+      }
+
+      // 4) Needs sponsorship + on-site/hybrid only might reduce feasible roles (not impossible, but higher friction)
+      if(visa.includes('sponsor') && (mode === 'on-site' || mode === 'hybrid')){
+        warnings.push('Needs sponsorship + on-site/hybrid may increase friction depending on market. Consider adding fallback options.');
+      }
+
+      // 5) Avoid includes "startup" while stage is early-stage
+      if((p.avoid||'').toLowerCase().includes('startup') && early){
+        warnings.push('You prefer early-stage, but your Avoid list mentions startups. Consider refining “startup” meaning.');
+      }
+
+      return warnings;
+    }
+
+    function showWarnings(warnings){
+      const box = document.getElementById('warnBox');
+      const list = document.getElementById('warnList');
+      if(!warnings.length){
+        box.style.display = 'none';
+        list.innerHTML = '';
+        return;
+      }
+      box.style.display = 'block';
+      list.innerHTML = warnings.map(w => `<li>${escapeHtml(w)}</li>`).join('');
+    }
+
+    function savePrefs(andContinue){
+      const prefs = {
+        savedAtISO: new Date().toISOString(),
+        workMode: val('workMode'),
+        relocate: val('relocate'),
+        locations: val('locations'),
+        visa: val('visa'),
+        salaryMin: val('salaryMin'),
+        salaryFlex: val('salaryFlex'),
+        roleFocus: val('roleFocus'),
+        seniorityTarget: val('seniorityTarget'),
+        mustHave: val('mustHave'),
+        avoid: val('avoid'),
+        companyStage: val('companyStage'),
+        compType: val('compType'),
+        dealbreakers: val('dealbreakers'),
+        nicetohave: val('nicetohave'),
+        uncertainty: computeUncertainty()
+      };
+
+      // Required: workMode
+      if(!prefs.workMode){
+        alert('Please select a Work mode (or choose Flexible).');
+        return;
+      }
+
+      // Contradiction reflection (non-blocking)
+      const warnings = detectContradictions(prefs);
+      showWarnings(warnings);
+
+      try { localStorage.setItem('cb_mock_preferences', JSON.stringify(prefs)); }
+      catch(_) {}
+
+      document.getElementById('savedPill').textContent = `Saved: ${new Date(prefs.savedAtISO).toLocaleString()}`;
+
+      if(andContinue){
+        window.location.href = '09_job_intake.html';
+      }
+    }
+
+    function attachLiveReflection(){
+      const ids = [
+        'workMode','relocate','locations','visa','salaryMin','salaryFlex',
+        'roleFocus','seniorityTarget','mustHave','avoid','companyStage','compType',
+        'dealbreakers','nicetohave'
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.addEventListener('input', () => {
+          updateStatus();
+          // Live reflection uses current draft, does not require save
+          const draft = {
+            workMode: val('workMode'),
+            relocate: val('relocate'),
+            locations: val('locations'),
+            visa: val('visa'),
+            salaryMin: val('salaryMin'),
+            salaryFlex: val('salaryFlex'),
+            avoid: val('avoid'),
+            companyStage: val('companyStage'),
+            dealbreakers: val('dealbreakers')
+          };
+          showWarnings(detectContradictions(draft));
+        });
+        el.addEventListener('change', () => {
+          updateStatus();
+          const draft = {
+            workMode: val('workMode'),
+            relocate: val('relocate'),
+            locations: val('locations'),
+            visa: val('visa'),
+            salaryMin: val('salaryMin'),
+            salaryFlex: val('salaryFlex'),
+            avoid: val('avoid'),
+            companyStage: val('companyStage'),
+            dealbreakers: val('dealbreakers')
+          };
+          showWarnings(detectContradictions(draft));
+        });
+      });
+    }
+
+    // init
+    updateTrialPill();
+    loadExisting();
+    profileSnapshot();
+    updateStatus();
+    attachLiveReflection();
+  </script>
+</body>
+</html>

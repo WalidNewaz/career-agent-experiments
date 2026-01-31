@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Saved briefs</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+
+    /* Layout */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Head */
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    /* Controls */
+    .controls{
+      margin-top: 12px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .fieldRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:flex-end;
+    }
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: rgba(232,238,252,.85);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .input, select{
+      width: 220px;
+      max-width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      outline: none;
+      transition: .15s ease;
+      font-family: var(--sans);
+    }
+    .input{width: 280px}
+    .input:focus, select:focus{
+      border-color: rgba(110,231,255,.45);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
+    }
+
+    /* Cards */
+    .card{
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .sectionTitle{
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(232,238,252,.82);
+    }
+    .list{
+      margin-top: 10px;
+      display:grid;
+      gap: 10px;
+    }
+    .item{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      cursor:pointer;
+      transition: .15s ease;
+    }
+    .item:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.16);
+      background: rgba(255,255,255,.03);
+    }
+    .meta{
+      max-width: 78ch;
+    }
+    .title{
+      font-weight: 950;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .subtitle{
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .rightMeta{
+      text-align:right;
+      min-width: 180px;
+    }
+    .mono{font-family: var(--mono)}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      font-family: var(--mono);
+      justify-content:flex-end;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--warn);
+      box-shadow: 0 0 0 4px rgba(251,191,36,.10);
+    }
+    .dot.good{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+    .dot.bad{background: var(--bad); box-shadow:0 0 0 4px rgba(251,113,133,.10)}
+
+    /* Right rail */
+    .mini{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      margin-top: 10px;
+    }
+    .k{font-size: 12px; color: var(--muted2)}
+    .v{margin-top:4px; font-size: 13px; line-height:1.55; color: rgba(232,238,252,.88)}
+    ul{margin:8px 0 0; padding-left:18px}
+    li{margin: 4px 0; color: rgba(232,238,252,.86); line-height:1.55}
+
+    /* Buttons */
+    .ctaRow{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 850;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+    .btn.danger{
+      border-color: rgba(251,113,133,.32);
+      background: rgba(251,113,133,.08);
+    }
+
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+      white-space:nowrap;
+    }
+
+    /* Empty state */
+    .empty{
+      margin-top: 10px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .toast{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      max-width: 440px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,26,46,.85);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      color: rgba(232,238,252,.92);
+      font-size: 13px;
+      line-height: 1.5;
+      display:none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="07_done.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Saved briefs</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <main class="panel" aria-label="Saved briefs list">
+        <h1>Saved Decision Briefs</h1>
+        <p class="sub">
+          This is your decision trail. Save briefs to compare outcomes over time (gaps repeating, constraints repeating, confidence moving).
+          Nothing here is persuasive — it’s about clarity and control.
+        </p>
+
+        <div class="controls" aria-label="Filters and sort">
+          <div class="fieldRow">
+            <div class="field">
+              <label for="q">Search</label>
+              <input id="q" class="input" placeholder="Title, company, verdict…" />
+            </div>
+            <div class="field">
+              <label for="verdictFilter">Verdict</label>
+              <select id="verdictFilter">
+                <option value="">All</option>
+                <option value="consider">Consider</option>
+                <option value="caution">Caution</option>
+                <option value="explore">Explore</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="bandFilter">Confidence band</label>
+              <select id="bandFilter">
+                <option value="">All</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sortBy">Sort</label>
+              <select id="sortBy">
+                <option value="saved_desc">Saved (new → old)</option>
+                <option value="saved_asc">Saved (old → new)</option>
+                <option value="conf_desc">Confidence (high → low)</option>
+                <option value="conf_asc">Confidence (low → high)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+            <button class="btn" type="button" onclick="seedExample()">Seed 2 examples</button>
+            <button class="btn danger" type="button" onclick="clearAll()">Clear all</button>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Briefs">
+          <div class="sectionTitle">Briefs</div>
+          <div class="list" id="list"></div>
+          <div class="empty" id="empty" style="display:none;">
+            No saved briefs yet. Generate a preview brief from a job description and click <b>“Save this brief.”</b><br/>
+            <div style="margin-top:10px;">
+              <a class="btn primary" href="09_job_intake.html">Analyze a job <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="note">
+          <b>Trend hooks (placeholder):</b> In later screens we’ll visualize repeating gaps, recurring constraint mismatches,
+          and confidence trend over time. For now, this page prepares the data and navigation.
+        </div>
+
+        <div class="ctaRow">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn primary" href="09_job_intake.html">Analyze another job <span aria-hidden="true">→</span></a>
+            <a class="btn" href="11_job_brief_preview.html">Back to last brief</a>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <span class="pill" id="countPill">0 saved</span>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT RAIL -->
+      <aside class="panel" aria-label="Trend hooks and guidance">
+        <div class="card" style="margin-top:0;">
+          <div class="sectionTitle">Trend hooks</div>
+          <div class="mini">
+            <div class="k">Repeating gaps (top 3)</div>
+            <div class="v" id="trendGaps">—</div>
+
+            <div class="k" style="margin-top:10px;">Constraint mismatch signals</div>
+            <div class="v" id="trendConstraints">—</div>
+
+            <div class="k" style="margin-top:10px;">Confidence trend</div>
+            <div class="v" id="trendConfidence">—</div>
+          </div>
+          <div class="mini">
+            <div class="k">How to use this</div>
+            <div class="v">
+              If the same gap appears repeatedly, it’s a true bottleneck. If mismatches repeat, update preferences or change target roles.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Navigation note">
+          <div class="sectionTitle">Navigation</div>
+          <div class="mini">
+            <div class="v" style="margin-top:0;">
+              Click a brief to reopen it. We store the selected brief id as <span class="kbd">cb_mock_active_brief_id</span>
+              and then open the preview page.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Boundary">
+          <div class="sectionTitle">Boundary</div>
+          <div class="mini">
+            <div class="v" style="margin-top:0;">
+              Saved briefs are decision artifacts. They should record uncertainty and assumptions — not “sell” a job.
+            </div>
+            <div class="k" style="margin-top:10px;">Employer verifies. No embellishment.</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">A decision trail you can audit.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    function escapeHtml(s){
+      return String(s || '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2200);
+    }
+
+    function loadSaved(){
+      try{
+        const raw = localStorage.getItem('cb_mock_saved_briefs') || '[]';
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch(_) {
+        return [];
+      }
+    }
+
+    function verdictDot(v){
+      const s = (v||'').toLowerCase();
+      if(s.includes('caution')) return 'bad';
+      if(s.includes('consider')) return 'good';
+      return '';
+    }
+    function bandDot(b){
+      const s = (b||'').toLowerCase();
+      if(s.includes('high')) return 'good';
+      if(s.includes('low')) return 'bad';
+      return '';
+    }
+
+    function matchesFilters(item, q, verdictF, bandF){
+      const b = item?.brief;
+      const title = (b?.input?.job?.title || '').toLowerCase();
+      const company = (b?.input?.job?.company || '').toLowerCase();
+      const verdict = (b?.snapshot?.verdict || '').toLowerCase();
+      const band = (b?.snapshot?.confidence?.band || '').toLowerCase();
+
+      if(q){
+        const hay = `${title} ${company} ${verdict} ${band}`.toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      if(verdictF && !verdict.includes(verdictF)) return false;
+      if(bandF && !band.includes(bandF)) return false;
+      return true;
+    }
+
+    function sortArr(arr, sortBy){
+      const copy = [...arr];
+      const getSaved = x => new Date(x?.savedAtISO || 0).getTime();
+      const getConf = x => Number(x?.brief?.snapshot?.confidence?.score ?? -1);
+
+      if(sortBy === 'saved_asc') copy.sort((a,b) => getSaved(a) - getSaved(b));
+      else if(sortBy === 'saved_desc') copy.sort((a,b) => getSaved(b) - getSaved(a));
+      else if(sortBy === 'conf_asc') copy.sort((a,b) => getConf(a) - getConf(b));
+      else if(sortBy === 'conf_desc') copy.sort((a,b) => getConf(b) - getConf(a));
+      return copy;
+    }
+
+    function render(){
+      const listEl = document.getElementById('list');
+      const emptyEl = document.getElementById('empty');
+
+      const q = (document.getElementById('q').value || '').trim().toLowerCase();
+      const verdictF = (document.getElementById('verdictFilter').value || '').trim().toLowerCase();
+      const bandF = (document.getElementById('bandFilter').value || '').trim().toLowerCase();
+      const sortBy = document.getElementById('sortBy').value;
+
+      let arr = loadSaved();
+      const totalCount = arr.length;
+
+      arr = arr.filter(it => matchesFilters(it, q, verdictF, bandF));
+      arr = sortArr(arr, sortBy);
+
+      document.getElementById('countPill').textContent = `${totalCount} saved`;
+
+      if(!arr.length){
+        listEl.innerHTML = '';
+        emptyEl.style.display = 'block';
+      } else {
+        emptyEl.style.display = 'none';
+        listEl.innerHTML = arr.map(it => {
+          const b = it.brief || {};
+          const job = b.input?.job || {};
+          const title = job.title || 'Unknown title';
+          const company = job.company || 'Unknown company';
+          const verdict = b.snapshot?.verdict || '—';
+          const band = b.snapshot?.confidence?.band || '—';
+          const score = Number(b.snapshot?.confidence?.score ?? 0);
+          const savedAt = it.savedAtISO ? new Date(it.savedAtISO) : null;
+
+          const vDot = verdictDot(verdict);
+          const cDot = bandDot(band);
+          const sDot = score >= 70 ? 'good' : (score < 50 ? 'bad' : '');
+
+          return `
+            <div class="item" role="button" tabindex="0"
+                 onclick="openBrief('${escapeHtml(it.id)}')"
+                 onkeydown="if(event.key==='Enter'){openBrief('${escapeHtml(it.id)}')}">
+              <div class="meta">
+                <div class="title">${escapeHtml(title)} <span style="opacity:.7;">@</span> ${escapeHtml(company)}</div>
+                <div class="subtitle">
+                  Saved: <span class="mono">${savedAt ? escapeHtml(savedAt.toLocaleString()) : '—'}</span>
+                  <span style="opacity:.65;">•</span>
+                  Generated: <span class="mono">${b.generatedAtISO ? escapeHtml(new Date(b.generatedAtISO).toLocaleString()) : '—'}</span>
+                </div>
+              </div>
+              <div class="rightMeta">
+                <div class="chip"><span class="dot ${vDot}"></span>${escapeHtml(verdict)}</div>
+                <div style="height:8px;"></div>
+                <div class="chip"><span class="dot ${cDot}"></span>${escapeHtml(band)} <span style="opacity:.7;">•</span> <span class="mono">${escapeHtml(String(score))}</span></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderTrendHooks(loadSaved());
+    }
+
+    function openBrief(id){
+      try { localStorage.setItem('cb_mock_active_brief_id', id); } catch(_) {}
+      // Leave existing preview generation intact; the preview page can optionally read active id later.
+      toast('Opening brief…');
+      setTimeout(() => { window.location.href = '11_job_brief_preview.html'; }, 250);
+    }
+
+    function clearAll(){
+      if(!confirm('Clear all saved briefs (mock)?')) return;
+      try { localStorage.setItem('cb_mock_saved_briefs', JSON.stringify([])); } catch(_) {}
+      try { localStorage.removeItem('cb_mock_active_brief_id'); } catch(_) {}
+      toast('Cleared.');
+      render();
+    }
+
+    function seedExample(){
+      const existing = loadSaved();
+      if(existing.length >= 2){
+        toast('Already have saved briefs. Seed skipped.');
+        return;
+      }
+
+      // Two lightweight examples with different verdict/confidence
+      const ex1 = {
+        id: 'brief_seed_a',
+        savedAtISO: new Date(Date.now() - 1000*60*12).toISOString(),
+        brief: {
+          generatedAtISO: new Date(Date.now() - 1000*60*14).toISOString(),
+          input: { job: { title: "Senior Frontend Engineer", company: "StartupX", url: null }, notes: "Remote preferred; salary ≥ 160k", jobTextLengthChars: 1580 },
+          snapshot: {
+            verdict: "Consider",
+            confidence: { score: 68, band: "Medium" },
+            topSignals: ["Stack match: strong (React/TS)", "Design systems experience: partial", "Constraints: known"],
+            topGaps: ["Add 2 impact metrics to recent bullets", "Clarify ownership scope (architecture decisions)", "Evidence for Next.js / SSR is missing"],
+            uncertainties: ["Team seniority expectations unknown."],
+            suggestedStrategy: ["Apply with targeted outreach", "Ask about remote policy and ownership scope early"]
+          },
+          trace: { used: { cb_mock_job_raw:true, cb_mock_job_meta:true, cb_mock_preferences:true, cb_mock_profile_confirmed:true, cb_mock_resume_results:true } }
+        }
+      };
+
+      const ex2 = {
+        id: 'brief_seed_b',
+        savedAtISO: new Date(Date.now() - 1000*60*4).toISOString(),
+        brief: {
+          generatedAtISO: new Date(Date.now() - 1000*60*5).toISOString(),
+          input: { job: { title: "Staff Frontend Engineer (On-site)", company: "BigCo", url: "https://example.com/job" }, notes: "Must be remote", jobTextLengthChars: 740 },
+          snapshot: {
+            verdict: "Caution",
+            confidence: { score: 49, band: "Low" },
+            topSignals: ["Work mode mismatch risk", "Requirements incomplete (short JD)", "Seniority bar unclear"],
+            topGaps: ["Missing evidence for staff-level scope (org-wide impact)", "Job constraints conflict with preferences", "Unclear mapping to must-haves"],
+            uncertainties: ["Job description is short; requirements may be incomplete.", "Hiring scope unclear (IC vs lead)."],
+            suggestedStrategy: ["Only pursue if work-mode is flexible", "Get clarifications before investing time"]
+          },
+          trace: { used: { cb_mock_job_raw:true, cb_mock_job_meta:true, cb_mock_preferences:true, cb_mock_profile_confirmed:false, cb_mock_resume_results:true } }
+        }
+      };
+
+      const seeded = [ex2, ex1, ...existing];
+      try { localStorage.setItem('cb_mock_saved_briefs', JSON.stringify(seeded)); } catch(_) {}
+      toast('Seeded 2 example briefs.');
+      render();
+    }
+
+    function renderTrendHooks(all){
+      // Placeholder aggregation: count top gap strings and identify "constraint mismatch" via verdict caution + notes keywords.
+      const topGapCounts = new Map();
+      let mismatchCount = 0;
+      const confs = [];
+
+      all.forEach(it => {
+        const b = it?.brief;
+        if(!b) return;
+        const gaps = b.snapshot?.topGaps || [];
+        gaps.forEach(g => {
+          const key = String(g || '').trim();
+          if(!key) return;
+          topGapCounts.set(key, (topGapCounts.get(key) || 0) + 1);
+        });
+
+        const verdict = (b.snapshot?.verdict || '').toLowerCase();
+        const notes = (b.input?.notes || '').toLowerCase();
+        if(verdict.includes('caution') || notes.includes('must be remote') || notes.includes('sponsorship') || notes.includes('salary')){
+          mismatchCount += 1;
+        }
+
+        const score = Number(b.snapshot?.confidence?.score ?? NaN);
+        if(!Number.isNaN(score)) confs.push(score);
+      });
+
+      const top = [...topGapCounts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3);
+      const gapsText = top.length ? top.map(([k,v]) => `${k} (${v}×)`).join('<br/>') : '—';
+      document.getElementById('trendGaps').innerHTML = gapsText;
+
+      document.getElementById('trendConstraints').innerHTML =
+        all.length ? `${mismatchCount} of ${all.length} briefs show potential constraint mismatch signals (placeholder).` : '—';
+
+      if(!confs.length){
+        document.getElementById('trendConfidence').textContent = '—';
+      } else {
+        const avg = Math.round(confs.reduce((a,b)=>a+b,0)/confs.length);
+        const min = Math.min(...confs);
+        const max = Math.max(...confs);
+        document.getElementById('trendConfidence').innerHTML =
+          `Avg: <span class="kbd">${avg}</span> • Range: <span class="kbd">${min}–${max}</span> (placeholder)`;
+      }
+    }
+
+    function bind(){
+      ['q','verdictFilter','bandFilter','sortBy'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', render);
+        el.addEventListener('change', render);
+      });
+    }
+
+    function init(){
+      updateTrialPill();
+      bind();
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>

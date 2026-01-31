@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClarityBrief — Decision Brief preview</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --panel2:#0c172b;
+      --stroke:rgba(255,255,255,.10);
+      --stroke2:rgba(255,255,255,.14);
+      --text:#e8eefc;
+      --muted:rgba(232,238,252,.72);
+      --muted2:rgba(232,238,252,.58);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 16px;
+      --radius2: 22px;
+      --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
+        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+    }
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
+
+    /* Topbar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(15,26,46,.55);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
+      box-shadow: 0 10px 25px rgba(110,231,255,.12);
+      position:relative;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:9px;
+      border-radius: 10px;
+      background: rgba(11,18,32,.70);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex; align-items:center; gap:10px;
+      font-size: 14px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .link{
+      color: rgba(232,238,252,.85);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-size: 13px;
+    }
+
+    /* Layout */
+    .grid{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .panel{
+      background: rgba(15,26,46,.55);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Banner */
+    .banner{
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(110,231,255,.20);
+      background:
+        radial-gradient(600px 260px at 15% 0%, rgba(110,231,255,.10), transparent 60%),
+        rgba(110,231,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .bannerLeft{
+      display:flex; gap: 10px; align-items:center; flex-wrap:wrap;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: rgba(232,238,252,.88);
+      white-space:nowrap;
+      font-family: var(--mono);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--warn);
+      box-shadow: 0 0 0 4px rgba(251,191,36,.10);
+    }
+    .dot.good{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+    .dot.bad{background: var(--bad); box-shadow:0 0 0 4px rgba(251,113,133,.10)}
+    .mono{font-family: var(--mono)}
+
+    /* Header */
+    .headerRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    h1{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+    .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    .badges{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      font-family: var(--mono);
+    }
+
+    /* Cards */
+    .card{
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .sectionTitle{
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(232,238,252,.82);
+    }
+    .rows{
+      margin-top: 10px;
+      display:grid;
+      gap: 10px;
+    }
+    .rowItem{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+    }
+    .k{font-size: 12px; color: var(--muted2)}
+    .v{margin-top:4px; font-size: 13px; line-height:1.55; color: rgba(232,238,252,.88)}
+    ul{margin:8px 0 0; padding-left: 18px}
+    li{margin: 4px 0; color: rgba(232,238,252,.86); line-height:1.55}
+
+    /* Meter */
+    .meter{
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .meterTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap: 10px;
+    }
+    .meterLabel{font-weight: 900; font-size: 13px}
+    .meterVal{font-family: var(--mono); font-size: 12px; color: rgba(232,238,252,.86)}
+    .bar{
+      margin-top: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(110,231,255,.85), rgba(167,139,250,.75));
+      transition: width .4s ease;
+    }
+    .meterHint{
+      margin-top: 8px;
+      color: var(--muted2);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    /* CTAs */
+    .ctaRow{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      font-weight: 850;
+      cursor:pointer;
+      transition: .15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
+    .btn:active{transform: translateY(0px)}
+    .btn.primary{
+      border-color: rgba(110,231,255,.35);
+      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
+      box-shadow: 0 14px 40px rgba(110,231,255,.10);
+    }
+    .btn.primary:hover{
+      border-color: rgba(110,231,255,.50);
+      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    }
+
+    /* Right rail */
+    .mini{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      margin-top: 10px;
+    }
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.02);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .footer{
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap: wrap;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(232,238,252,.85);
+      white-space:nowrap;
+    }
+    .toast{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      max-width: 420px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(15,26,46,.85);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      color: rgba(232,238,252,.92);
+      font-size: 13px;
+      line-height: 1.5;
+      display:none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand" aria-label="Product">
+        <a href="07_done.html" style="display:flex;align-items:center;gap:10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div style="display:flex;align-items:baseline;gap:8px;">
+              <div style="font-size:15px;">ClarityBrief</div>
+              <div style="font-size:12px;color:var(--muted);font-weight:650;">Decision Brief preview</div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <nav class="nav" aria-label="Top navigation">
+        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+        <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="09_job_intake.html">Analyze a job</a>
+        <a class="link" href="08_preferences.html">Preferences</a>
+        <a class="link" href="12_saved_briefs.html">Saved briefs</a>
+        <a class="link" href="13_trends.html">Trends</a>
+      </nav>
+    </header>
+
+    <!-- NEW: mode banner -->
+    <div class="banner" aria-label="View mode banner">
+      <div class="bannerLeft">
+        <span class="tag" id="modeTag"><span class="dot"></span>view: last generated preview</span>
+        <span class="tag" id="activeIdTag" style="display:none;">active id: <span class="mono" id="activeIdText">—</span></span>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <a class="btn" href="12_saved_briefs.html" id="backSavedBtn">Back to Saved Briefs</a>
+        <button class="btn" type="button" onclick="clearActive()">Clear active</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <main class="panel" aria-label="Decision brief">
+        <div class="headerRow">
+          <div>
+            <h1>Decision Brief</h1>
+            <p class="sub" id="briefSub">
+              Preview only. We keep uncertainty explicit and avoid persuasion. Employers verify.
+            </p>
+          </div>
+
+          <div class="badges" aria-label="Top badges">
+            <span class="chip" id="verdictChip"><span class="dot"></span>verdict: —</span>
+            <span class="chip" id="confChip"><span class="dot"></span>confidence: —</span>
+            <span class="chip" id="scoreChip"><span class="dot"></span>score: —</span>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Decision completeness">
+          <div class="sectionTitle">Decision completeness</div>
+          <div class="meter" style="margin-top:10px;">
+            <div class="meterTop">
+              <div class="meterLabel">Completeness meter</div>
+              <div class="meterVal"><span id="compVal">—</span>/100</div>
+            </div>
+            <div class="bar"><i id="compBar"></i></div>
+            <div class="meterHint" id="compHint">
+              Derived from presence of preferences, profile confirmation, job text quality, and confidence.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Fit snapshot">
+          <div class="sectionTitle">Fit snapshot</div>
+          <div class="rows">
+            <div class="rowItem">
+              <div class="k">Verdict</div>
+              <div class="v"><b id="verdictText">—</b> <span style="opacity:.75">•</span> Confidence: <b id="confBand">—</b> (<span class="mono" id="confScore">—</span>)</div>
+            </div>
+            <div class="rowItem">
+              <div class="k">Key signals</div>
+              <div class="v">
+                <ul id="signalsList"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Top gaps">
+          <div class="sectionTitle">Top gaps</div>
+          <div class="rows">
+            <div class="rowItem">
+              <div class="k">Prioritized, actionable</div>
+              <div class="v">
+                <ol id="gapsList" style="margin:8px 0 0; padding-left:18px;"></ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Uncertainty and assumptions">
+          <div class="sectionTitle">Uncertainty & assumptions</div>
+          <div class="rows">
+            <div class="rowItem">
+              <div class="k">Unknowns we are carrying forward</div>
+              <div class="v">
+                <ul id="uncertList"></ul>
+              </div>
+            </div>
+            <div class="rowItem">
+              <div class="k">Why this matters</div>
+              <div class="v" id="uncertWhy">
+                Uncertainty reduces confidence and can change strategy. You can resolve it by clarifying constraints, confirming profile fields, or improving evidence in resume bullets.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Suggested strategy">
+          <div class="sectionTitle">Suggested strategy</div>
+          <div class="rows">
+            <div class="rowItem">
+              <div class="k">Options (non-persuasive)</div>
+              <div class="v">
+                <ul id="stratList"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Counter-argument">
+          <div class="sectionTitle">Counter-argument</div>
+          <div class="rows">
+            <div class="rowItem">
+              <div class="k">Strongest reasons <b>not</b> to apply right now</div>
+              <div class="v">
+                <ul id="counterList"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctaRow" aria-label="Actions">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn primary" type="button" onclick="saveBrief()">Save this brief</button>
+            <a class="btn" href="09_job_intake.html">Try another job</a>
+            <a class="btn" href="03_resume_intake.html">Refine resume</a>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <span class="pill" id="savedPill">Not saved</span>
+          </div>
+        </div>
+
+        <div class="note">
+          <b>Reminder:</b> This is a preview. In a full build, each claim would link to an Evidence Ledger entry, and you could edit assumptions inline.
+        </div>
+      </main>
+
+      <!-- RIGHT RAIL -->
+      <aside class="panel" aria-label="Inputs and notes">
+        <div class="card" style="margin-top:0;">
+          <div class="sectionTitle">Inputs summary</div>
+          <div class="mini" id="inputSummary">
+            Loading…
+          </div>
+
+          <div class="mini">
+            <div class="k">Job text length</div>
+            <div class="v"><span class="mono" id="jobLen">—</span> chars</div>
+            <div class="k" style="margin-top:8px;">Preferences present?</div>
+            <div class="v" id="prefsPresent">—</div>
+            <div class="k" style="margin-top:8px;">Profile confirmed?</div>
+            <div class="v" id="profilePresent">—</div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Evidence note">
+          <div class="sectionTitle">Evidence note</div>
+          <div class="mini">
+            <div class="v" style="margin-top:0;">
+              This preview does not yet show an Evidence Ledger. In production, each gap/signal will link to the exact resume snippet or input that supports it.
+            </div>
+            <div class="k" style="margin-top:10px;">
+              Boundary: no embellishment. Uncertainty stays explicit. Employer verifies.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" aria-label="Next step suggestions">
+          <div class="sectionTitle">Next best actions</div>
+          <div class="mini">
+            <ul style="margin:0; padding-left:18px;" id="nextActions"></ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer" aria-label="Footer">
+      <div>
+        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
+        <div style="margin-top:4px;">Decision support that keeps assumptions visible.</div>
+      </div>
+      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
+        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
+        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    function getUser(){
+      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
+      catch { return null; }
+    }
+    function computeTrialDay(user){
+      if(!user?.trialStartISO) return 1;
+      const start = new Date(user.trialStartISO);
+      const now = new Date();
+      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
+      return Math.min((user.trialDays || 7), diffDays + 1);
+    }
+    function updateTrialPill(){
+      const user = getUser();
+      const day = computeTrialDay(user);
+      const total = user?.trialDays || 7;
+      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
+    }
+
+    function escapeHtml(s){
+      return String(s || '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2200);
+    }
+
+    function loadSavedBriefs(){
+      try{
+        const raw = localStorage.getItem('cb_mock_saved_briefs') || '[]';
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch(_) { return []; }
+    }
+
+    function getActiveId(){
+      try { return localStorage.getItem('cb_mock_active_brief_id') || ''; }
+      catch { return ''; }
+    }
+
+    function getBriefSource(){
+      // NEW: if active id exists and matches saved brief, use it; else fall back to last generated.
+      const activeId = getActiveId();
+      if(activeId){
+        const saved = loadSavedBriefs();
+        const match = saved.find(x => x && String(x.id) === String(activeId));
+        if(match && match.brief){
+          return { brief: match.brief, mode: 'saved', activeId };
+        }
+      }
+
+      // fallback: last generated preview
+      try{
+        const raw = localStorage.getItem('cb_mock_decision_brief_preview');
+        if(raw){
+          const b = JSON.parse(raw);
+          return { brief: b, mode: 'last', activeId: activeId || null };
+        }
+      } catch(_) {}
+
+      // final fallback
+      const fallback = {
+        generatedAtISO: new Date().toISOString(),
+        input: { job: { title: "Senior Frontend Engineer", company: "StartupX", url: null }, notes: null, jobTextLengthChars: 1480 },
+        snapshot: {
+          verdict: "Consider",
+          confidence: { score: 62, band: "Medium" },
+          topSignals: ["Stack match: partial", "Role theme: architecture + design system", "Constraints: unknown"],
+          topGaps: [
+            "Missing explicit evidence for ownership/impact at scale",
+            "Ambiguity in timeline/scope reduces seniority confidence",
+            "Unclear mapping for 1–2 must-have requirements"
+          ],
+          uncertainties: [
+            "Preferences not set; feasibility checks have unknowns.",
+            "Profile confirmations missing; seniority calibration is weaker."
+          ],
+          suggestedStrategy: [
+            "If applying, focus on evidence-backed bullets (scope + outcome).",
+            "Ask 2 early clarifying questions (work mode, seniority expectations).",
+            "Use targeted outreach (hiring manager) rather than broad apply-only."
+          ]
+        },
+        trace: { used: { cb_mock_job_raw: false, cb_mock_job_meta: true, cb_mock_preferences: false, cb_mock_profile_confirmed: false, cb_mock_resume_results: false } }
+      };
+      return { brief: fallback, mode: 'last', activeId: activeId || null };
+    }
+
+    function setModeBanner(mode, activeId){
+      const tag = document.getElementById('modeTag');
+      const activeTag = document.getElementById('activeIdTag');
+      const activeText = document.getElementById('activeIdText');
+
+      if(mode === 'saved'){
+        tag.innerHTML = `<span class="dot good"></span>view: saved brief`;
+        activeTag.style.display = 'inline-flex';
+        activeText.textContent = activeId || '—';
+      } else {
+        tag.innerHTML = `<span class="dot"></span>view: last generated preview`;
+        if(activeId){
+          // active id exists but no match -> show it as a hint
+          activeTag.style.display = 'inline-flex';
+          activeText.textContent = activeId;
+        } else {
+          activeTag.style.display = 'none';
+        }
+      }
+    }
+
+    function clearActive(){
+      try { localStorage.removeItem('cb_mock_active_brief_id'); } catch(_) {}
+      toast('Cleared active brief. Showing last generated preview.');
+      setTimeout(()=>window.location.reload(), 450);
+    }
+
+    function setTopChips(brief){
+      const verdict = brief?.snapshot?.verdict || '—';
+      const band = brief?.snapshot?.confidence?.band || '—';
+      const score = Number(brief?.snapshot?.confidence?.score ?? 0);
+
+      const vChip = document.getElementById('verdictChip');
+      const cChip = document.getElementById('confChip');
+      const sChip = document.getElementById('scoreChip');
+
+      const dotVerdict = verdict.toLowerCase().includes('caution') ? 'bad' : (verdict.toLowerCase().includes('consider') ? 'good' : '');
+      const dotConf = band.toLowerCase().includes('high') ? 'good' : (band.toLowerCase().includes('low') ? 'bad' : '');
+      const dotScore = score >= 70 ? 'good' : (score < 50 ? 'bad' : '');
+
+      vChip.innerHTML = `<span class="dot ${dotVerdict}"></span>verdict: ${escapeHtml(verdict)}`;
+      cChip.innerHTML = `<span class="dot ${dotConf}"></span>confidence: ${escapeHtml(band)}`;
+      sChip.innerHTML = `<span class="dot ${dotScore}"></span>score: ${escapeHtml(String(score))}/100`;
+    }
+
+    function fillList(elId, items, emptyText){
+      const el = document.getElementById(elId);
+      if(!el) return;
+      const arr = (items || []).filter(Boolean);
+      if(!arr.length){
+        el.innerHTML = `<li>${escapeHtml(emptyText || '—')}</li>`;
+        return;
+      }
+      el.innerHTML = arr.map(x => `<li>${escapeHtml(x)}</li>`).join('');
+    }
+    function fillOl(elId, items, emptyText){
+      const el = document.getElementById(elId);
+      if(!el) return;
+      const arr = (items || []).filter(Boolean);
+      if(!arr.length){
+        el.innerHTML = `<li>${escapeHtml(emptyText || '—')}</li>`;
+        return;
+      }
+      el.innerHTML = arr.map(x => `<li>${escapeHtml(x)}</li>`).join('');
+    }
+
+    function renderMain(brief){
+      const verdict = brief?.snapshot?.verdict || '—';
+      const band = brief?.snapshot?.confidence?.band || '—';
+      const score = Number(brief?.snapshot?.confidence?.score ?? 0);
+
+      document.getElementById('verdictText').textContent = verdict;
+      document.getElementById('confBand').textContent = band;
+      document.getElementById('confScore').textContent = `${score}/100`;
+
+      fillList('signalsList', brief?.snapshot?.topSignals, 'No signals captured.');
+      fillOl('gapsList', brief?.snapshot?.topGaps, 'No gaps captured.');
+      fillList('uncertList', brief?.snapshot?.uncertainties, 'No explicit unknowns.');
+      fillList('stratList', brief?.snapshot?.suggestedStrategy, 'No strategy suggestions.');
+
+      const genAt = brief?.generatedAtISO ? new Date(brief.generatedAtISO) : new Date();
+      document.getElementById('briefSub').textContent =
+        `Preview only • Generated ${genAt.toLocaleString()} • Uncertainty is explicit.`;
+    }
+
+    function computeCompleteness(brief){
+      // Components: prefs present (20), profile confirmed (20), job length quality (20), confidence score (40 scaled)
+      const used = brief?.trace?.used || {};
+      const hasPrefs = !!used.cb_mock_preferences;
+      const hasProfile = !!used.cb_mock_profile_confirmed;
+
+      const jobLen = Number(brief?.input?.jobTextLengthChars ?? 0);
+      const jobLenScore = jobLen >= 1400 ? 20 : (jobLen >= 900 ? 14 : (jobLen >= 500 ? 8 : 3));
+
+      const prefsScore = hasPrefs ? 20 : 8;
+      const profileScore = hasProfile ? 20 : 8;
+
+      const conf = Number(brief?.snapshot?.confidence?.score ?? 0);
+      const confScore = Math.max(0, Math.min(40, Math.round(conf * 0.40))); // 0..40
+
+      const total = Math.max(0, Math.min(100, prefsScore + profileScore + jobLenScore + confScore));
+
+      return {
+        total,
+        breakdown: { prefsScore, profileScore, jobLenScore, confScore, jobLen, hasPrefs, hasProfile, conf }
+      };
+    }
+
+    function renderCompletenessMeter(comp){
+      document.getElementById('compVal').textContent = String(comp.total);
+      document.getElementById('compBar').style.width = comp.total + '%';
+
+      const b = comp.breakdown;
+      const hintParts = [];
+      hintParts.push(b.hasPrefs ? 'Preferences present' : 'Preferences missing');
+      hintParts.push(b.hasProfile ? 'Profile confirmed' : 'Profile unconfirmed');
+      hintParts.push(`Job text: ${b.jobLen} chars`);
+      hintParts.push(`Confidence contributes: ${b.confScore}/40`);
+      document.getElementById('compHint').textContent = hintParts.join(' • ');
+    }
+
+    function renderInputsSummary(brief){
+      const job = brief?.input?.job || {};
+      const title = job.title || 'Unknown';
+      const company = job.company || 'Unknown';
+      const url = job.url || null;
+
+      const used = brief?.trace?.used || {};
+      const hasPrefs = !!used.cb_mock_preferences;
+      const hasProfile = !!used.cb_mock_profile_confirmed;
+      const len = Number(brief?.input?.jobTextLengthChars ?? 0);
+
+      document.getElementById('inputSummary').innerHTML = `
+        <div class="k">Job</div>
+        <div class="v"><b>${escapeHtml(title)}</b> @ <b>${escapeHtml(company)}</b></div>
+        <div class="k" style="margin-top:10px;">URL</div>
+        <div class="v">${url ? `<span class="mono">${escapeHtml(url)}</span>` : `<span style="opacity:.75">None provided</span>`}</div>
+        <div class="k" style="margin-top:10px;">Notes</div>
+        <div class="v">${brief?.input?.notes ? escapeHtml(brief.input.notes) : `<span style="opacity:.75">None</span>`}</div>
+      `;
+
+      document.getElementById('jobLen').textContent = String(len);
+      document.getElementById('prefsPresent').innerHTML = hasPrefs ? `<span class="kbd">Yes</span>` : `<span class="kbd">No</span>`;
+      document.getElementById('profilePresent').innerHTML = hasProfile ? `<span class="kbd">Yes</span>` : `<span class="kbd">No</span>`;
+    }
+
+    function buildCounterArguments(brief){
+      const verdict = (brief?.snapshot?.verdict || '').toLowerCase();
+      const band = (brief?.snapshot?.confidence?.band || '').toLowerCase();
+      const score = Number(brief?.snapshot?.confidence?.score ?? 0);
+      const used = brief?.trace?.used || {};
+      const len = Number(brief?.input?.jobTextLengthChars ?? 0);
+
+      const reasons = [];
+
+      if(!used.cb_mock_preferences) reasons.push('Preferences are missing → feasibility constraints are unknown (risk of false “fit”).');
+      if(!used.cb_mock_profile_confirmed) reasons.push('Profile not confirmed → seniority and scope assumptions may be wrong.');
+      if(len < 900) reasons.push('Job description may be incomplete → requirements uncertainty is high.');
+      if(score < 55 || band.includes('low')) reasons.push('Low confidence → decision is fragile; improve evidence or gather missing info first.');
+      if(verdict.includes('caution')) reasons.push('Constraint mismatch detected → could be a waste of time unless flexibility changes.');
+      reasons.push('If you can’t name 2 concrete evidence bullets for must-haves, pause and strengthen resume clarity first.');
+
+      return reasons;
+    }
+
+    function renderNextActions(brief){
+      const used = brief?.trace?.used || {};
+      const actions = [];
+
+      if(!used.cb_mock_preferences) actions.push('Set preferences to reduce feasibility uncertainty (work mode, visa, salary floor).');
+      if(!used.cb_mock_profile_confirmed) actions.push('Confirm key profile fields to improve calibration.');
+      actions.push('Try one more job to compare patterns (gaps repeating? constraints repeating?).');
+      actions.push('Refine 2–3 resume bullets into outcomes (scope + metric) for better evidence strength.');
+
+      fillList('nextActions', actions, '—');
+    }
+
+    function saveBrief(){
+      const source = getBriefSource();
+      const brief = source.brief;
+
+      const payload = {
+        id: 'brief_' + Math.random().toString(16).slice(2),
+        savedAtISO: new Date().toISOString(),
+        brief
+      };
+
+      let arr = [];
+      try{
+        arr = JSON.parse(localStorage.getItem('cb_mock_saved_briefs') || '[]');
+        if(!Array.isArray(arr)) arr = [];
+      } catch(_) { arr = []; }
+
+      // simple dedupe: if same generatedAt + job title/company, replace newest
+      const title = (brief?.input?.job?.title || '').toLowerCase();
+      const company = (brief?.input?.job?.company || '').toLowerCase();
+      const gen = brief?.generatedAtISO || '';
+      arr = arr.filter(x => {
+        const b = x?.brief;
+        const t = (b?.input?.job?.title || '').toLowerCase();
+        const c = (b?.input?.job?.company || '').toLowerCase();
+        const g = b?.generatedAtISO || '';
+        return !(t === title && c === company && g === gen);
+      });
+
+      arr.unshift(payload);
+      try { localStorage.setItem('cb_mock_saved_briefs', JSON.stringify(arr)); } catch(_) {}
+
+      document.getElementById('savedPill').textContent = `Saved: ${new Date(payload.savedAtISO).toLocaleString()}`;
+      toast('Saved (mock).');
+    }
+
+    function init(){
+      updateTrialPill();
+
+      const source = getBriefSource();
+      const brief = source.brief;
+
+      // NEW: banner
+      setModeBanner(source.mode, source.activeId);
+
+      setTopChips(brief);
+      renderMain(brief);
+
+      const comp = computeCompleteness(brief);
+      renderCompletenessMeter(comp);
+
+      renderInputsSummary(brief);
+
+      const counter = buildCounterArguments(brief);
+      fillList('counterList', counter, '—');
+
+      renderNextActions(brief);
+
+      // Subtle: if viewing a saved brief, show "Saved:" in pill if present
+      if(source.mode === 'saved'){
+        document.getElementById('savedPill').textContent = 'Viewing saved brief';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
