@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Career Standing — Profile</title>
+  <style>
+    :root{
+      --bg:#0f1115; --panel:#151922; --panel2:#121622;
+      --text:#e6e9ef; --muted:#9aa4b2;
+      --border:#262b36; --accent:#6aa3ff;
+      --ok:#8bffb0; --warn:#ffcc66; --bad:#ff7a7a;
+      --chip:#1e2433;
+      --shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:20px;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.45}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    h1{margin:0 0 6px 0;font-size:1.35rem;font-weight:650}
+    h2{margin:0 0 10px 0;font-size:1.05rem;font-weight:650}
+    h3{margin:0 0 8px 0;font-size:0.95rem;font-weight:650}
+    p{margin:6px 0}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .page{max-width:1120px;margin:0 auto}
+
+    .topbar{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+    .top-left{min-width:280px}
+    .top-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+
+    .badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.02);font-size:0.8rem}
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;background:var(--chip);border:1px solid var(--border);color:var(--muted);font-size:0.78rem;margin:2px 6px 2px 0}
+    .pill strong{color:var(--text);font-weight:600}
+    .btn{
+      cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,0.03);
+      color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.85rem
+    }
+    .btn:hover{border-color:rgba(106,163,255,0.55)}
+    .btn.primary{border-color:rgba(106,163,255,0.45); background: rgba(106,163,255,0.08)}
+    .btn.danger{border-color:rgba(255,122,122,0.35); background: rgba(255,122,122,0.08)}
+    .btn.small{padding:6px 8px;font-size:0.8rem}
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px 0}
+    .tab{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.02);cursor:pointer;font-size:0.86rem}
+    .tab.active{border-color:rgba(106,163,255,0.55); background: rgba(106,163,255,0.08)}
+    .panel{display:none}
+    .panel.active{display:block}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow: var(--shadow)}
+    .card.soft{background:var(--panel2)}
+    .divider{height:1px;background:var(--border);margin:12px 0}
+
+    .k{font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)}
+    .v{font-size:0.95rem}
+    .kv{display:flex;flex-direction:column;gap:3px;min-width:220px}
+
+    /* scorecards */
+    .scoregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media (max-width: 980px){ .scoregrid{grid-template-columns:1fr} }
+    .tile{
+      border:1px solid var(--border);border-radius:12px;padding:12px;background:rgba(255,255,255,0.02);
+      min-height:92px; display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .metric{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+    .metric .num{font-size:1.35rem;font-weight:700;letter-spacing:0.02em}
+    .metric .unit{font-size:0.85rem;color:var(--muted)}
+    .hint{font-size:0.84rem;color:var(--muted);margin-top:6px}
+    .status{display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-size:0.85rem;color:var(--muted)}
+    .status strong{color:var(--text)}
+
+    /* progress bar */
+    .bar{height:8px;border-radius:999px;background:rgba(255,255,255,0.06);overflow:hidden;border:1px solid var(--border)}
+    .bar > div{height:100%;width:0%}
+    .bar.ok > div{background:rgba(139,255,176,0.8)}
+    .bar.warn > div{background:rgba(255,204,102,0.85)}
+    .bar.bad > div{background:rgba(255,122,122,0.85)}
+
+    /* action list */
+    ul{margin:6px 0 0 18px;padding:0}
+    li{margin:6px 0}
+
+    /* collapsibles */
+    details{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,0.02);padding:10px 12px}
+    summary{cursor:pointer;font-weight:650}
+    details + details{margin-top:10px}
+
+    /* evidence chips */
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:3px 8px;border-radius:999px;border:1px solid var(--border);
+      background:rgba(255,255,255,0.02);color:var(--muted);font-size:0.75rem;margin:2px 6px 2px 0;
+      cursor:pointer; user-select:none;
+    }
+    .chip:hover{border-color:rgba(106,163,255,0.55);color:var(--text)}
+    .chip small{opacity:0.85}
+
+    .table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+    .table th,.table td{border-bottom:1px solid var(--border);padding:10px 8px;font-size:0.88rem;vertical-align:top}
+    .table th{color:var(--muted);text-transform:uppercase;font-size:0.72rem;letter-spacing:0.06em;background:rgba(255,255,255,0.02);text-align:left}
+    .hl{outline:2px solid rgba(106,163,255,0.75);background:rgba(106,163,255,0.08)!important}
+
+    .input{
+      width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--border);
+      background:rgba(255,255,255,0.02);color:var(--text);outline:none
+    }
+    .input:focus{border-color:rgba(106,163,255,0.6)}
+    textarea.input{min-height:110px;resize:vertical}
+
+    /* modal */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+    .overlay.open{display:flex}
+    .modal{width:min(760px,100%);background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px}
+    .modalhead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .modalbody{margin-top:10px}
+    .modalfoot{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .foot{margin:22px 0 8px 0;text-align:center;color:var(--muted);font-size:0.8rem}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <div class="top-left">
+      <h1 id="h_name">Career Standing</h1>
+      <div class="muted" id="h_sub"></div>
+      <div class="muted" id="h_meta"></div>
+      <div class="row" id="h_links" style="margin-top:6px;"></div>
+    </div>
+    <div class="top-right">
+      <button class="btn" id="btn_export_snapshot">Export Snapshot</button>
+      <button class="btn" id="btn_reset_overrides">Reset Edits</button>
+      <span class="badge" id="badge_conf"></span>
+      <span class="badge" id="badge_quality"></span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="tab_overview">Overview</div>
+    <div class="tab" data-tab="tab_baseline">Baseline (editable)</div>
+    <div class="tab" data-tab="tab_experience">Experience</div>
+    <div class="tab" data-tab="tab_resume">Master Resume</div>
+    <div class="tab" data-tab="tab_audit">Audit (deep)</div>
+  </div>
+
+  <!-- Panels -->
+  <div class="panel active" id="tab_overview"></div>
+  <div class="panel" id="tab_baseline"></div>
+  <div class="panel" id="tab_experience"></div>
+  <div class="panel" id="tab_resume"></div>
+  <div class="panel" id="tab_audit"></div>
+
+  <div class="foot">
+    Profile = stable baseline · Cases = decision briefs · Trends live on the homepage (across cases)
+  </div>
+</div>
+
+<!-- modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modalhead">
+      <div>
+        <h2 id="modal_title">Edit</h2>
+        <div class="muted" id="modal_desc"></div>
+      </div>
+      <button class="btn" id="modal_close">Close</button>
+    </div>
+    <div class="modalbody" id="modal_body"></div>
+    <div class="modalfoot">
+      <button class="btn danger" id="modal_clear">Clear</button>
+      <button class="btn primary" id="modal_save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * ===== INPUT: Resume analysis result (as provided) =====
+ */
+const RESUME_AGENT_OUTPUT = {
+  "schema_version": "resume_agent_output.v1",
+  "run": {
+    "run_id": "run_2475d59763",
+    "generated_at_iso": "2026-02-01T02:04:02Z",
+    "agent_name": "resume_parse_and_score",
+    "agent_notes": "Parsed resume with clear sections and reasonable detail. Some bullet points lack metrics and explicit outcomes. Dates and roles are consistent. No education degree ambiguity. Skills well listed. No major red flags but some vague verbs and missing metrics."
+  },
+  "input": {
+    "resume_text": "ALEX MORGAN\nDenver, CO • alexmorgan@email.com • (555) 111-2222 • linkedin.com/in/alexmorgan • github.com/alexmorgan\n\nSUMMARY\nSenior Frontend Engineer with 8+ years building React and TypeScript web applications in FinTech. Interested in frontend architecture, performance, and GraphQL.\n\nEXPERIENCE\nSenior Frontend Engineer — FinBank (Contract) — 2022-03 to Present\n- Worked on a React migration from legacy UI to modern stack.\n- Built reusable UI components with TypeScript.\n- Improved performance and fixed bugs across multiple pages.\n- Collaborated with backend teams to integrate GraphQL APIs.\n\nFrontend Engineer — PayFlow Inc — 2019-01 to 2022-02\n- Developed customer onboarding flows using React, Redux, and REST APIs.\n- Implemented design system components and improved UI consistency.\n- Helped with CI/CD and wrote unit tests.\n\nSoftware Engineer — RetailTech — 2017-06 to 2018-12\n- Built internal admin tools using JavaScript and Node.js.\n- Maintained existing codebase and added new features.\n\nSKILLS\nReact, TypeScript, JavaScript, Redux, GraphQL, HTML/CSS, Node.js, Jest, Git\n\nEDUCATION\nB.S. Computer Science — State University — 2013-09 to 2017-05",
+    "input_format": "plain_text"
+  },
+  "resume_spans": [
+    {"span_id":"span_1","text":"ALEX MORGAN","char_start":0,"char_end":10,"section_hint":"header"},
+    {"span_id":"span_2","text":"Denver, CO • alexmorgan@email.com • (555) 111-2222 • linkedin.com/in/alexmorgan • github.com/alexmorgan","char_start":11,"char_end":98,"section_hint":"header"},
+    {"span_id":"span_3","text":"SUMMARY\nSenior Frontend Engineer with 8+ years building React and TypeScript web applications in FinTech. Interested in frontend architecture, performance, and GraphQL.","char_start":99,"char_end":210,"section_hint":"summary"},
+    {"span_id":"span_4","text":"EXPERIENCE","char_start":211,"char_end":220,"section_hint":"experience"},
+    {"span_id":"span_5","text":"Senior Frontend Engineer — FinBank (Contract) — 2022-03 to Present","char_start":221,"char_end":277,"section_hint":"experience"},
+    {"span_id":"span_6","text":"- Worked on a React migration from legacy UI to modern stack.","char_start":278,"char_end":329,"section_hint":"experience"},
+    {"span_id":"span_7","text":"- Built reusable UI components with TypeScript.","char_start":330,"char_end":370,"section_hint":"experience"},
+    {"span_id":"span_8","text":"- Improved performance and fixed bugs across multiple pages.","char_start":371,"char_end":424,"section_hint":"experience"},
+    {"span_id":"span_9","text":"- Collaborated with backend teams to integrate GraphQL APIs.","char_start":425,"char_end":479,"section_hint":"experience"},
+    {"span_id":"span_10","text":"Frontend Engineer — PayFlow Inc — 2019-01 to 2022-02","char_start":480,"char_end":527,"section_hint":"experience"},
+    {"span_id":"span_11","text":"- Developed customer onboarding flows using React, Redux, and REST APIs.","char_start":528,"char_end":588,"section_hint":"experience"},
+    {"span_id":"span_12","text":"- Implemented design system components and improved UI consistency.","char_start":589,"char_end":646,"section_hint":"experience"},
+    {"span_id":"span_13","text":"- Helped with CI/CD and wrote unit tests.","char_start":647,"char_end":681,"section_hint":"experience"},
+    {"span_id":"span_14","text":"Software Engineer — RetailTech — 2017-06 to 2018-12","char_start":682,"char_end":731,"section_hint":"experience"},
+    {"span_id":"span_15","text":"- Built internal admin tools using JavaScript and Node.js.","char_start":732,"char_end":780,"section_hint":"experience"},
+    {"span_id":"span_16","text":"- Maintained existing codebase and added new features.","char_start":781,"char_end":823,"section_hint":"experience"},
+    {"span_id":"span_17","text":"SKILLS\nReact, TypeScript, JavaScript, Redux, GraphQL, HTML/CSS, Node.js, Jest, Git","char_start":824,"char_end":885,"section_hint":"skills"},
+    {"span_id":"span_18","text":"EDUCATION\nB.S. Computer Science — State University — 2013-09 to 2017-05","char_start":886,"char_end":946,"section_hint":"education"}
+  ],
+  "profile_structured": {
+    "candidate": {"name":"ALEX MORGAN","location":"Denver, CO","email":"alexmorgan@email.com","phone":"(555) 111-2222"},
+    "headline_summary": {"headline":"Senior Frontend Engineer","summary":"Senior Frontend Engineer with 8+ years building React and TypeScript web applications in FinTech. Interested in frontend architecture, performance, and GraphQL."},
+    "roles": [
+      {"role_id":"role_1","title":"Senior Frontend Engineer","company":"FinBank","employment_type":"contract","location":null,"start_date":"2022-03","end_date":null,"is_current":true,
+        "bullets":[
+          {"bullet_id":"b_1_1","text":"Worked on a React migration from legacy UI to modern stack.","span_ids":["span_6"],"impact_signals":{"has_metric":false,"has_scope":false,"has_outcome":false,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","missing_scope","missing_outcome"]},
+          {"bullet_id":"b_1_2","text":"Built reusable UI components with TypeScript.","span_ids":["span_7"],"impact_signals":{"has_metric":false,"has_scope":false,"has_outcome":false,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","missing_scope","missing_outcome"]},
+          {"bullet_id":"b_1_3","text":"Improved performance and fixed bugs across multiple pages.","span_ids":["span_8"],"impact_signals":{"has_metric":false,"has_scope":true,"has_outcome":true,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","unclear_ownership"]},
+          {"bullet_id":"b_1_4","text":"Collaborated with backend teams to integrate GraphQL APIs.","span_ids":["span_9"],"impact_signals":{"has_metric":false,"has_scope":true,"has_outcome":false,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","missing_outcome","unclear_ownership"]}
+        ],
+        "seniority_signals":{"architecture":"some","leadership":"none","cross_team_influence":"some","ownership_scope":"feature","domain_depth":"strong"}
+      },
+      {"role_id":"role_2","title":"Frontend Engineer","company":"PayFlow Inc","employment_type":"full_time","location":null,"start_date":"2019-01","end_date":"2022-02","is_current":false,
+        "bullets":[
+          {"bullet_id":"b_2_1","text":"Developed customer onboarding flows using React, Redux, and REST APIs.","span_ids":["span_11"],"impact_signals":{"has_metric":false,"has_scope":true,"has_outcome":false,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","missing_outcome","unclear_ownership"]},
+          {"bullet_id":"b_2_2","text":"Implemented design system components and improved UI consistency.","span_ids":["span_12"],"impact_signals":{"has_metric":false,"has_scope":true,"has_outcome":true,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","unclear_ownership"]},
+          {"bullet_id":"b_2_3","text":"Helped with CI/CD and wrote unit tests.","span_ids":["span_13"],"impact_signals":{"has_metric":false,"has_scope":false,"has_outcome":false,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","missing_scope","missing_outcome","unclear_ownership"]}
+        ],
+        "seniority_signals":{"architecture":"some","leadership":"none","cross_team_influence":"some","ownership_scope":"feature","domain_depth":"some"}
+      },
+      {"role_id":"role_3","title":"Software Engineer","company":"RetailTech","employment_type":"full_time","location":null,"start_date":"2017-06","end_date":"2018-12","is_current":false,
+        "bullets":[
+          {"bullet_id":"b_3_1","text":"Built internal admin tools using JavaScript and Node.js.","span_ids":["span_15"],"impact_signals":{"has_metric":false,"has_scope":true,"has_outcome":false,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","missing_outcome","unclear_ownership"]},
+          {"bullet_id":"b_3_2","text":"Maintained existing codebase and added new features.","span_ids":["span_16"],"impact_signals":{"has_metric":false,"has_scope":false,"has_outcome":false,"has_ownership":false},"clarity_flags":["vague_verb","missing_metric","missing_scope","missing_outcome","unclear_ownership"]}
+        ],
+        "seniority_signals":{"architecture":"none","leadership":"none","cross_team_influence":"none","ownership_scope":"task","domain_depth":"some"}
+      }
+    ],
+    "skills": {"hard_skills":["React","TypeScript","JavaScript","Redux","GraphQL","HTML/CSS","Node.js","Jest","Git"],"soft_skills":[],"tools":["Git","Jest"],"domains":["FinTech","Frontend Development"]},
+    "education": [{"school":"State University","degree":"B.S.","field":"Computer Science","start_date":"2013-09","end_date":"2017-05"}],
+    "links": {"linkedin":"linkedin.com/in/alexmorgan","github":"github.com/alexmorgan","portfolio":null,"other":[]},
+    "artifacts": {"talks":[],"papers":[],"projects":[],"certifications":[]}
+  },
+  "field_level_confidence": {
+    "candidate": {"name":1,"location":1,"email":1,"phone":1},
+    "roles": [{"role_id":"role_1","title":1,"company":1,"dates":1,"bullets":0.8},{"role_id":"role_2","title":1,"company":1,"dates":1,"bullets":0.8},{"role_id":"role_3","title":1,"company":1,"dates":1,"bullets":0.7}],
+    "skills": 0.9, "education": 1, "links": 1
+  },
+  "resume_quality_scores": {
+    "overall": 72,
+    "subscores": {"clarity":65,"evidence_strength":60,"seniority_signals":70,"structure_completeness":85,"role_focus":75,"credibility_signals":75},
+    "score_reasons": [
+      {"dimension":"clarity","reason":"Many bullet points use vague verbs and lack explicit outcomes or metrics.","severity":"medium","span_ids":["span_6","span_7","span_8","span_9","span_11","span_12","span_13","span_15","span_16"]},
+      {"dimension":"evidence_strength","reason":"No quantified metrics or clear impact results provided in experience bullets.","severity":"high","span_ids":["span_6","span_7","span_8","span_9","span_11","span_12","span_13","span_15","span_16"]},
+      {"dimension":"seniority_signals","reason":"Some architecture and cross-team influence signals present but no leadership or org-level ownership claims.","severity":"medium","span_ids":["span_5","span_10","span_14"]},
+      {"dimension":"structure_completeness","reason":"Clear sections for header, summary, experience, skills, and education with consistent formatting.","severity":"low","span_ids":["span_1","span_3","span_4","span_17","span_18"]},
+      {"dimension":"role_focus","reason":"Consistent frontend engineering roles with relevant skills and domain focus in FinTech.","severity":"low","span_ids":["span_3","span_5","span_10"]},
+      {"dimension":"credibility_signals","reason":"Contact info and professional links present; education dates and degree clear.","severity":"low","span_ids":["span_2","span_18"]}
+    ]
+  },
+  "seniority_calibration": {
+    "estimated_band": "mid",
+    "confidence": 0.7,
+    "signals_supporting": [
+      {"signal":"8+ years experience in frontend roles","why":"Indicates mid-level to senior experience","span_ids":["span_3"]},
+      {"signal":"Some architecture involvement and cross-team collaboration","why":"Shows growing responsibility beyond individual tasks","span_ids":["span_5","span_9"]}
+    ],
+    "signals_missing": [
+      {"signal":"Leadership or management experience","why_it_matters":"Leadership signals differentiate senior from mid-level","how_to_provide_evidence":"Add bullets describing team leadership, mentoring, or project ownership"},
+      {"signal":"Quantified impact metrics","why_it_matters":"Metrics demonstrate scope and effectiveness of work","how_to_provide_evidence":"Include numbers on performance improvements, user impact, or project scale"}
+    ],
+    "premature_targets": [
+      {"target_band":"senior","why_premature":"No explicit leadership or ownership at org level shown","evidence_needed":["Leadership roles","Project ownership","Impact metrics"]},
+      {"target_band":"staff","why_premature":"No evidence of cross-org influence or strategic leadership","evidence_needed":["Cross-org initiatives","Mentorship","Strategic contributions"]}
+    ]
+  },
+  "top_gaps": [
+    {"gap_id":"gap_1","title":"Lack of quantified metrics in experience bullets","description":"No metrics or numbers to demonstrate impact or scope of work.","category":"evidence","impact":"high","effort":"medium","span_ids":["span_6","span_7","span_8","span_9","span_11","span_12","span_13","span_15","span_16"],"next_actions":["Add measurable results or KPIs for key accomplishments"]},
+    {"gap_id":"gap_2","title":"Vague verbs and missing outcomes in bullet points","description":"Many bullets use generic verbs without clear outcomes or ownership.","category":"clarity","impact":"medium","effort":"medium","span_ids":["span_6","span_7","span_8","span_9","span_11","span_12","span_13","span_15","span_16"],"next_actions":["Rewrite bullets to specify actions, ownership, and results"]},
+    {"gap_id":"gap_3","title":"No leadership or team management evidence","description":"No explicit mention of leading teams or mentoring.","category":"seniority","impact":"medium","effort":"high","span_ids":["span_5","span_10","span_14"],"next_actions":["Add leadership or mentorship responsibilities if applicable"]}
+  ],
+  "red_flags": [],
+  "fix_plan": {
+    "minutes_30": ["Clarify vague verbs in 2-3 key bullet points","Add missing contact info if any (none missing here)"],
+    "hours_2": ["Rewrite experience bullets to include outcomes and ownership","Add any missing leadership or ownership details"],
+    "days_7": ["Gather and add quantified metrics for accomplishments","Consider adding leadership or mentorship roles if applicable"],
+    "guardrails": ["Do not invent metrics or outcomes","Avoid vague verbs without context","Keep formatting consistent"]
+  },
+  "suggested_rewrites": [
+    {"rewrite_id":"rewrite_b_1_1","original_bullet":"Worked on a React migration from legacy UI to modern stack.","span_ids":["span_6"],"rewrite_variants":[{"variant_id":"v1","text":"Contributed to migrating the legacy UI to a modern React stack."}],"missing_info_questions":["What was the scope or scale of the migration project?","What was your specific role or ownership in the migration?","Were there any measurable outcomes or improvements?"]},
+    {"rewrite_id":"rewrite_b_1_2","original_bullet":"Built reusable UI components with TypeScript.","span_ids":["span_7"],"rewrite_variants":[{"variant_id":"v1","text":"Developed reusable UI components using TypeScript."}],"missing_info_questions":["How many components or what scope did you build?","Did these components improve development efficiency or UI consistency?"]},
+    {"rewrite_id":"rewrite_b_1_3","original_bullet":"Improved performance and fixed bugs across multiple pages.","span_ids":["span_8"],"rewrite_variants":[{"variant_id":"v1","text":"Enhanced application performance and resolved bugs on multiple pages."}],"missing_info_questions":["Can you quantify the performance improvements?","How many bugs were fixed or what was the impact on users?"]}
+  ],
+  "questions_for_user": [
+    {"question_id":"q_1","question":"Can you provide any metrics or measurable outcomes for your React migration work at FinBank?","why_needed":"Metrics improve evidence strength and clarity of impact.","priority":"p0"},
+    {"question_id":"q_2","question":"Did you have any leadership, mentoring, or project ownership responsibilities in any of your roles?","why_needed":"Leadership signals are important for seniority calibration.","priority":"p0"},
+    {"question_id":"q_3","question":"Can you specify the scope or scale of the UI components you built and their impact?","why_needed":"Clarifies ownership and outcome for better clarity and evidence.","priority":"p1"}
+  ]
+};
+
+/**
+ * ===== Local overrides (key-field edits) =====
+ * Stored in localStorage so this can run as a static HTML file.
+ * In production, these would be persisted server-side and applied as user_overrides.
+ */
+const LS_KEY = `career_profile_overrides:${RESUME_AGENT_OUTPUT.run.run_id}`;
+function loadOverrides(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); }catch{ return {}; }
+}
+function saveOverrides(o){ localStorage.setItem(LS_KEY, JSON.stringify(o)); }
+function clearOverrides(){ localStorage.removeItem(LS_KEY); }
+
+/**
+ * ===== Decision-grade profile model (Profile != Case) =====
+ * - Overview focuses on metrics + guidance + next actions
+ * - Baseline is editable (targets, constraints, preferences, key facts)
+ * - Deep audit contains evidence, gaps, uncertainties, rewrites
+ */
+function buildProfile(out, overrides){
+  const ps = out.profile_structured;
+  const cal = out.seniority_calibration || { confidence: 0.5, estimated_band: "unknown" };
+  const conf = clamp01(cal.confidence ?? 0.5);
+  const confidenceBand = conf >= 0.80 ? "high" : conf >= 0.60 ? "medium" : "low";
+
+  // ===== Editable baseline fields (user-declared) =====
+  const baselineDefaults = {
+    targets: {
+      primary_role_family: "Senior Frontend Engineer",
+      secondary_role_family: "Frontend Platform / UI Architecture"
+    },
+    constraints: {
+      work_authorization: "",
+      location_policy: ps.candidate.location || "",
+      salary_floor: "",
+      start_availability: "",
+      travel_tolerance: ""
+    },
+    preferences: {
+      deal_breakers: "",
+      values: "",
+      risk_tolerance: "",
+      notes: ""
+    },
+    key_facts: {
+      headline: ps.headline_summary.headline || "",
+      summary: ps.headline_summary.summary || ""
+    }
+  };
+
+  const baseline = deepMerge(structuredClone(baselineDefaults), overrides?.baseline || {});
+
+  // ===== Metric construction (honest, not fake precision) =====
+  const q = out.resume_quality_scores || { overall: 0, subscores: {} };
+  const subs = q.subscores || {};
+  const evidenceStrength = clamp01((subs.evidence_strength ?? 0) / 100);
+  const clarity = clamp01((subs.clarity ?? 0) / 100);
+  const roleFocus = clamp01((subs.role_focus ?? 0) / 100);
+
+  // Ownership signal (proxy): if missing leadership + ownership_scope feature/task.
+  const roles = ps.roles || [];
+  const leadershipMissing = (out.seniority_calibration?.signals_missing || []).some(s => String(s.signal).toLowerCase().includes("leadership"));
+  const ownershipScope = mostCommon(roles.map(r => r.seniority_signals?.ownership_scope || "unknown"));
+  const ownershipSignal =
+    leadershipMissing ? 0.35 :
+    ownershipScope === "org" ? 0.85 :
+    ownershipScope === "project" ? 0.75 :
+    ownershipScope === "feature" ? 0.55 :
+    ownershipScope === "task" ? 0.35 : 0.45;
+
+  // Impact signal (proxy): count bullets with outcome/scope and metrics
+  const allBullets = roles.flatMap(r => r.bullets || []);
+  const hasOutcome = allBullets.filter(b => b.impact_signals?.has_outcome).length;
+  const hasScope = allBullets.filter(b => b.impact_signals?.has_scope).length;
+  const hasMetric = allBullets.filter(b => b.impact_signals?.has_metric).length;
+  const impactSignal = clamp01((0.25*ratio(hasScope, allBullets.length) + 0.35*ratio(hasOutcome, allBullets.length) + 0.40*ratio(hasMetric, allBullets.length)));
+
+  // Constraint completeness: key feasibility gates present?
+  const constraintFields = ["work_authorization","location_policy","salary_floor","start_availability"];
+  const constraintCompleteness = clamp01(constraintFields.filter(k => (baseline.constraints[k] || "").trim().length > 0).length / constraintFields.length);
+
+  // Proof coverage: portfolio signals (links + artifacts count)
+  const linkCount = ["linkedin","github","portfolio"].filter(k => (ps.links?.[k] || "").trim().length > 0).length;
+  const artifactCount =
+    (ps.artifacts?.projects?.length||0) + (ps.artifacts?.certifications?.length||0) +
+    (ps.artifacts?.talks?.length||0) + (ps.artifacts?.papers?.length||0);
+  const proofCoverage = clamp01((linkCount >= 2 ? 0.55 : linkCount === 1 ? 0.35 : 0.15) + Math.min(0.45, artifactCount*0.12));
+
+  // Market readiness: blend of confidence + evidence strength + constraints completeness
+  // (This is NOT "fit", it's readiness for high-confidence recommendations.)
+  const marketReadiness = clamp01(0.45*conf + 0.35*evidenceStrength + 0.20*constraintCompleteness);
+
+  // Guidance: keep it small and actionable
+  const nextActions = buildNextActions(out, baseline);
+
+  // Experience abstraction (light): chapters from roles
+  const chapters = roles.map(r => ({
+    role_id: r.role_id,
+    title: r.title,
+    company: r.company,
+    start: r.start_date,
+    end: r.end_date || "Present",
+    employment_type: r.employment_type,
+    seniority_signals: r.seniority_signals,
+    bullets: r.bullets
+  }));
+
+  // Audit objects
+  const evidenceLedger = out.resume_spans.map(s => ({
+    evidence_id: s.span_id,
+    section: s.section_hint,
+    text: s.text
+  }));
+
+  const uncertainties = [
+    ...(out.seniority_calibration?.signals_missing || []).map((m, i) => ({
+      id: `missing_${i+1}`,
+      priority: "p0",
+      title: m.signal,
+      why: m.why_it_matters,
+      resolution: m.how_to_provide_evidence
+    })),
+    ...(out.questions_for_user || []).map(q => ({
+      id: q.question_id,
+      priority: q.priority,
+      title: q.question,
+      why: q.why_needed,
+      resolution: "Answer + add a supporting artifact or rewrite bullets (no invented metrics)."
+    }))
+  ];
+
+  // Snapshot artifact: what cases should pin to
+  const snapshot = {
+    schema_version: "decision_profile_snapshot.v1",
+    generated_at_iso: new Date().toISOString(),
+    resume_run_id: out.run.run_id,
+    candidate: ps.candidate,
+    baseline,
+    metrics: {
+      confidence_band: confidenceBand,
+      calibration_confidence: conf,
+      evidence_strength: evidenceStrength,
+      ownership_signal: ownershipSignal,
+      impact_signal: impactSignal,
+      constraint_completeness: constraintCompleteness,
+      proof_coverage: proofCoverage,
+      market_readiness: marketReadiness
+    }
+  };
+
+  return {
+    meta: {
+      profile_id: `prof_${out.run.run_id}`,
+      updated_at_iso: out.run.generated_at_iso,
+      run_id: out.run.run_id,
+      confidence_band: confidenceBand,
+      calibration_confidence: conf,
+      resume_quality_overall: q.overall
+    },
+    candidate: ps.candidate,
+    links: ps.links,
+    headline: ps.headline_summary,
+    baseline,
+    metrics: {
+      calibration_confidence: conf,
+      evidence_strength: evidenceStrength,
+      ownership_signal: ownershipSignal,
+      impact_signal: impactSignal,
+      constraint_completeness: constraintCompleteness,
+      proof_coverage: proofCoverage,
+      role_focus: roleFocus,
+      clarity: clarity,
+      market_readiness: marketReadiness
+    },
+    guidance: {
+      micro: buildGuidance(out, {conf, evidenceStrength, ownershipSignal, impactSignal}),
+      next_actions: nextActions
+    },
+    chapters,
+    master_resume_text: out.input.resume_text,
+    audit: {
+      score_reasons: out.resume_quality_scores?.score_reasons || [],
+      top_gaps: out.top_gaps || [],
+      fix_plan: out.fix_plan || {},
+      suggested_rewrites: out.suggested_rewrites || [],
+      uncertainties,
+      evidence_ledger: evidenceLedger
+    },
+    snapshot
+  };
+}
+
+/* ---------- Guidance & actions ---------- */
+function buildGuidance(out, m){
+  // Keep to max 2–3 bullets.
+  const bullets = [];
+  const hasMetricsGap = (out.top_gaps || []).some(g => g.category === "evidence" && g.impact === "high");
+  const missingLeadership = (out.seniority_calibration?.signals_missing || []).some(s => String(s.signal).toLowerCase().includes("leadership"));
+
+  if (hasMetricsGap){
+    bullets.push("Add 2–3 quantified outcomes (even small) to unlock stronger evidence strength. Do not invent numbers.");
+  }
+  if (missingLeadership){
+    bullets.push("If applicable, add one concrete ownership/mentoring example to differentiate mid vs senior signals.");
+  }
+  if (m.calibration_confidence < 0.65){
+    bullets.push("Resolve the top P0 unknowns before trusting high-confidence recommendations.");
+  }
+  if (!bullets.length){
+    bullets.push("Profile looks structurally solid. Next: strengthen proof coverage (portfolio/work samples).");
+  }
+  return bullets.slice(0,3);
+}
+
+function buildNextActions(out, baseline){
+  // Convert fix_plan + top gaps into 3 concrete tasks, minimal text.
+  const tasks = [];
+  const gaps = out.top_gaps || [];
+  const fp = out.fix_plan || {};
+
+  if (gaps.find(g => g.gap_id === "gap_1")){
+    tasks.push({title:"Add impact metrics", detail:"Pick 2 bullets and add measurable outcomes (perf %, time saved, users affected).", effort:"~30–60 min"});
+  }
+  if (gaps.find(g => g.gap_id === "gap_2")){
+    tasks.push({title:"Rewrite vague bullets", detail:"Rewrite 3 bullets to include ownership + result (what changed because of your work).", effort:"~30 min"});
+  }
+  if (gaps.find(g => g.gap_id === "gap_3")){
+    tasks.push({title:"Capture leadership evidence", detail:"If applicable, add one mentoring/ownership story (project lead, review culture, onboarding).", effort:"~45–90 min"});
+  }
+
+  // Ensure constraints completeness is addressed
+  const c = baseline.constraints || {};
+  const missing = ["work_authorization","salary_floor","start_availability"].filter(k => !(c[k]||"").trim());
+  if (missing.length){
+    tasks.unshift({title:"Fill feasibility constraints", detail:`Add ${missing.join(", ")} to reduce false-positive recommendations.`, effort:"~2 min"});
+  }
+
+  // Trim to 3
+  return tasks.slice(0,3);
+}
+
+/* ---------- Utility ---------- */
+function clamp01(x){ return Math.max(0, Math.min(1, Number(x)||0)); }
+function ratio(a,b){ return b>0 ? a/b : 0; }
+function mostCommon(arr){
+  const m = new Map();
+  arr.forEach(v => m.set(v, (m.get(v)||0)+1));
+  let best=null, bestN=-1;
+  for (const [k,n] of m.entries()){ if (n>bestN){best=k;bestN=n} }
+  return best ?? "unknown";
+}
+function deepMerge(dst, src){
+  if (!src || typeof src !== "object") return dst;
+  for (const k of Object.keys(src)){
+    if (src[k] && typeof src[k] === "object" && !Array.isArray(src[k])){
+      dst[k] = deepMerge(dst[k] ? structuredClone(dst[k]) : {}, src[k]);
+    } else {
+      dst[k] = src[k];
+    }
+  }
+  return dst;
+}
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+}
+function formatIso(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString(undefined,{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+  }catch{ return iso; }
+}
+function confBandLabel(b){
+  return b === "high" ? {dot:"ok", txt:"High"} : b === "medium" ? {dot:"warn", txt:"Medium"} : {dot:"bad", txt:"Low"};
+}
+function barClass(v){
+  if (v >= 0.75) return "ok";
+  if (v >= 0.55) return "warn";
+  return "bad";
+}
+function pct(v){ return `${Math.round(clamp01(v)*100)}%`; }
+function chipSpan(spanId, label=null){
+  const txt = label ?? spanId;
+  return `<span class="chip" data-span="${escapeHtml(spanId)}" title="Jump to evidence ${escapeHtml(spanId)}">${escapeHtml(txt)} <small class="mono">${escapeHtml(spanId)}</small></span>`;
+}
+
+/* ---------- Render ---------- */
+const $ = (id) => document.getElementById(id);
+let OVERRIDES = loadOverrides();
+let PROFILE = buildProfile(RESUME_AGENT_OUTPUT, OVERRIDES);
+
+function render(){
+  renderHeader(PROFILE);
+  renderOverview(PROFILE);
+  renderBaseline(PROFILE);
+  renderExperience(PROFILE);
+  renderMasterResume(PROFILE);
+  renderAudit(PROFILE);
+  wireEvidenceChips();
+}
+
+function renderHeader(p){
+  const name = p.candidate?.name || "Career Standing";
+  const headline = (p.baseline?.key_facts?.headline || p.headline?.headline || "").trim();
+  const location = (p.baseline?.constraints?.location_policy || p.candidate?.location || "").trim();
+
+  $("h_name").textContent = name;
+  $("h_sub").textContent = `${headline}${headline && location ? " · " : ""}${location}`.trim();
+  $("h_meta").innerHTML = `<span class="muted">Profile:</span> <span class="mono">${escapeHtml(p.meta.profile_id)}</span> · <span class="muted">Updated:</span> ${escapeHtml(formatIso(p.meta.updated_at_iso))}`;
+
+  const links = [];
+  if (p.links?.linkedin) links.push(`<span class="pill"><strong>LinkedIn</strong> <a href="https://${escapeHtml(p.links.linkedin)}" target="_blank" rel="noreferrer">${escapeHtml(p.links.linkedin)}</a></span>`);
+  if (p.links?.github) links.push(`<span class="pill"><strong>GitHub</strong> <a href="https://${escapeHtml(p.links.github)}" target="_blank" rel="noreferrer">${escapeHtml(p.links.github)}</a></span>`);
+  if (p.links?.portfolio) links.push(`<span class="pill"><strong>Portfolio</strong> <a href="${escapeHtml(p.links.portfolio)}" target="_blank" rel="noreferrer">${escapeHtml(p.links.portfolio)}</a></span>`);
+  $("h_links").innerHTML = links.join("");
+
+  const band = confBandLabel(p.meta.confidence_band);
+  $("badge_conf").innerHTML = `<span class="dot ${band.dot}"></span> Calibration confidence: <strong>${band.txt}</strong> <span class="muted">(${pct(p.meta.calibration_confidence)})</span>`;
+  $("badge_quality").innerHTML = `<span class="dot ${p.meta.resume_quality_overall>=80?"ok":p.meta.resume_quality_overall>=65?"warn":"bad"}"></span> Resume quality: <strong>${escapeHtml(p.meta.resume_quality_overall)}</strong>/100`;
+}
+
+function renderOverview(p){
+  const m = p.metrics;
+  const tile = (title, value, unit, v, hint) => `
+    <div class="tile">
+      <div>
+        <div class="k">${escapeHtml(title)}</div>
+        <div class="metric">
+          <div class="num">${escapeHtml(value)}</div>
+          <div class="unit">${escapeHtml(unit)}</div>
+        </div>
+        <div class="hint">${escapeHtml(hint)}</div>
+      </div>
+      <div class="bar ${barClass(v)}" title="${pct(v)}">
+        <div style="width:${pct(v)}"></div>
+      </div>
+    </div>
+  `;
+
+  const actions = (p.guidance?.next_actions || []).map(a => `
+    <li>
+      <strong>${escapeHtml(a.title)}</strong>
+      <div class="muted" style="font-size:0.86rem;margin-top:2px;">${escapeHtml(a.detail)} · <span class="mono">${escapeHtml(a.effort)}</span></div>
+    </li>
+  `).join("");
+
+  const micro = (p.guidance?.micro || []).map(x => `<li>${escapeHtml(x)}</li>`).join("");
+
+  const primaryTarget = p.baseline?.targets?.primary_role_family || "—";
+  const secondaryTarget = p.baseline?.targets?.secondary_role_family || "—";
+
+  $("tab_overview").innerHTML = `
+    <div class="grid">
+      <section class="card">
+        <h2>Career Standing</h2>
+        <p class="muted">A calm summary of where you stand — and what to do next. Deep audit is available in the Audit tab.</p>
+
+        <div class="divider"></div>
+        <div class="scoregrid">
+          ${tile("Calibration confidence", pct(m.calibration_confidence), "certainty", m.calibration_confidence,
+            "How sure the system is about your current seniority signals.")}
+          ${tile("Evidence strength", pct(m.evidence_strength), "proof", m.evidence_strength,
+            "How well your profile claims are supported by outcomes/metrics.")}
+          ${tile("Market readiness", pct(m.market_readiness), "readiness", m.market_readiness,
+            "Readiness for high-confidence recommendations (not job fit).")}
+          ${tile("Impact signal", pct(m.impact_signal), "outcomes", m.impact_signal,
+            "Presence of measurable outcomes, scope, and results in bullets.")}
+          ${tile("Ownership signal", pct(m.ownership_signal), "scope", m.ownership_signal,
+            "Signals of leading/owning work beyond tasks.")}
+          ${tile("Constraint completeness", pct(m.constraint_completeness), "feasibility", m.constraint_completeness,
+            "Whether feasibility gates (salary, authorization, start date) are declared.")}
+        </div>
+
+        <div class="divider"></div>
+        <div class="row">
+          <span class="pill"><strong>Primary target</strong> ${escapeHtml(primaryTarget)}</span>
+          <span class="pill"><strong>Secondary target</strong> ${escapeHtml(secondaryTarget)}</span>
+          <span class="pill"><strong>Role focus</strong> ${pct(m.role_focus)}</span>
+          <span class="pill"><strong>Clarity</strong> ${pct(m.clarity)}</span>
+          <span class="pill"><strong>Proof coverage</strong> ${pct(m.proof_coverage)}</span>
+        </div>
+
+        <div class="divider"></div>
+        <h3>Guidance (minimal)</h3>
+        <ul>${micro || `<li class="muted">No guidance.</li>`}</ul>
+
+        <div class="divider"></div>
+        <h3>Top next actions</h3>
+        <ul>${actions || `<li class="muted">No actions.</li>`}</ul>
+
+        <div class="divider"></div>
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="k">Homepage note</div>
+            <div class="v">Trends across jobs live on the homepage (across cases). This profile is your baseline.</div>
+          </div>
+          <div class="row">
+            <button class="btn" id="btn_go_audit">Open Audit</button>
+            <button class="btn primary" id="btn_edit_baseline">Edit Baseline</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card soft">
+        <h2>Quick Baseline</h2>
+        <p class="muted">These are the levers that most affect feasibility and recommendations.</p>
+
+        <div class="divider"></div>
+        <div class="grid">
+          <div class="kv">
+            <div class="k">Work authorization</div>
+            <div class="v">${escapeHtml(p.baseline.constraints.work_authorization || "— (add)")}</div>
+          </div>
+          <div class="kv">
+            <div class="k">Salary floor</div>
+            <div class="v">${escapeHtml(p.baseline.constraints.salary_floor || "— (add)")}</div>
+          </div>
+          <div class="kv">
+            <div class="k">Start availability</div>
+            <div class="v">${escapeHtml(p.baseline.constraints.start_availability || "— (add)")}</div>
+          </div>
+          <div class="kv">
+            <div class="k">Location policy</div>
+            <div class="v">${escapeHtml(p.baseline.constraints.location_policy || "—")}</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <details>
+          <summary>What these metrics mean (and what they don’t)</summary>
+          <div class="muted" style="margin-top:8px;font-size:0.9rem;">
+            <ul>
+              <li><strong>Market readiness</strong> is not job fit. It means the system has enough feasibility + evidence to make reliable recommendations.</li>
+              <li><strong>Evidence strength</strong> increases when outcomes are measurable and specific. We never invent numbers.</li>
+              <li><strong>Ownership signal</strong> grows with real examples of leading work, mentoring, or owning a project end-to-end.</li>
+              <li>This page intentionally avoids long explanations. Deep rationale is in <strong>Audit</strong>.</li>
+            </ul>
+          </div>
+        </details>
+
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn" id="btn_open_resume">View Master Resume</button>
+          <button class="btn" id="btn_open_experience">View Experience</button>
+        </div>
+      </section>
+    </div>
+  `;
+
+  $("btn_go_audit").onclick = () => setTab("tab_audit");
+  $("btn_edit_baseline").onclick = () => setTab("tab_baseline");
+  $("btn_open_resume").onclick = () => setTab("tab_resume");
+  $("btn_open_experience").onclick = () => setTab("tab_experience");
+}
+
+function renderBaseline(p){
+  const b = p.baseline;
+
+  const block = (title, desc, rows, editKey) => `
+    <section class="card ${title.includes("Preferences") ? "soft" : ""}">
+      <div class="row" style="justify-content:space-between;align-items:flex-start;">
+        <div style="min-width:240px;flex:1;">
+          <h2>${escapeHtml(title)}</h2>
+          <p class="muted">${escapeHtml(desc)}</p>
+        </div>
+        <div>
+          <button class="btn primary" data-edit="${escapeHtml(editKey)}">Edit</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="grid">${rows}</div>
+    </section>
+  `;
+
+  const targetsRows = `
+    <div class="kv"><div class="k">Primary role family</div><div class="v">${escapeHtml(b.targets.primary_role_family || "—")}</div></div>
+    <div class="kv"><div class="k">Secondary role family</div><div class="v">${escapeHtml(b.targets.secondary_role_family || "—")}</div></div>
+  `;
+
+  const constraintsRows = `
+    <div class="kv"><div class="k">Work authorization</div><div class="v">${escapeHtml(b.constraints.work_authorization || "—")}</div></div>
+    <div class="kv"><div class="k">Location policy</div><div class="v">${escapeHtml(b.constraints.location_policy || "—")}</div></div>
+    <div class="kv"><div class="k">Salary floor</div><div class="v">${escapeHtml(b.constraints.salary_floor || "—")}</div></div>
+    <div class="kv"><div class="k">Start availability</div><div class="v">${escapeHtml(b.constraints.start_availability || "—")}</div></div>
+    <div class="kv"><div class="k">Travel tolerance</div><div class="v">${escapeHtml(b.constraints.travel_tolerance || "—")}</div></div>
+  `;
+
+  const prefsRows = `
+    <div class="kv"><div class="k">Deal-breakers</div><div class="v">${escapeHtml(b.preferences.deal_breakers || "—")}</div></div>
+    <div class="kv"><div class="k">Values (what you optimize for)</div><div class="v">${escapeHtml(b.preferences.values || "—")}</div></div>
+    <div class="kv"><div class="k">Risk tolerance</div><div class="v">${escapeHtml(b.preferences.risk_tolerance || "—")}</div></div>
+    <div class="kv"><div class="k">Notes</div><div class="v">${escapeHtml(b.preferences.notes || "—")}</div></div>
+  `;
+
+  const keyFactsRows = `
+    <div class="kv"><div class="k">Headline</div><div class="v">${escapeHtml(b.key_facts.headline || "—")}</div></div>
+    <div class="kv"><div class="k">Summary</div><div class="v">${escapeHtml(b.key_facts.summary || "—")}</div></div>
+  `;
+
+  $("tab_baseline").innerHTML = `
+    <div class="grid">
+      ${block("Targets", "Used to interpret gaps and prioritize recommendations. Not public. Not a resume.", targetsRows, "targets")}
+      ${block("Constraints", "Feasibility gates. Unknown constraints reduce recommendation confidence.", constraintsRows, "constraints")}
+      ${block("Preferences", "We do not infer values. Declare what you want and what you won’t accept.", prefsRows, "preferences")}
+      ${block("Key Facts", "Quick corrections without editing the full resume document.", keyFactsRows, "key_facts")}
+    </div>
+    <div style="margin-top:12px;" class="card soft">
+      <h2>How edits work</h2>
+      <p class="muted">
+        This page stores edits as <strong>overrides</strong> on top of resume-derived data. The master resume remains intact.
+        In production, these overrides should be persisted server-side and preserved across re-parses.
+      </p>
+      <div class="row">
+        <button class="btn" id="btn_open_edit_targets">Edit Targets</button>
+        <button class="btn" id="btn_open_edit_constraints">Edit Constraints</button>
+        <button class="btn" id="btn_open_edit_preferences">Edit Preferences</button>
+        <button class="btn" id="btn_open_edit_keyfacts">Edit Key Facts</button>
+      </div>
+    </div>
+  `;
+
+  // Wire edit buttons
+  $("tab_baseline").querySelectorAll("[data-edit]").forEach(btn => {
+    btn.onclick = () => openEditModal(btn.getAttribute("data-edit"));
+  });
+  $("btn_open_edit_targets").onclick = () => openEditModal("targets");
+  $("btn_open_edit_constraints").onclick = () => openEditModal("constraints");
+  $("btn_open_edit_preferences").onclick = () => openEditModal("preferences");
+  $("btn_open_edit_keyfacts").onclick = () => openEditModal("key_facts");
+}
+
+function renderExperience(p){
+  const roles = p.chapters;
+
+  const roleCard = (r) => {
+    const flagsCount = (r.bullets||[]).reduce((acc,b)=>acc+(b.clarity_flags?.length||0),0);
+    const sig = r.seniority_signals || {};
+    const sigPills = [
+      `<span class="pill"><strong>Architecture</strong> ${escapeHtml(sig.architecture||"—")}</span>`,
+      `<span class="pill"><strong>Cross-team</strong> ${escapeHtml(sig.cross_team_influence||"—")}</span>`,
+      `<span class="pill"><strong>Ownership</strong> ${escapeHtml(sig.ownership_scope||"—")}</span>`,
+      `<span class="pill"><strong>Domain</strong> ${escapeHtml(sig.domain_depth||"—")}</span>`
+    ].join("");
+
+    // Keep bullets compact by default; details reveal more.
+    const topBullets = (r.bullets||[]).slice(0,2).map(b => `• ${escapeHtml(b.text)}`).join("<br/>");
+    const moreBullets = (r.bullets||[]).slice(2).map(b => `
+      <div style="margin-top:8px;">
+        <div class="v">• ${escapeHtml(b.text)}</div>
+        <div class="muted" style="font-size:0.86rem;margin-top:4px;">
+          Flags: ${(b.clarity_flags||[]).map(f=>`<span class="pill">${escapeHtml(f)}</span>`).join("") || "—"}
+        </div>
+        <div style="margin-top:6px;">${(b.span_ids||[]).map(id=>chipSpan(id)).join("")}</div>
+      </div>
+    `).join("");
+
+    return `
+      <details>
+        <summary>${escapeHtml(r.start)} – ${escapeHtml(r.end)} · ${escapeHtml(r.title)} @ ${escapeHtml(r.company)} <span class="muted">(${escapeHtml(r.employment_type)})</span></summary>
+        <div class="muted" style="margin-top:8px;font-size:0.9rem;">
+          <div class="row">${sigPills}</div>
+          <div style="margin-top:8px;">
+            <div class="k">Bullet summary</div>
+            <div class="v">${topBullets || "<span class='muted'>No bullets</span>"}</div>
+            <div class="muted" style="font-size:0.86rem;margin-top:6px;">Clarity flags (count): <span class="mono">${flagsCount}</span></div>
+          </div>
+          ${moreBullets ? `<div class="divider"></div><div class="k">More bullets (with evidence)</div>${moreBullets}` : ""}
+        </div>
+      </details>
+    `;
+  };
+
+  const skills = p.headline?.summary || "";
+  const domains = (RESUME_AGENT_OUTPUT.profile_structured.skills.domains || []).map(d => `<span class="pill"><strong>${escapeHtml(d)}</strong></span>`).join("");
+  const hard = (RESUME_AGENT_OUTPUT.profile_structured.skills.hard_skills || []).map(s => `<span class="pill">${escapeHtml(s)}</span>`).join("");
+
+  $("tab_experience").innerHTML = `
+    <div class="grid">
+      <section class="card">
+        <h2>Experience Summary</h2>
+        <p class="muted">Compact view of your history. Not a resume editor. Deep evidence is available via Audit.</p>
+        <div class="divider"></div>
+        ${roles.map(roleCard).join("")}
+      </section>
+
+      <section class="card soft">
+        <h2>Skills & Domain (derived)</h2>
+        <p class="muted">Derived from resume. Use Baseline edits to correct priorities or add targets/preferences.</p>
+        <div class="divider"></div>
+        <div class="k">Domains</div>
+        <div>${domains || `<p class="muted">None</p>`}</div>
+        <div class="divider"></div>
+        <div class="k">Hard skills</div>
+        <div style="max-height:260px;overflow:auto;padding-right:6px;">${hard || `<p class="muted">None</p>`}</div>
+        <div class="divider"></div>
+        <div class="k">Resume summary</div>
+        <div class="v">${escapeHtml(skills)}</div>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn" id="btn_go_baseline_from_exp">Edit Baseline</button>
+          <button class="btn" id="btn_go_resume_from_exp">View Master Resume</button>
+        </div>
+      </section>
+    </div>
+  `;
+  $("btn_go_baseline_from_exp").onclick = () => setTab("tab_baseline");
+  $("btn_go_resume_from_exp").onclick = () => setTab("tab_resume");
+}
+
+function renderMasterResume(p){
+  $("tab_resume").innerHTML = `
+    <div class="grid">
+      <section class="card">
+        <h2>Master Resume</h2>
+        <p class="muted">Read-only view of the source artifact. Edits should be done via Baseline key fields, not by changing this text here.</p>
+        <div class="divider"></div>
+        <textarea class="input mono" readonly>${escapeHtml(p.master_resume_text || "")}</textarea>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn" id="btn_copy_resume">Copy</button>
+          <button class="btn" id="btn_download_resume_txt">Download .txt</button>
+          <button class="btn primary" id="btn_go_baseline_from_resume">Edit Key Fields</button>
+        </div>
+      </section>
+
+      <section class="card soft">
+        <h2>Re-parse / Update (placeholder)</h2>
+        <p class="muted">
+          In production, re-parsing should create a new run_id and preserve user overrides.
+          This static page does not call the backend, but the UI structure is ready.
+        </p>
+        <div class="divider"></div>
+        <div class="k">Last parse</div>
+        <div class="v"><span class="mono">${escapeHtml(RESUME_AGENT_OUTPUT.run.run_id)}</span> · ${escapeHtml(formatIso(RESUME_AGENT_OUTPUT.run.generated_at_iso))}</div>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn" disabled title="backend not wired">Re-parse now</button>
+          <button class="btn" disabled title="backend not wired">Upload new resume</button>
+        </div>
+        <div class="divider"></div>
+        <details>
+          <summary>Design rule: overrides survive re-parses</summary>
+          <div class="muted" style="margin-top:8px;font-size:0.9rem;">
+            Store:
+            <ul>
+              <li><strong>resume_derived</strong> (from parser)</li>
+              <li><strong>user_overrides</strong> (baseline edits)</li>
+              <li>Resolve using precedence: overrides &gt; derived</li>
+              <li>Keep provenance for auditability</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+    </div>
+  `;
+
+  $("btn_copy_resume").onclick = async () => {
+    try{
+      await navigator.clipboard.writeText(p.master_resume_text || "");
+      toast("Copied resume text.");
+    }catch{
+      toast("Copy failed (browser permissions).");
+    }
+  };
+  $("btn_download_resume_txt").onclick = () => {
+    const blob = new Blob([p.master_resume_text || ""], {type:"text/plain"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `${p.candidate?.name || "resume"}.txt`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  };
+  $("btn_go_baseline_from_resume").onclick = () => setTab("tab_baseline");
+}
+
+function renderAudit(p){
+  const a = p.audit;
+
+  const gaps = (a.top_gaps||[]).map(g => {
+    const sev = g.impact === "high" ? "bad" : g.impact === "medium" ? "warn" : "ok";
+    return `
+      <details>
+        <summary>${escapeHtml(g.title)} <span class="muted">· impact ${escapeHtml(g.impact)} · effort ${escapeHtml(g.effort)}</span></summary>
+        <div class="muted" style="margin-top:8px;font-size:0.9rem;">
+          <div>${escapeHtml(g.description)}</div>
+          <div style="margin-top:8px;"><strong>Next:</strong> ${escapeHtml((g.next_actions||[]).join("; "))}</div>
+          <div style="margin-top:8px;">${(g.span_ids||[]).slice(0,10).map(id=>chipSpan(id)).join("")}${(g.span_ids||[]).length>10?`<span class="pill">${(g.span_ids||[]).length-10} more…</span>`:""}</div>
+        </div>
+      </details>
+    `;
+  }).join("");
+
+  const unknowns = (a.uncertainties||[]).sort((x,y)=>{
+    const pr = (p)=> p==="p0"?0:p==="p1"?1:2;
+    return pr(x.priority)-pr(y.priority);
+  }).map(u => `
+    <details>
+      <summary>${escapeHtml(u.title)} <span class="muted">· ${escapeHtml(u.priority)}</span></summary>
+      <div class="muted" style="margin-top:8px;font-size:0.9rem;">
+        <div><strong>Why it matters:</strong> ${escapeHtml(u.why || "")}</div>
+        <div style="margin-top:8px;"><strong>How to resolve:</strong> ${escapeHtml(u.resolution || "")}</div>
+      </div>
+    </details>
+  `).join("");
+
+  const rewrites = (a.suggested_rewrites||[]).map(r => `
+    <details>
+      <summary>Rewrite starter <span class="muted">· ${escapeHtml(r.rewrite_id)}</span></summary>
+      <div class="muted" style="margin-top:8px;font-size:0.9rem;">
+        <div><strong>Original:</strong> ${escapeHtml(r.original_bullet)}</div>
+        <div style="margin-top:8px;"><strong>Variant:</strong> ${escapeHtml(r.rewrite_variants?.[0]?.text || "")}</div>
+        <div style="margin-top:8px;">${(r.span_ids||[]).map(id=>chipSpan(id)).join("")}</div>
+        <div style="margin-top:8px;"><strong>Missing info questions:</strong> ${escapeHtml((r.missing_info_questions||[]).join(" | "))}</div>
+      </div>
+    </details>
+  `).join("");
+
+  const reasons = (a.score_reasons||[]).map(r => {
+    const sev = r.severity === "high" ? "bad" : r.severity === "medium" ? "warn" : "ok";
+    const dot = sev === "bad" ? "bad" : sev === "warn" ? "warn" : "ok";
+    return `
+      <details>
+        <summary><span class="dot ${dot}" style="display:inline-block;margin-right:8px;"></span>${escapeHtml(r.dimension)} <span class="muted">· severity ${escapeHtml(r.severity)}</span></summary>
+        <div class="muted" style="margin-top:8px;font-size:0.9rem;">
+          <div>${escapeHtml(r.reason)}</div>
+          <div style="margin-top:8px;">${(r.span_ids||[]).slice(0,10).map(id=>chipSpan(id)).join("")}${(r.span_ids||[]).length>10?`<span class="pill">${(r.span_ids||[]).length-10} more…</span>`:""}</div>
+        </div>
+      </details>
+    `;
+  }).join("");
+
+  $("tab_audit").innerHTML = `
+    <div class="grid">
+      <section class="card">
+        <h2>Audit</h2>
+        <p class="muted">Deep detail for trust and traceability. Most users won’t live here.</p>
+
+        <div class="divider"></div>
+        <details open>
+          <summary>Top gaps</summary>
+          <div style="margin-top:10px;">${gaps || `<p class="muted">No gaps.</p>`}</div>
+        </details>
+
+        <details>
+          <summary>Open questions (uncertainty)</summary>
+          <div style="margin-top:10px;">${unknowns || `<p class="muted">None.</p>`}</div>
+        </details>
+
+        <details>
+          <summary>Suggested rewrites</summary>
+          <div style="margin-top:10px;">${rewrites || `<p class="muted">None.</p>`}</div>
+        </details>
+
+        <details>
+          <summary>Score reasons (why the quality score is what it is)</summary>
+          <div style="margin-top:10px;">${reasons || `<p class="muted">None.</p>`}</div>
+        </details>
+      </section>
+
+      <section class="card soft">
+        <h2>Evidence Ledger</h2>
+        <p class="muted">Click any evidence chip to jump to the corresponding span.</p>
+        <div class="divider"></div>
+        <div class="k">Search evidence</div>
+        <input id="ev_search" class="input" placeholder="Search (e.g., GraphQL, metrics, PayFlow, span_8)"/>
+        <div class="divider"></div>
+
+        <div style="max-height:520px;overflow:auto;border-radius:12px;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:130px;">Evidence ID</th>
+                <th style="width:110px;">Section</th>
+                <th>Text</th>
+              </tr>
+            </thead>
+            <tbody id="ev_tbody">
+              ${a.evidence_ledger.map(e => `
+                <tr id="row_${escapeHtml(e.evidence_id)}" data-evidence-row="${escapeHtml(e.evidence_id)}">
+                  <td class="mono">${escapeHtml(e.evidence_id)}</td>
+                  <td>${escapeHtml(e.section)}</td>
+                  <td>${escapeHtml(e.text)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  `;
+
+  // Wire evidence search
+  const input = $("ev_search");
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    const rows = Array.from(document.querySelectorAll("#ev_tbody tr"));
+    rows.forEach(r => {
+      const id = r.getAttribute("data-evidence-row").toLowerCase();
+      const txt = r.innerText.toLowerCase();
+      const show = !q || id.includes(q) || txt.includes(q);
+      r.style.display = show ? "" : "none";
+    });
+  });
+}
+
+/* ---------- Tabs ---------- */
+function setTab(id){
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.getAttribute("data-tab") === id));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === id));
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+document.querySelectorAll(".tab").forEach(t => {
+  t.onclick = () => setTab(t.getAttribute("data-tab"));
+});
+
+/* ---------- Evidence chips jump ---------- */
+function wireEvidenceChips(){
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    const span = chip.getAttribute("data-span");
+    if (!span) return;
+
+    // Ensure audit tab visible (ledger is there)
+    setTab("tab_audit");
+    setTimeout(() => {
+      const row = document.getElementById(`row_${span}`);
+      if (!row) return;
+      row.scrollIntoView({ behavior:"smooth", block:"center" });
+      row.classList.add("hl");
+      setTimeout(()=>row.classList.remove("hl"), 1200);
+    }, 80);
+  }, {capture:false});
+}
+
+/* ---------- Modal edits ---------- */
+let MODAL_STATE = { key: null };
+
+function openEditModal(key){
+  MODAL_STATE.key = key;
+  $("overlay").classList.add("open");
+
+  const titleMap = {
+    targets: ["Edit Targets", "Used for gaps and recommendation priorities."],
+    constraints: ["Edit Constraints", "Feasibility gates. Unknown constraints reduce confidence."],
+    preferences: ["Edit Preferences", "Values and deal-breakers are user-declared (never inferred)."],
+    key_facts: ["Edit Key Facts", "Quick corrections without editing the master resume text."]
+  };
+  const [t, d] = titleMap[key] || ["Edit", ""];
+  $("modal_title").textContent = t;
+  $("modal_desc").textContent = d;
+
+  const b = PROFILE.baseline;
+
+  if (key === "targets"){
+    $("modal_body").innerHTML = `
+      <div class="grid">
+        <div>
+          <div class="k">Primary role family</div>
+          <input class="input" id="f_primary" value="${escapeHtml(b.targets.primary_role_family || "")}"/>
+        </div>
+        <div>
+          <div class="k">Secondary role family</div>
+          <input class="input" id="f_secondary" value="${escapeHtml(b.targets.secondary_role_family || "")}"/>
+        </div>
+      </div>
+    `;
+  } else if (key === "constraints"){
+    $("modal_body").innerHTML = `
+      <div class="grid">
+        <div><div class="k">Work authorization</div><input class="input" id="f_wa" placeholder="e.g., US Citizen / H1B / TN / etc." value="${escapeHtml(b.constraints.work_authorization || "")}"/></div>
+        <div><div class="k">Location policy</div><input class="input" id="f_loc" placeholder="e.g., Remote (US), Hybrid (Denver)" value="${escapeHtml(b.constraints.location_policy || "")}"/></div>
+        <div><div class="k">Salary floor</div><input class="input" id="f_sal" placeholder="e.g., 150000" value="${escapeHtml(b.constraints.salary_floor || "")}"/></div>
+        <div><div class="k">Start availability</div><input class="input" id="f_start" placeholder="e.g., 2 weeks, 4 weeks, immediately" value="${escapeHtml(b.constraints.start_availability || "")}"/></div>
+        <div><div class="k">Travel tolerance</div><input class="input" id="f_travel" placeholder="e.g., up to 10%, none" value="${escapeHtml(b.constraints.travel_tolerance || "")}"/></div>
+      </div>
+      <div class="divider"></div>
+      <div class="muted" style="font-size:0.9rem;">
+        Tip: These fields prevent wasted applications by ruling out infeasible roles early.
+      </div>
+    `;
+  } else if (key === "preferences"){
+    $("modal_body").innerHTML = `
+      <div class="grid">
+        <div>
+          <div class="k">Deal-breakers</div>
+          <textarea class="input" id="f_db" placeholder="e.g., no frequent on-call; no 60+ hour weeks">${escapeHtml(b.preferences.deal_breakers || "")}</textarea>
+        </div>
+        <div>
+          <div class="k">Values</div>
+          <textarea class="input" id="f_vals" placeholder="e.g., learning, autonomy, mentorship, stability">${escapeHtml(b.preferences.values || "")}</textarea>
+        </div>
+        <div>
+          <div class="k">Risk tolerance</div>
+          <input class="input" id="f_risk" placeholder="e.g., low/medium/high, or a sentence" value="${escapeHtml(b.preferences.risk_tolerance || "")}"/>
+        </div>
+        <div>
+          <div class="k">Notes</div>
+          <textarea class="input" id="f_notes" placeholder="Optional">${escapeHtml(b.preferences.notes || "")}</textarea>
+        </div>
+      </div>
+    `;
+  } else if (key === "key_facts"){
+    $("modal_body").innerHTML = `
+      <div>
+        <div class="k">Headline</div>
+        <input class="input" id="f_headline" value="${escapeHtml(b.key_facts.headline || "")}"/>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="k">Summary</div>
+        <textarea class="input" id="f_summary">${escapeHtml(b.key_facts.summary || "")}</textarea>
+      </div>
+      <div class="divider"></div>
+      <div class="muted" style="font-size:0.9rem;">
+        This is not a resume editor — it’s a baseline summary the system uses in decisions.
+      </div>
+    `;
+  } else {
+    $("modal_body").innerHTML = `<p class="muted">Unknown edit section.</p>`;
+  }
+
+  // Wire buttons
+  $("modal_save").onclick = () => saveModal(key);
+  $("modal_clear").onclick = () => clearModal(key);
+}
+
+function closeModal(){
+  $("overlay").classList.remove("open");
+  MODAL_STATE.key = null;
+}
+$("modal_close").onclick = closeModal;
+$("overlay").addEventListener("click", (e)=>{ if (e.target === $("overlay")) closeModal(); });
+
+function saveModal(key){
+  const o = loadOverrides();
+  o.baseline = o.baseline || {};
+
+  if (key === "targets"){
+    o.baseline.targets = {
+      primary_role_family: ($("f_primary")?.value || "").trim(),
+      secondary_role_family: ($("f_secondary")?.value || "").trim()
+    };
+  } else if (key === "constraints"){
+    o.baseline.constraints = {
+      work_authorization: ($("f_wa")?.value || "").trim(),
+      location_policy: ($("f_loc")?.value || "").trim(),
+      salary_floor: ($("f_sal")?.value || "").trim(),
+      start_availability: ($("f_start")?.value || "").trim(),
+      travel_tolerance: ($("f_travel")?.value || "").trim()
+    };
+  } else if (key === "preferences"){
+    o.baseline.preferences = {
+      deal_breakers: ($("f_db")?.value || "").trim(),
+      values: ($("f_vals")?.value || "").trim(),
+      risk_tolerance: ($("f_risk")?.value || "").trim(),
+      notes: ($("f_notes")?.value || "").trim()
+    };
+  } else if (key === "key_facts"){
+    o.baseline.key_facts = {
+      headline: ($("f_headline")?.value || "").trim(),
+      summary: ($("f_summary")?.value || "").trim()
+    };
+  }
+
+  saveOverrides(o);
+  OVERRIDES = o;
+  PROFILE = buildProfile(RESUME_AGENT_OUTPUT, OVERRIDES);
+  closeModal();
+  render();
+  toast("Saved.");
+}
+
+function clearModal(key){
+  const o = loadOverrides();
+  if (o.baseline && o.baseline[key]){
+    delete o.baseline[key];
+    saveOverrides(o);
+    OVERRIDES = o;
+    PROFILE = buildProfile(RESUME_AGENT_OUTPUT, OVERRIDES);
+    closeModal();
+    render();
+    toast("Cleared.");
+  } else {
+    toast("Nothing to clear.");
+  }
+}
+
+/* ---------- Export snapshot ---------- */
+$("btn_export_snapshot").onclick = () => {
+  const data = JSON.stringify(PROFILE.snapshot, null, 2);
+  const blob = new Blob([data], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${(PROFILE.candidate?.name || "candidate").toLowerCase().replace(/\s+/g,"_")}_profile_snapshot.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast("Exported snapshot.");
+};
+
+/* ---------- Reset overrides ---------- */
+$("btn_reset_overrides").onclick = () => {
+  clearOverrides();
+  OVERRIDES = {};
+  PROFILE = buildProfile(RESUME_AGENT_OUTPUT, OVERRIDES);
+  render();
+  toast("Edits reset.");
+};
+
+/* ---------- Overview shortcuts ---------- */
+document.addEventListener("click", (e)=>{
+  const id = e.target?.id;
+  if (id === "btn_edit_baseline"){ setTab("tab_baseline"); }
+});
+
+/* ---------- Tiny toast ---------- */
+let TOAST_T;
+function toast(msg){
+  clearTimeout(TOAST_T);
+  let el = document.getElementById("toast");
+  if (!el){
+    el = document.createElement("div");
+    el.id = "toast";
+    el.style.position = "fixed";
+    el.style.bottom = "16px";
+    el.style.left = "50%";
+    el.style.transform = "translateX(-50%)";
+    el.style.padding = "10px 12px";
+    el.style.borderRadius = "12px";
+    el.style.border = "1px solid var(--border)";
+    el.style.background = "rgba(0,0,0,0.65)";
+    el.style.color = "var(--text)";
+    el.style.zIndex = "80";
+    el.style.fontSize = "0.9rem";
+    el.style.boxShadow = "var(--shadow)";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = "block";
+  TOAST_T = setTimeout(()=>{ el.style.display="none"; }, 1200);
+}
+
+/* ---------- Init ---------- */
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,2165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Job Case Tracker — Demo</title>
+
+  <!-- Optional minimal CSS framework to reduce code -->
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
+
+  <style>
+    :root{
+      --bg: #0b0f17;
+      --panel: #0f1625;
+      --panel2:#121b2d;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+      --border: rgba(255,255,255,.10);
+      --accent: #7aa2ff;
+      --accent2:#6ee7c8;
+      --warn: #f4d17a;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 14px;
+      --radius2: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    html, body { height: 100%; }
+    body{
+      background: radial-gradient(1200px 700px at 10% -10%, rgba(122,162,255,.12), transparent 55%),
+                  radial-gradient(1100px 650px at 85% 0%, rgba(110,231,200,.09), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+    }
+
+    /* Pico overrides (subtle) */
+    :where(button, [type="submit"], [type="button"], a[role="button"]) { border-radius: 12px; }
+    :where(input, select, textarea) { border-radius: 12px; background: rgba(255,255,255,.06); border-color: var(--border); color: var(--text); }
+    :where(article, section, nav, header, footer) { border-radius: var(--radius); }
+    a { color: #cfe0ff; }
+    a:hover { color: #ffffff; }
+
+    /* App shell */
+    .shell {
+      max-width: 1300px;
+      margin: 18px auto 60px;
+      padding: 0 16px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width: 260px;
+    }
+    .brand .logo{
+      width: 34px; height: 34px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, rgba(122,162,255,.9), rgba(110,231,200,.85));
+      box-shadow: 0 10px 30px rgba(122,162,255,.18);
+    }
+    .brand .title{
+      display:flex; flex-direction:column; line-height:1.12;
+    }
+    .brand .title strong{ font-size: 14px; }
+    .brand .title span{ font-size: 12px; color: var(--muted2); }
+
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+      flex: 1;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    .pill b{ color: var(--text); font-weight: 650; }
+    .btn-ghost{
+      background: rgba(255,255,255,.04) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text) !important;
+    }
+
+    /* Views */
+    .view { margin-top: 16px; }
+    .hidden { display:none !important; }
+
+    /* Command strip */
+    .strip{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin: 16px 0 14px;
+    }
+    .strip .metric{
+      flex: 1 1 180px;
+      padding: 12px 12px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 22px rgba(0,0,0,.25);
+    }
+    .metric .k{ font-size: 12px; color: var(--muted2); }
+    .metric .v{ font-size: 18px; font-weight: 720; margin-top: 2px; }
+    .metric .s{ font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* Lanes */
+    .lanes{
+      display:grid;
+      grid-template-columns: repeat(5, minmax(220px, 1fr));
+      gap: 12px;
+      align-items:start;
+      overflow-x:auto;
+      padding-bottom: 8px;
+    }
+    .lane{
+      min-width: 220px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      padding: 10px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+    }
+    .lane-head{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding: 6px 6px 10px;
+    }
+    .lane-head h4{
+      margin: 0;
+      font-size: 13px;
+      color: var(--text);
+      letter-spacing: .2px;
+    }
+    .count{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+    .cards{ display:flex; flex-direction:column; gap:10px; }
+
+    /* Case cards */
+    .card{
+      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border-radius: 16px;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform .08s ease, border-color .12s ease, background .12s ease;
+      position: relative;
+      overflow:hidden;
+    }
+    .card:hover{
+      transform: translateY(-1px);
+      border-color: rgba(122,162,255,.28);
+      background: linear-gradient(180deg, rgba(122,162,255,.08), rgba(255,255,255,.02));
+    }
+    .card .row1{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+    }
+    .card .jt{
+      min-width: 0;
+    }
+    .card .jt .t{
+      font-size: 13px;
+      font-weight: 720;
+      margin: 0;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .card .jt .c{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .chipbar{
+      display:flex; flex-wrap:wrap; gap:6px;
+      margin-top: 8px;
+    }
+    .chip{
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .chip strong{ color: var(--text); font-weight: 650; }
+    .chip.conf-high{ border-color: rgba(110,231,200,.35); color: rgba(110,231,200,.95); background: rgba(110,231,200,.06); }
+    .chip.conf-med{ border-color: rgba(244,209,122,.35); color: rgba(244,209,122,.95); background: rgba(244,209,122,.06); }
+    .chip.conf-low{ border-color: rgba(255,255,255,.22); color: rgba(255,255,255,.72); background: rgba(255,255,255,.03); }
+    .chip.verdict-apply{ border-color: rgba(122,162,255,.35); color: rgba(122,162,255,.98); background: rgba(122,162,255,.08); }
+    .chip.verdict-consider{ border-color: rgba(244,209,122,.30); color: rgba(244,209,122,.95); background: rgba(244,209,122,.05); }
+    .chip.verdict-pass{ border-color: rgba(255,255,255,.18); color: rgba(255,255,255,.70); background: rgba(255,255,255,.03); }
+    .chip.attn{
+      border-color: rgba(244,209,122,.35);
+      color: rgba(244,209,122,.95);
+      background: rgba(244,209,122,.06);
+    }
+    .meta{
+      margin-top: 8px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      color: var(--muted2);
+      font-size: 12px;
+    }
+    .meta .line{
+      display:flex;
+      gap:6px;
+      align-items:center;
+      min-width: 0;
+    }
+    .meta .k{
+      color: var(--muted2);
+      min-width: 86px;
+      font-size: 11px;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+    }
+    .meta .v{
+      color: var(--muted);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    /* Drawer */
+    .drawer-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.48);
+      z-index: 40;
+      display:none;
+    }
+    .drawer{
+      position: fixed;
+      top: 0; right: 0;
+      height: 100%;
+      width: min(460px, 92vw);
+      background: rgba(15,22,37,.96);
+      border-left: 1px solid var(--border);
+      box-shadow: -20px 0 50px rgba(0,0,0,.45);
+      z-index: 50;
+      transform: translateX(105%);
+      transition: transform .18s ease;
+      display:flex;
+      flex-direction:column;
+      backdrop-filter: blur(10px);
+    }
+    .drawer.open{ transform: translateX(0%); }
+    .drawer-overlay.open{ display:block; }
+    .drawer-head{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .drawer-head h3{
+      margin:0;
+      font-size: 15px;
+      line-height:1.2;
+    }
+    .drawer-head .sub{
+      margin-top: 3px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .drawer-body{
+      padding: 12px 14px;
+      overflow:auto;
+      flex: 1;
+    }
+    .drawer-section{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      border-radius: var(--radius);
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .drawer-section h5{
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: .25px;
+    }
+    .mini-list{ display:flex; flex-direction:column; gap:8px; }
+    .mini-item{
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .mini-item .top{
+      display:flex; justify-content:space-between; gap:10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .mini-item .txt{
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.25;
+    }
+    .drawer-actions{
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      background: rgba(255,255,255,.02);
+    }
+
+    /* Detail page */
+    .detail-wrap{
+      display:grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 12px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .detail-wrap{ grid-template-columns: 1fr; }
+    }
+    .panel{
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .ph{
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .panel .ph h4{
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: .2px;
+    }
+    .panel .pb{ padding: 12px 14px; }
+    .muted{ color: var(--muted); }
+    .muted2{ color: var(--muted2); }
+
+    /* Sticky header inside detail */
+    .sticky-case{
+      position: sticky;
+      top: 78px; /* below topbar */
+      z-index: 10;
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      backdrop-filter: blur(10px);
+      margin-bottom: 12px;
+    }
+    .case-head-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .case-title{
+      min-width: 260px;
+    }
+    .case-title h2{
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .case-title .sub{
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .case-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+      justify-content:flex-end;
+      align-items:center;
+    }
+
+    /* Collapsible snapshot */
+    details.snapshot{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
+    details.snapshot summary{
+      cursor:pointer;
+      list-style:none;
+      font-weight: 650;
+      color: var(--text);
+    }
+    details.snapshot summary::-webkit-details-marker{ display:none; }
+    .jd-box{
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.82);
+      max-height: 220px;
+      overflow:auto;
+    }
+
+    /* Timeline */
+    .timeline{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .event{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .event .top{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      align-items:baseline;
+    }
+    .event .type{
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .event .time{
+      color: var(--muted2);
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+    .event .note{
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .tagrow{
+      margin-top: 8px;
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .tag{
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      color: rgba(255,255,255,.70);
+    }
+
+    /* Decision brief history */
+    .briefs{ display:flex; flex-direction:column; gap:10px; }
+    .brief{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .brief .top{
+      display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    }
+    .brief .ver{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted2);
+    }
+    .brief .when{
+      font-size: 11px; color: var(--muted2);
+    }
+    .brief .main{
+      margin-top: 6px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .brief .reasons{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .brief button{
+      padding: 6px 9px !important;
+      font-size: 12px !important;
+    }
+    .delta{
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(122,162,255,.25);
+      background: rgba(122,162,255,.07);
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .delta .hdr{
+      font-size: 11px;
+      color: rgba(255,255,255,.78);
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    /* Artifacts list */
+    .artifacts{ display:flex; flex-direction:column; gap:10px; }
+    .artifact{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .artifact .top{
+      display:flex; justify-content:space-between; gap:10px;
+      align-items:baseline;
+    }
+    .artifact .name{
+      font-weight: 720;
+      font-size: 12px;
+    }
+    .artifact .meta{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Modal */
+    dialog{
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(15,22,37,.96);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      max-width: 560px;
+    }
+    dialog::backdrop{ background: rgba(0,0,0,.55); }
+    .dialog-actions{
+      display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;
+      margin-top: 12px;
+    }
+
+    /* Utility */
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      color: rgba(255,255,255,.82);
+      margin-left: 6px;
+    }
+    .hr{ height:1px; background: var(--border); margin: 10px 0; }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">
+          <strong>Job Case Tracker</strong>
+          <span>Command center • clarity, confidence, control</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="search" type="search" placeholder="Search title / company…" style="max-width: 340px; width: 100%;" />
+        <select id="filterLane" style="max-width: 200px;">
+          <option value="">All lanes</option>
+          <option value="Analyzed">Analyzed</option>
+          <option value="Applied">Applied</option>
+          <option value="Interviewing">Interviewing</option>
+          <option value="Closing">Closing</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <button class="btn-ghost" id="goJobs" type="button">/jobs <span class="kbd">G</span></button>
+        <button id="addJob" type="button">Add job (demo)</button>
+      </div>
+    </div>
+
+    <!-- /jobs view -->
+    <div id="viewJobs" class="view">
+      <div class="strip" id="commandStrip"></div>
+
+      <div class="lanes" id="lanes"></div>
+
+      <p class="muted2" style="margin-top:12px;">
+        Tip: click a case card to open the drawer. Use “Open full case” for deep work.
+      </p>
+    </div>
+
+    <!-- /jobs/{id} view -->
+    <div id="viewDetail" class="view hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin: 10px 0 12px;">
+        <div class="pill">
+          <span class="muted2">Route</span>
+          <b id="routeLabel">/jobs/{id}</b>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-ghost" id="backToJobs" type="button">← Back to /jobs</button>
+          <button id="closeLoopBtn" type="button">Close loop…</button>
+        </div>
+      </div>
+
+      <div class="sticky-case" id="stickyCase"></div>
+
+      <div class="detail-wrap">
+        <div>
+          <div class="panel" style="margin-bottom:12px;">
+            <div class="ph"><h4>Job snapshot</h4><span class="muted2" id="snapshotMeta"></span></div>
+            <div class="pb" id="jobSnapshot"></div>
+          </div>
+
+          <div class="panel" style="margin-bottom:12px;">
+            <div class="ph">
+              <h4>Status timeline</h4>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn-ghost" id="addEventBtn" type="button">Add event</button>
+                <button class="btn-ghost" id="addCommBtn" type="button">Add communication</button>
+              </div>
+            </div>
+            <div class="pb">
+              <div class="timeline" id="timeline"></div>
+              <div id="timelineEmpty" class="muted2 hidden">No events yet. Add one to start your trace.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="ph"><h4>Notes & reflections</h4><button class="btn-ghost" id="addNoteBtn" type="button">Add note</button></div>
+            <div class="pb" id="notes"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" style="margin-bottom:12px;">
+            <div class="ph">
+              <h4>Decision Brief history</h4>
+              <button class="btn-ghost" id="newBriefBtn" type="button">New Decision Brief</button>
+            </div>
+            <div class="pb">
+              <div class="briefs" id="briefs"></div>
+              <div id="briefsEmpty" class="muted2 hidden">No decision briefs found.</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:12px;">
+            <div class="ph">
+              <h4>Artifacts</h4>
+              <button class="btn-ghost" id="addArtifactBtn" type="button">Add artifact</button>
+            </div>
+            <div class="pb">
+              <div class="artifacts" id="artifacts"></div>
+              <div id="artifactsEmpty" class="muted2 hidden">No artifacts yet.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="ph">
+              <h4>Next step & blockers</h4>
+              <button class="btn-ghost" id="editNextBtn" type="button">Edit</button>
+            </div>
+            <div class="pb" id="nextBlockers"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer -->
+  <div id="drawerOverlay" class="drawer-overlay" aria-hidden="true"></div>
+  <aside id="drawer" class="drawer" aria-label="Job case drawer">
+    <div class="drawer-head">
+      <div>
+        <h3 id="drawerTitle">—</h3>
+        <div class="sub" id="drawerSub">—</div>
+      </div>
+      <button class="btn-ghost" id="drawerClose" type="button" aria-label="Close drawer">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="drawer-section">
+        <h5>Current signal</h5>
+        <div class="chipbar" id="drawerChips"></div>
+        <div class="meta" style="margin-top:10px;">
+          <div class="line"><span class="k">Last activity</span><span class="v" id="drawerLast">—</span></div>
+          <div class="line"><span class="k">Next step</span><span class="v" id="drawerNext">—</span></div>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h5>Latest Decision Brief</h5>
+        <div id="drawerBrief" class="muted">—</div>
+      </div>
+
+      <div class="drawer-section">
+        <h5>Recent timeline</h5>
+        <div class="mini-list" id="drawerTimeline"></div>
+        <div id="drawerTimelineEmpty" class="muted2 hidden">No events yet.</div>
+      </div>
+
+      <div class="drawer-section">
+        <h5>Artifacts</h5>
+        <div class="mini-list" id="drawerArtifacts"></div>
+        <div id="drawerArtifactsEmpty" class="muted2 hidden">No artifacts yet.</div>
+      </div>
+    </div>
+
+    <div class="drawer-actions">
+      <button class="btn-ghost" id="drawerUpdateStatus" type="button">Update status</button>
+      <button class="btn-ghost" id="drawerAddComm" type="button">Add communication</button>
+      <button id="drawerOpenFull" type="button">Open full case</button>
+    </div>
+  </aside>
+
+  <!-- Modal: Close loop -->
+  <dialog id="closeLoopDialog">
+    <form method="dialog">
+      <h3 style="margin:0 0 6px;">Close loop</h3>
+      <p class="muted" style="margin:0 0 10px;">
+        This is a neutral closure step for calibration. Reasons are optional.
+      </p>
+
+      <label>
+        Outcome
+        <select id="closeOutcome">
+          <option value="rejected">Rejected</option>
+          <option value="withdrawn">Withdrawn</option>
+          <option value="offer">Offer received</option>
+          <option value="accepted">Accepted</option>
+          <option value="no_response">No response</option>
+        </select>
+      </label>
+
+      <label>
+        Stage (optional)
+        <select id="closeStage">
+          <option value="">—</option>
+          <option value="applied">Applied</option>
+          <option value="screen">Recruiter screen</option>
+          <option value="round1">Interview round 1</option>
+          <option value="round2">Interview round 2</option>
+          <option value="round3">Interview round 3</option>
+          <option value="assignment">Assignment</option>
+          <option value="closing">Closing</option>
+        </select>
+      </label>
+
+      <label>
+        Note (optional)
+        <textarea id="closeNote" rows="3" placeholder="One sentence is enough."></textarea>
+      </label>
+
+      <div class="dialog-actions">
+        <button class="btn-ghost" value="cancel" type="submit">Cancel</button>
+        <button id="confirmCloseLoop" value="confirm" type="submit">Close loop</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Modal: Quick add event/comm/note/artifact -->
+  <dialog id="quickDialog">
+    <form method="dialog">
+      <h3 id="qdTitle" style="margin:0 0 6px;">—</h3>
+      <p id="qdDesc" class="muted" style="margin:0 0 10px;">—</p>
+
+      <div id="qdFields"></div>
+
+      <div class="dialog-actions">
+        <button class="btn-ghost" value="cancel" type="submit">Cancel</button>
+        <button id="qdConfirm" value="confirm" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    /*****************************************************************
+     * Fixture JSON (inlined)
+     *****************************************************************/
+    const FIXTURE = {
+      user: { id: "user_001", name: "Walid" },
+      job_cases: [
+        {
+          id: "case_101",
+          user_id: "user_001",
+          job_identity: { title: "Senior Frontend Engineer", company: "StartupX", location_policy: "Remote (US)", role_tags: ["React", "TypeScript", "Next.js", "GraphQL"] },
+          source: { posting_url: "https://example.com/jobs/startupx-sfe", captured_from: "url" },
+          current_state: { macro_state: "Analyzed", precise_state: "Considering" },
+          current_verdict: { verdict: "Consider", confidence_band: "High", decision_brief_id: "brief_101_v2" },
+          next_step: "Draft outreach message for hiring manager",
+          blockers: ["Need referral"],
+          timestamps: { created_at: "2026-01-03T18:20:00Z", updated_at: "2026-01-24T03:10:00Z", last_activity_at: "2026-01-24T03:10:00Z" },
+          flags: { needs_attention: true, stale: false }
+        },
+        {
+          id: "case_102",
+          user_id: "user_001",
+          job_identity: { title: "Staff UI Engineer", company: "CloudRelay", location_policy: "Remote", role_tags: ["Design Systems", "Performance", "React"] },
+          source: { posting_url: "https://example.com/jobs/cloudrelay-staff-ui", captured_from: "paste" },
+          current_state: { macro_state: "Applied", precise_state: "Waiting" },
+          current_verdict: { verdict: "Apply", confidence_band: "Med", decision_brief_id: "brief_102_v1" },
+          next_step: "Follow up after 7 days (if no reply)",
+          blockers: ["Waiting on response"],
+          timestamps: { created_at: "2026-01-10T15:05:00Z", updated_at: "2026-01-18T02:40:00Z", last_activity_at: "2026-01-18T02:40:00Z" },
+          flags: { needs_attention: false, stale: true }
+        },
+        {
+          id: "case_103",
+          user_id: "user_001",
+          job_identity: { title: "Frontend Platform Engineer", company: "FinNova", location_policy: "Hybrid (Denver)", role_tags: ["React", "Platform", "Tooling"] },
+          source: { posting_url: "https://example.com/jobs/finnova-fpe", captured_from: "url" },
+          current_state: { macro_state: "Interviewing", precise_state: "Round 2" },
+          current_verdict: { verdict: "Apply", confidence_band: "High", decision_brief_id: "brief_103_v2" },
+          next_step: "Prep for Round 2: architecture + tradeoffs",
+          blockers: [],
+          timestamps: { created_at: "2026-01-05T21:10:00Z", updated_at: "2026-01-30T01:15:00Z", last_activity_at: "2026-01-30T01:15:00Z" },
+          flags: { needs_attention: false, stale: false }
+        },
+        {
+          id: "case_104",
+          user_id: "user_001",
+          job_identity: { title: "Senior Frontend Engineer", company: "DataHarbor", location_policy: "Remote", role_tags: ["Next.js", "GraphQL", "B2B SaaS"] },
+          source: { posting_url: "https://example.com/jobs/dataharbor-sfe", captured_from: "url" },
+          current_state: { macro_state: "Closing", precise_state: "Offer received" },
+          current_verdict: { verdict: "Apply", confidence_band: "Med", decision_brief_id: "brief_104_v1" },
+          next_step: "Clarify scope + growth path before negotiation",
+          blockers: ["Need comp benchmark"],
+          timestamps: { created_at: "2025-12-20T22:40:00Z", updated_at: "2026-01-28T04:05:00Z", last_activity_at: "2026-01-28T04:05:00Z" },
+          flags: { needs_attention: true, stale: false }
+        },
+        {
+          id: "case_105",
+          user_id: "user_001",
+          job_identity: { title: "Senior UI Engineer", company: "Enterprisely", location_policy: "Remote", role_tags: ["React", "Micro-frontends", "Accessibility"] },
+          source: { posting_url: "https://example.com/jobs/enterprisely-ui", captured_from: "paste" },
+          current_state: { macro_state: "Closed", precise_state: "Rejected" },
+          current_verdict: { verdict: "Apply", confidence_band: "Low", decision_brief_id: "brief_105_v1" },
+          next_step: "—",
+          blockers: [],
+          timestamps: { created_at: "2025-12-10T17:12:00Z", updated_at: "2026-01-06T19:30:00Z", last_activity_at: "2026-01-06T19:30:00Z", closed_at: "2026-01-06T19:30:00Z" },
+          flags: { needs_attention: false, stale: false }
+        }
+      ],
+      job_posting_snapshots: [
+        {
+          id: "jd_101_1",
+          job_case_id: "case_101",
+          captured_at: "2026-01-03T18:20:00Z",
+          source_url: "https://example.com/jobs/startupx-sfe",
+          raw_text: "StartupX is hiring a Senior Frontend Engineer to build a design system and ship user-facing features. Stack: React, TypeScript, Next.js, GraphQL. Expect ownership of architecture and mentoring. Remote US.",
+          normalized_fields: { skills: ["React", "TypeScript", "Next.js", "GraphQL"], seniority: "Senior", comp_range: null }
+        },
+        {
+          id: "jd_102_1",
+          job_case_id: "case_102",
+          captured_at: "2026-01-10T15:05:00Z",
+          source_url: "https://example.com/jobs/cloudrelay-staff-ui",
+          raw_text: "CloudRelay seeks a Staff UI Engineer focused on design systems and performance. React, TypeScript. Influence platform direction; partner with product and infra. Remote.",
+          normalized_fields: { skills: ["React", "TypeScript", "Design Systems", "Performance"], seniority: "Staff", comp_range: "$170k-$210k" }
+        },
+        {
+          id: "jd_103_1",
+          job_case_id: "case_103",
+          captured_at: "2026-01-05T21:10:00Z",
+          source_url: "https://example.com/jobs/finnova-fpe",
+          raw_text: "FinNova is building a frontend platform for internal product teams. You will own tooling, CI for UI, and standards across repos. React required; strong collaboration and documentation. Hybrid Denver.",
+          normalized_fields: { skills: ["React", "Tooling", "CI", "Docs"], seniority: "Senior", comp_range: null }
+        },
+        {
+          id: "jd_104_1",
+          job_case_id: "case_104",
+          captured_at: "2025-12-20T22:40:00Z",
+          source_url: "https://example.com/jobs/dataharbor-sfe",
+          raw_text: "DataHarbor (Series B) needs a Senior Frontend Engineer. Next.js + GraphQL. You'll ship dashboards, improve performance, and collaborate on product discovery. Remote.",
+          normalized_fields: { skills: ["Next.js", "GraphQL", "React", "Performance"], seniority: "Senior", comp_range: null }
+        },
+        {
+          id: "jd_105_1",
+          job_case_id: "case_105",
+          captured_at: "2025-12-10T17:12:00Z",
+          source_url: "https://example.com/jobs/enterprisely-ui",
+          raw_text: "Enterprisely seeks Senior UI Engineer. Micro-frontends, React, accessibility, enterprise scale. Remote. Strong communication required.",
+          normalized_fields: { skills: ["React", "Micro-frontends", "Accessibility"], seniority: "Senior", comp_range: null }
+        }
+      ],
+      decision_briefs: [
+        {
+          id: "brief_101_v1",
+          job_case_id: "case_101",
+          version: 1,
+          created_at: "2026-01-03T18:25:00Z",
+          inputs: { jd_snapshot_id: "jd_101_1", profile_snapshot_id: "profile_001", constraints_hash: "c_v1" },
+          verdict: "Consider",
+          confidence_band: "Med",
+          key_reasons: ["Strong React/TS fit", "Next.js gap is learnable", "Startup ownership aligns with architecture strengths"],
+          gaps: ["Limited production Next.js"],
+          unknowns: ["Team seniority expectations", "On-call load"],
+          evidence_refs: ["ev_101_a", "ev_101_b"],
+          completeness_band: "Medium",
+          change_triggers: ["user_request"],
+          delta_summary: "Initial read: good fit, main uncertainty is Next.js depth and team expectations."
+        },
+        {
+          id: "brief_101_v2",
+          job_case_id: "case_101",
+          version: 2,
+          created_at: "2026-01-24T03:10:00Z",
+          inputs: { jd_snapshot_id: "jd_101_1", profile_snapshot_id: "profile_001", constraints_hash: "c_v2_salary" },
+          verdict: "Consider",
+          confidence_band: "High",
+          key_reasons: ["Confirmed Next.js requirement is 'medium'", "Role emphasizes design system leadership", "Remote US aligns with constraints"],
+          gaps: ["Next.js production patterns"],
+          unknowns: ["Comp band"],
+          evidence_refs: ["ev_101_a", "ev_101_c"],
+          completeness_band: "High",
+          change_triggers: ["new_info", "event_feedback"],
+          delta_summary: "What changed: clarified Next.js strictness + role focus shifted to design system leadership; confidence increased."
+        },
+        {
+          id: "brief_102_v1",
+          job_case_id: "case_102",
+          version: 1,
+          created_at: "2026-01-10T15:12:00Z",
+          inputs: { jd_snapshot_id: "jd_102_1", profile_snapshot_id: "profile_001", constraints_hash: "c_v1" },
+          verdict: "Apply",
+          confidence_band: "Med",
+          key_reasons: ["Design systems match", "Performance focus match", "Comp range meets floor"],
+          gaps: ["Staff-level scope proof in recent roles"],
+          unknowns: ["Interview loop structure"],
+          evidence_refs: ["ev_102_a"],
+          completeness_band: "Medium",
+          change_triggers: ["user_request"],
+          delta_summary: "Solid match; confidence medium due to staff-level scope signaling."
+        },
+        {
+          id: "brief_103_v1",
+          job_case_id: "case_103",
+          version: 1,
+          created_at: "2026-01-05T21:18:00Z",
+          inputs: { jd_snapshot_id: "jd_103_1", profile_snapshot_id: "profile_001", constraints_hash: "c_v1" },
+          verdict: "Apply",
+          confidence_band: "Med",
+          key_reasons: ["Platform/tooling experience transferable", "Hybrid is acceptable short-term", "Strong documentation/mentorship fit"],
+          gaps: ["Domain-specific metrics"],
+          unknowns: ["Team size and autonomy"],
+          evidence_refs: ["ev_103_a"],
+          completeness_band: "Medium",
+          change_triggers: ["user_request"],
+          delta_summary: "Initial apply decision; some unknowns around autonomy and metrics."
+        },
+        {
+          id: "brief_103_v2",
+          job_case_id: "case_103",
+          version: 2,
+          created_at: "2026-01-30T01:15:00Z",
+          inputs: { jd_snapshot_id: "jd_103_1", profile_snapshot_id: "profile_001", constraints_hash: "c_v2_scope" },
+          verdict: "Apply",
+          confidence_band: "High",
+          key_reasons: ["Recruiter confirmed platform ownership", "Interview scope matches architecture strengths", "Hybrid frequency is flexible"],
+          gaps: ["None critical"],
+          unknowns: ["Final comp"],
+          evidence_refs: ["ev_103_a", "ev_103_b"],
+          completeness_band: "High",
+          change_triggers: ["event_feedback"],
+          delta_summary: "What changed: recruiter confirmed ownership + flexible hybrid; uncertainty reduced; confidence increased."
+        },
+        {
+          id: "brief_104_v1",
+          job_case_id: "case_104",
+          version: 1,
+          created_at: "2025-12-20T22:50:00Z",
+          inputs: { jd_snapshot_id: "jd_104_1", profile_snapshot_id: "profile_001", constraints_hash: "c_v1" },
+          verdict: "Apply",
+          confidence_band: "Med",
+          key_reasons: ["B2B SaaS alignment", "GraphQL experience", "Design system sensibility valuable"],
+          gaps: ["Next.js at scale"],
+          unknowns: ["Offer band"],
+          evidence_refs: ["ev_104_a"],
+          completeness_band: "Medium",
+          change_triggers: ["user_request"],
+          delta_summary: "Apply with medium confidence; main gap is Next.js at scale."
+        },
+        {
+          id: "brief_105_v1",
+          job_case_id: "case_105",
+          version: 1,
+          created_at: "2025-12-10T17:20:00Z",
+          inputs: { jd_snapshot_id: "jd_105_1", profile_snapshot_id: "profile_001", constraints_hash: "c_v1" },
+          verdict: "Apply",
+          confidence_band: "Low",
+          key_reasons: ["Enterprise scale match", "Accessibility interest", "Remote"],
+          gaps: ["Micro-frontend leadership proof"],
+          unknowns: ["Team appetite for architectural change"],
+          evidence_refs: ["ev_105_a"],
+          completeness_band: "Low",
+          change_triggers: ["user_request"],
+          delta_summary: "Low confidence due to micro-frontend leadership signal gap."
+        }
+      ],
+      artifacts: [
+        { id: "art_resume_v3", job_case_id: "case_101", type: "resume", title: "Resume — Frontend (v3)", created_at: "2026-01-02T20:10:00Z", content_ref: "blob://resume_v3.pdf", used_in_event_ids: ["evt_102_apply", "evt_105_apply"] },
+        { id: "art_resume_v4", job_case_id: "case_103", type: "resume", title: "Resume — Platform emphasis (v4)", created_at: "2026-01-04T19:15:00Z", content_ref: "blob://resume_v4.pdf", used_in_event_ids: ["evt_103_apply"] },
+        { id: "art_outreach_101", job_case_id: "case_101", type: "outreach", title: "Outreach — hiring manager draft", created_at: "2026-01-24T03:20:00Z", content_ref: "text://Short note re: design system leadership + learnable Next.js", used_in_event_ids: ["evt_101_comm_out"] },
+        { id: "art_cover_102", job_case_id: "case_102", type: "cover_letter", title: "Cover — Staff UI (condensed)", created_at: "2026-01-10T15:30:00Z", content_ref: "text://One-page cover emphasizing design systems + perf", used_in_event_ids: ["evt_102_apply"] },
+        { id: "art_interview_notes_103", job_case_id: "case_103", type: "notes", title: "Interview prep — platform tradeoffs", created_at: "2026-01-29T18:45:00Z", content_ref: "text://Tradeoffs: build vs buy, standards, adoption, CI for UI", used_in_event_ids: ["evt_103_interview_round2"] }
+      ],
+      status_events: [
+        // Case 101 (communication)
+        { id: "evt_101_comm_out", job_case_id: "case_101", type: "communication", occurred_at: "2026-01-24T03:22:00Z", created_at: "2026-01-24T03:22:10Z",
+          metadata: { channel: "LinkedIn", direction: "outbound", linked_artifact_ids: ["art_outreach_101"] },
+          note: "Sent a short note highlighting design system leadership and willingness to ramp on Next.js." },
+
+        // Case 102 (applied + no response + email follow-up)
+        { id: "evt_102_apply", job_case_id: "case_102", type: "applied", occurred_at: "2026-01-10T16:05:00Z", created_at: "2026-01-10T16:05:10Z",
+          metadata: { stage: "applied", linked_artifact_ids: ["art_resume_v3", "art_cover_102"] },
+          note: "Applied via company portal. Kept cover letter short and metrics-forward." },
+        { id: "evt_102_comm_out", job_case_id: "case_102", type: "communication", occurred_at: "2026-01-18T02:40:00Z", created_at: "2026-01-18T02:40:10Z",
+          metadata: { channel: "email", direction: "outbound", linked_artifact_ids: [] },
+          note: "Follow-up email sent to recruiter address listed on posting (polite + concise)." },
+
+        // Case 103 (applied + calls/interviews)
+        { id: "evt_103_apply", job_case_id: "case_103", type: "applied", occurred_at: "2026-01-06T00:12:00Z", created_at: "2026-01-06T00:12:10Z",
+          metadata: { stage: "applied", linked_artifact_ids: ["art_resume_v4"] },
+          note: "Applied with platform-focused resume." },
+        { id: "evt_103_comm_in", job_case_id: "case_103", type: "communication", occurred_at: "2026-01-20T17:30:00Z", created_at: "2026-01-20T17:30:10Z",
+          metadata: { channel: "call", direction: "inbound", linked_artifact_ids: [] },
+          note: "Recruiter call: confirmed platform ownership and flexible hybrid cadence." },
+        { id: "evt_103_interview_round2", job_case_id: "case_103", type: "interview", occurred_at: "2026-01-30T01:15:00Z", created_at: "2026-01-30T01:15:10Z",
+          metadata: { stage: "round2", linked_artifact_ids: ["art_interview_notes_103"] },
+          note: "Round 2 scheduled: architecture + tradeoffs. Use platform stories + adoption strategy." },
+
+        // Case 104 (offer)
+        { id: "evt_104_offer", job_case_id: "case_104", type: "offer", occurred_at: "2026-01-28T04:05:00Z", created_at: "2026-01-28T04:05:10Z",
+          metadata: { stage: "closing", linked_artifact_ids: [] },
+          note: "Offer received. Need to clarify scope and growth path before negotiating." },
+
+        // Case 105 (applied + rejected)
+        { id: "evt_105_apply", job_case_id: "case_105", type: "applied", occurred_at: "2025-12-12T16:40:00Z", created_at: "2025-12-12T16:40:10Z",
+          metadata: { stage: "applied", linked_artifact_ids: ["art_resume_v3"] },
+          note: "Applied through LinkedIn Easy Apply." },
+        { id: "evt_105_reject", job_case_id: "case_105", type: "rejection", occurred_at: "2026-01-06T19:30:00Z", created_at: "2026-01-06T19:30:10Z",
+          metadata: { stage: "screen", outcome_reason: "Not enough micro-frontend leadership proof", linked_artifact_ids: [] },
+          note: "Closed loop: rejection after initial review. Capture as signal for micro-frontend leadership examples." }
+      ],
+      notes: [
+        { id: "note_101_1", job_case_id: "case_101", created_at: "2026-01-24T03:12:00Z", updated_at: "2026-01-24T03:12:00Z",
+          body: "If I proceed, emphasize design system + performance wins; mention Next.js ramp plan with concrete milestones.",
+          tags: ["positioning","plan"], linked_event_id: null, linked_decision_brief_id: "brief_101_v2" },
+        { id: "note_103_1", job_case_id: "case_103", created_at: "2026-01-20T18:05:00Z", updated_at: "2026-01-20T18:05:00Z",
+          body: "Recruiter seems to value written standards + adoption strategy. Prepare an example of how I drove consistency across teams.",
+          tags: ["interview","platform"], linked_event_id: "evt_103_comm_in", linked_decision_brief_id: null }
+      ]
+    };
+
+    /*****************************************************************
+     * Helpers
+     *****************************************************************/
+    const LANE_ORDER = ["Analyzed", "Applied", "Interviewing", "Closing", "Closed"];
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const byId = (arr) => Object.fromEntries(arr.map(x => [x.id, x]));
+    const nowIso = () => new Date().toISOString();
+
+    function daysAgo(iso){
+      const t = new Date(iso).getTime();
+      const n = Date.now();
+      const d = Math.max(0, Math.floor((n - t) / (1000*60*60*24)));
+      return d === 0 ? "today" : `${d}d ago`;
+    }
+
+    function formatIso(iso){
+      const dt = new Date(iso);
+      const opts = { year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" };
+      return dt.toLocaleString(undefined, opts);
+    }
+
+    function confidenceClass(band){
+      if(!band) return "conf-med";
+      const b = band.toLowerCase();
+      if(b.includes("high")) return "conf-high";
+      if(b.includes("low")) return "conf-low";
+      return "conf-med";
+    }
+
+    function verdictClass(v){
+      if(!v) return "verdict-consider";
+      const x = v.toLowerCase();
+      if(x.includes("apply")) return "verdict-apply";
+      if(x.includes("pass")) return "verdict-pass";
+      return "verdict-consider";
+    }
+
+    function laneFromCase(c){ return c.current_state?.macro_state || "Analyzed"; }
+
+    function deriveNeedsAttention(c){
+      // Neutral: needs attention if flagged or stale + active lane
+      const active = ["Analyzed","Applied","Interviewing","Closing"].includes(laneFromCase(c));
+      if(!active) return false;
+      if(c.flags?.needs_attention) return true;
+      if(c.flags?.stale) return true;
+      // also if no activity > 10d
+      const la = c.timestamps?.last_activity_at;
+      if(la){
+        const d = Math.floor((Date.now() - new Date(la)) / (1000*60*60*24));
+        if(d >= 10) return true;
+      }
+      return false;
+    }
+
+    /*****************************************************************
+     * In-memory DB
+     *****************************************************************/
+    const DB = {
+      user: FIXTURE.user,
+      cases: [...FIXTURE.job_cases],
+      snapshots: [...FIXTURE.job_posting_snapshots],
+      briefs: [...FIXTURE.decision_briefs],
+      artifacts: [...FIXTURE.artifacts],
+      events: [...FIXTURE.status_events],
+      notes: [...FIXTURE.notes]
+    };
+
+    const IDX = {
+      caseById: () => byId(DB.cases),
+      snapshotById: () => byId(DB.snapshots),
+      briefById: () => byId(DB.briefs),
+      artifactById: () => byId(DB.artifacts),
+      eventsByCase: (caseId) => DB.events.filter(e => e.job_case_id === caseId).sort((a,b)=>new Date(b.occurred_at)-new Date(a.occurred_at)),
+      notesByCase: (caseId) => DB.notes.filter(n => n.job_case_id === caseId).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)),
+      briefsByCase: (caseId) => DB.briefs.filter(b => b.job_case_id === caseId).sort((a,b)=>a.version-b.version),
+      artifactsByCase: (caseId) => DB.artifacts.filter(a => a.job_case_id === caseId).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)),
+      snapshotByCase: (caseId) => DB.snapshots.find(s => s.job_case_id === caseId)
+    };
+
+    /*****************************************************************
+     * Routing
+     *****************************************************************/
+    const ROUTE = {
+      go(path){
+        // path formats: "/jobs" or `/jobs/{id}`
+        location.hash = `#${path}`;
+      },
+      parse(){
+        const h = (location.hash || "#/jobs").replace(/^#/, "");
+        if(!h.startsWith("/")) return { name:"jobs" };
+        const parts = h.split("/").filter(Boolean); // e.g. ["jobs", "case_101"]
+        if(parts[0] !== "jobs") return { name:"jobs" };
+        if(parts.length === 1) return { name:"jobs" };
+        return { name:"detail", caseId: parts[1] };
+      }
+    };
+
+    /*****************************************************************
+     * Rendering: /jobs
+     *****************************************************************/
+    function renderCommandStrip(cases){
+      const active = cases.filter(c => laneFromCase(c) !== "Closed").length;
+      const needs = cases.filter(c => deriveNeedsAttention(c)).length;
+      const stale = cases.filter(c => c.flags?.stale).length;
+      const closed = cases.filter(c => laneFromCase(c) === "Closed").length;
+
+      $("#commandStrip").innerHTML = `
+        <div class="metric">
+          <div class="k">Active cases</div>
+          <div class="v">${active}</div>
+          <div class="s">Where momentum lives</div>
+        </div>
+        <div class="metric">
+          <div class="k">Needs attention</div>
+          <div class="v">${needs}</div>
+          <div class="s">Stale or flagged, neutral cue</div>
+        </div>
+        <div class="metric">
+          <div class="k">Stale</div>
+          <div class="v">${stale}</div>
+          <div class="s">No activity for a while</div>
+        </div>
+        <div class="metric">
+          <div class="k">Closed loops</div>
+          <div class="v">${closed}</div>
+          <div class="s">For calibration, not judgment</div>
+        </div>
+      `;
+    }
+
+    function caseCardHTML(c){
+      const lane = laneFromCase(c);
+      const title = c.job_identity?.title || "Untitled role";
+      const company = c.job_identity?.company || "Unknown company";
+      const verdict = c.current_verdict?.verdict || "—";
+      const conf = c.current_verdict?.confidence_band || "—";
+      const last = c.timestamps?.last_activity_at ? daysAgo(c.timestamps.last_activity_at) : "—";
+      const next = c.next_step || "—";
+      const attn = deriveNeedsAttention(c);
+
+      return `
+        <div class="card" role="button" tabindex="0" data-case-id="${c.id}">
+          <div class="row1">
+            <div class="jt">
+              <div class="t">${escapeHtml(title)}</div>
+              <div class="c">${escapeHtml(company)} • <span class="muted2">${escapeHtml(c.job_identity?.location_policy || "—")}</span></div>
+            </div>
+            <div class="chip">${escapeHtml(lane)} • <strong>${escapeHtml(c.current_state?.precise_state || "—")}</strong></div>
+          </div>
+
+          <div class="chipbar">
+            <span class="chip ${verdictClass(verdict)}"><strong>${escapeHtml(verdict)}</strong></span>
+            <span class="chip ${confidenceClass(conf)}">${escapeHtml(conf)} confidence</span>
+            ${attn ? `<span class="chip attn">Needs attention</span>` : ``}
+          </div>
+
+          <div class="meta">
+            <div class="line"><span class="k">Last</span><span class="v">${escapeHtml(last)}</span></div>
+            <div class="line"><span class="k">Next</span><span class="v">${escapeHtml(next)}</span></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLanes(cases){
+      const lanesEl = $("#lanes");
+      const grouped = Object.fromEntries(LANE_ORDER.map(l => [l, []]));
+      for(const c of cases){
+        const l = laneFromCase(c);
+        (grouped[l] ||= []).push(c);
+      }
+      lanesEl.innerHTML = LANE_ORDER.map(lane => {
+        const arr = grouped[lane] || [];
+        const cards = arr.length ? arr.map(caseCardHTML).join("") : `<div class="muted2" style="padding:8px 8px 10px;">No cases here.</div>`;
+        return `
+          <div class="lane" data-lane="${lane}">
+            <div class="lane-head">
+              <h4>${lane}</h4>
+              <span class="count">${arr.length}</span>
+            </div>
+            <div class="cards">${cards}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderJobsView(){
+      const q = ($("#search").value || "").trim().toLowerCase();
+      const laneFilter = $("#filterLane").value;
+
+      let cases = DB.cases.slice();
+
+      if(q){
+        cases = cases.filter(c => {
+          const t = (c.job_identity?.title || "").toLowerCase();
+          const co = (c.job_identity?.company || "").toLowerCase();
+          return t.includes(q) || co.includes(q);
+        });
+      }
+      if(laneFilter){
+        cases = cases.filter(c => laneFromCase(c) === laneFilter);
+      }
+
+      renderCommandStrip(cases);
+      renderLanes(cases);
+
+      // bind card click
+      $$(".card").forEach(el => {
+        const open = () => openDrawer(el.getAttribute("data-case-id"));
+        el.addEventListener("click", open);
+        el.addEventListener("keydown", (e)=>{ if(e.key === "Enter" || e.key === " ") open(); });
+      });
+    }
+
+    /*****************************************************************
+     * Drawer
+     *****************************************************************/
+    let drawerCaseId = null;
+
+    function openDrawer(caseId){
+      drawerCaseId = caseId;
+      const c = IDX.caseById()[caseId];
+      if(!c) return;
+
+      $("#drawerTitle").textContent = c.job_identity?.title || "Untitled role";
+      $("#drawerSub").textContent = `${c.job_identity?.company || "Unknown"} • ${c.job_identity?.location_policy || "—"}`;
+
+      const chips = [];
+      chips.push(`<span class="chip"><strong>${escapeHtml(laneFromCase(c))}</strong> • ${escapeHtml(c.current_state?.precise_state || "—")}</span>`);
+      chips.push(`<span class="chip ${verdictClass(c.current_verdict?.verdict)}"><strong>${escapeHtml(c.current_verdict?.verdict || "—")}</strong></span>`);
+      chips.push(`<span class="chip ${confidenceClass(c.current_verdict?.confidence_band)}">${escapeHtml(c.current_verdict?.confidence_band || "—")} confidence</span>`);
+      if(deriveNeedsAttention(c)) chips.push(`<span class="chip attn">Needs attention</span>`);
+      $("#drawerChips").innerHTML = chips.join("");
+
+      $("#drawerLast").textContent = c.timestamps?.last_activity_at ? `${daysAgo(c.timestamps.last_activity_at)} (${formatIso(c.timestamps.last_activity_at)})` : "—";
+      $("#drawerNext").textContent = c.next_step || "—";
+
+      // Latest brief
+      const briefs = IDX.briefsByCase(caseId);
+      const latest = briefs[briefs.length - 1];
+      if(latest){
+        $("#drawerBrief").innerHTML = `
+          <div class="muted2" style="font-family:var(--mono); font-size:11px;">v${latest.version} • ${formatIso(latest.created_at)}</div>
+          <div style="margin-top:6px;">
+            <span class="chip ${verdictClass(latest.verdict)}"><strong>${escapeHtml(latest.verdict)}</strong></span>
+            <span class="chip ${confidenceClass(latest.confidence_band)}">${escapeHtml(latest.confidence_band)} confidence</span>
+          </div>
+          <div class="muted" style="margin-top:8px; font-size:12px; line-height:1.35;">
+            ${escapeHtml(latest.delta_summary || latest.key_reasons?.slice(0,2).join(" • ") || "—")}
+          </div>
+        `;
+      } else {
+        $("#drawerBrief").textContent = "—";
+      }
+
+      // Recent timeline (top 5)
+      const events = IDX.eventsByCase(caseId);
+      const recent = events.slice(0, 5);
+      if(recent.length){
+        $("#drawerTimelineEmpty").classList.add("hidden");
+        $("#drawerTimeline").innerHTML = recent.map(e => `
+          <div class="mini-item">
+            <div class="top">
+              <span>${escapeHtml(labelEventType(e))}</span>
+              <span class="muted2">${daysAgo(e.occurred_at)}</span>
+            </div>
+            <div class="txt">${escapeHtml(e.note || "—")}</div>
+          </div>
+        `).join("");
+      } else {
+        $("#drawerTimeline").innerHTML = "";
+        $("#drawerTimelineEmpty").classList.remove("hidden");
+      }
+
+      // Artifacts (top 4)
+      const arts = IDX.artifactsByCase(caseId).slice(0, 4);
+      if(arts.length){
+        $("#drawerArtifactsEmpty").classList.add("hidden");
+        $("#drawerArtifacts").innerHTML = arts.map(a => `
+          <div class="mini-item">
+            <div class="top">
+              <span>${escapeHtml(a.type)}</span>
+              <span class="muted2">${daysAgo(a.created_at)}</span>
+            </div>
+            <div class="txt">${escapeHtml(a.title)}</div>
+          </div>
+        `).join("");
+      } else {
+        $("#drawerArtifacts").innerHTML = "";
+        $("#drawerArtifactsEmpty").classList.remove("hidden");
+      }
+
+      $("#drawerOverlay").classList.add("open");
+      $("#drawer").classList.add("open");
+      $("#drawerOverlay").setAttribute("aria-hidden","false");
+    }
+
+    function closeDrawer(){
+      drawerCaseId = null;
+      $("#drawerOverlay").classList.remove("open");
+      $("#drawer").classList.remove("open");
+      $("#drawerOverlay").setAttribute("aria-hidden","true");
+    }
+
+    /*****************************************************************
+     * Rendering: /jobs/{id}
+     *****************************************************************/
+    let activeCaseId = null;
+
+    function renderDetail(caseId){
+      activeCaseId = caseId;
+      const c = IDX.caseById()[caseId];
+      if(!c){
+        $("#viewDetail").innerHTML = `<article class="panel"><div class="pb">Case not found.</div></article>`;
+        return;
+      }
+
+      $("#routeLabel").textContent = `/jobs/${caseId}`;
+
+      // Sticky header
+      const verdict = c.current_verdict?.verdict || "—";
+      const conf = c.current_verdict?.confidence_band || "—";
+      const lane = laneFromCase(c);
+      const precise = c.current_state?.precise_state || "—";
+
+      $("#stickyCase").innerHTML = `
+        <div class="case-head-row">
+          <div class="case-title">
+            <h2>${escapeHtml(c.job_identity?.title || "Untitled role")}</h2>
+            <div class="sub">${escapeHtml(c.job_identity?.company || "Unknown company")} • ${escapeHtml(c.job_identity?.location_policy || "—")}
+              <span class="muted2"> • last activity ${escapeHtml(c.timestamps?.last_activity_at ? daysAgo(c.timestamps.last_activity_at) : "—")}</span>
+            </div>
+            <div class="chipbar" style="margin-top:10px;">
+              <span class="chip"><strong>${escapeHtml(lane)}</strong> • ${escapeHtml(precise)}</span>
+              <span class="chip ${verdictClass(verdict)}"><strong>${escapeHtml(verdict)}</strong></span>
+              <span class="chip ${confidenceClass(conf)}">${escapeHtml(conf)} confidence</span>
+              ${deriveNeedsAttention(c) ? `<span class="chip attn">Needs attention</span>` : ``}
+            </div>
+          </div>
+
+          <div class="case-actions">
+            <button class="btn-ghost" id="btnUpdateStatus" type="button">Update status</button>
+            <button class="btn-ghost" id="btnAddEvent" type="button">Add event</button>
+            <button class="btn-ghost" id="btnAddArtifact" type="button">Add artifact</button>
+            <button id="btnNewBrief" type="button">New Decision Brief</button>
+          </div>
+        </div>
+      `;
+
+      // Snapshot
+      const snap = IDX.snapshotByCase(caseId);
+      $("#snapshotMeta").textContent = snap ? `Captured ${formatIso(snap.captured_at)}` : "—";
+      $("#jobSnapshot").innerHTML = snap ? `
+        <div class="muted2" style="font-size:12px;">
+          Source: <a href="${escapeAttr(snap.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(snap.source_url)}</a>
+        </div>
+        <div class="hr"></div>
+        <details class="snapshot" ${snap ? "" : "open"}>
+          <summary>JD snapshot (collapsed by default)</summary>
+          <div class="muted2" style="margin-top:8px; font-size:12px;">
+            Skills: ${escapeHtml((snap.normalized_fields?.skills || []).join(", ") || "—")}
+            ${snap.normalized_fields?.comp_range ? ` • Comp: ${escapeHtml(snap.normalized_fields.comp_range)}` : ``}
+          </div>
+          <div class="jd-box">${escapeHtml(snap.raw_text)}</div>
+        </details>
+      ` : `<div class="muted2">No JD snapshot available.</div>`;
+
+      // Decision briefs
+      const briefs = IDX.briefsByCase(caseId);
+      const briefsEl = $("#briefs");
+      if(!briefs.length){
+        briefsEl.innerHTML = "";
+        $("#briefsEmpty").classList.remove("hidden");
+      } else {
+        $("#briefsEmpty").classList.add("hidden");
+        briefsEl.innerHTML = briefs.map(b => {
+          const reasons = (b.key_reasons || []).slice(0,3).map(r => `• ${escapeHtml(r)}`).join("<br/>");
+          return `
+            <div class="brief" data-brief-id="${b.id}">
+              <div class="top">
+                <div class="ver">v${b.version}</div>
+                <div class="when">${escapeHtml(formatIso(b.created_at))}</div>
+              </div>
+              <div class="main">
+                <span class="chip ${verdictClass(b.verdict)}"><strong>${escapeHtml(b.verdict)}</strong></span>
+                <span class="chip ${confidenceClass(b.confidence_band)}">${escapeHtml(b.confidence_band)} confidence</span>
+                <span class="chip">Completeness: <strong>${escapeHtml(b.completeness_band || "—")}</strong></span>
+                <button class="btn-ghost" type="button" data-action="toggle-delta">What changed?</button>
+              </div>
+              <div class="reasons">${reasons || "<span class='muted2'>No reasons captured.</span>"}</div>
+              <div class="delta hidden">
+                <div class="hdr">Delta summary</div>
+                <div>${escapeHtml(b.delta_summary || "No delta summary available.")}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // bind toggle delta
+        $$(".brief [data-action='toggle-delta']").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const briefEl = e.target.closest(".brief");
+            const delta = briefEl.querySelector(".delta");
+            delta.classList.toggle("hidden");
+          });
+        });
+      }
+
+      // Artifacts
+      const arts = IDX.artifactsByCase(caseId);
+      const artsEl = $("#artifacts");
+      if(!arts.length){
+        artsEl.innerHTML = "";
+        $("#artifactsEmpty").classList.remove("hidden");
+      } else {
+        $("#artifactsEmpty").classList.add("hidden");
+        artsEl.innerHTML = arts.map(a => {
+          const used = (a.used_in_event_ids || []).length ? `Used in ${a.used_in_event_ids.length} event(s)` : "Not linked to an event yet";
+          return `
+            <div class="artifact">
+              <div class="top">
+                <div class="name">${escapeHtml(a.title)}</div>
+                <div class="muted2" style="font-size:11px; font-family:var(--mono);">${escapeHtml(a.type)} • ${escapeHtml(formatIso(a.created_at))}</div>
+              </div>
+              <div class="meta">${escapeHtml(used)}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Timeline
+      const events = IDX.eventsByCase(caseId);
+      if(!events.length){
+        $("#timeline").innerHTML = "";
+        $("#timelineEmpty").classList.remove("hidden");
+      } else {
+        $("#timelineEmpty").classList.add("hidden");
+        $("#timeline").innerHTML = events.map(e => {
+          const tags = [];
+          if(e.metadata?.stage) tags.push(`stage:${e.metadata.stage}`);
+          if(e.metadata?.channel) tags.push(`channel:${e.metadata.channel}`);
+          if(e.metadata?.direction) tags.push(`dir:${e.metadata.direction}`);
+          if(e.metadata?.outcome_reason) tags.push(`reason:${e.metadata.outcome_reason}`);
+          const linked = (e.metadata?.linked_artifact_ids || []);
+          const linkedText = linked.length ? `Linked artifacts: ${linked.join(", ")}` : "";
+
+          return `
+            <div class="event">
+              <div class="top">
+                <div class="type">${escapeHtml(labelEventType(e))}</div>
+                <div class="time">${escapeHtml(formatIso(e.occurred_at))}</div>
+              </div>
+              ${e.note ? `<div class="note">${escapeHtml(e.note)}</div>` : ``}
+              <div class="tagrow">
+                ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
+                ${linkedText ? `<span class="tag">${escapeHtml(linkedText)}</span>` : ``}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Notes
+      const notes = IDX.notesByCase(caseId);
+      const notesEl = $("#notes");
+      if(!notes.length){
+        notesEl.innerHTML = `<div class="muted2">No notes yet. Add one when you learn something worth reusing.</div>`;
+      } else {
+        notesEl.innerHTML = notes.map(n => {
+          const tags = (n.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+          const linkBits = [
+            n.linked_event_id ? `event:${n.linked_event_id}` : null,
+            n.linked_decision_brief_id ? `brief:${n.linked_decision_brief_id}` : null
+          ].filter(Boolean).join(" • ");
+
+          return `
+            <div class="event">
+              <div class="top">
+                <div class="type">Note</div>
+                <div class="time">${escapeHtml(formatIso(n.created_at))}</div>
+              </div>
+              <div class="note" style="color:rgba(255,255,255,.86);">${escapeHtml(n.body)}</div>
+              <div class="tagrow">
+                ${tags}
+                ${linkBits ? `<span class="tag">${escapeHtml(linkBits)}</span>` : ``}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Next step & blockers
+      $("#nextBlockers").innerHTML = `
+        <div class="drawer-section" style="margin:0; background:rgba(255,255,255,.02);">
+          <h5>Next step</h5>
+          <div style="font-size:13px; color:rgba(255,255,255,.88); line-height:1.25;">
+            ${escapeHtml(c.next_step || "—")}
+          </div>
+          <div class="hr"></div>
+          <h5>Blockers</h5>
+          <div class="chipbar" style="margin-top:4px;">
+            ${(c.blockers || []).length ? (c.blockers || []).map(b => `<span class="chip">${escapeHtml(b)}</span>`).join("") : `<span class="muted2">None recorded.</span>`}
+          </div>
+        </div>
+      `;
+
+      // bind detail actions
+      bindDetailActions(caseId);
+    }
+
+    function bindDetailActions(caseId){
+      // header buttons (inside sticky)
+      const hook = (id, fn) => {
+        const el = document.getElementById(id);
+        if(el) el.onclick = fn;
+      };
+
+      hook("btnUpdateStatus", () => openQuickDialog("Update status", "Change macro/precise state (manual, traceable).", buildStatusFields(caseId), (data) => {
+        const c = IDX.caseById()[caseId];
+        c.current_state.macro_state = data.macro_state;
+        c.current_state.precise_state = data.precise_state;
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        c.flags.stale = false;
+        // add an event
+        addEvent(caseId, {
+          type: "analyzed",
+          occurred_at: data.occurred_at,
+          metadata: { stage: data.macro_state.toLowerCase() },
+          note: `Status updated to ${data.macro_state} • ${data.precise_state}.`
+        });
+        // rerender
+        renderDetail(caseId);
+        renderJobsView();
+      }));
+
+      hook("btnAddEvent", () => openQuickDialog("Add event", "Add a neutral, traceable event to the timeline.", buildEventFields("event"), (data) => {
+        addEvent(caseId, {
+          type: data.type,
+          occurred_at: data.occurred_at,
+          metadata: { stage: data.stage || undefined, linked_artifact_ids: [] },
+          note: data.note
+        });
+        renderDetail(caseId);
+        renderJobsView();
+      }));
+
+      hook("btnAddArtifact", () => openQuickDialog("Add artifact", "Artifacts are reusable outputs (resume, outreach, cover letter, notes).", buildArtifactFields(), (data) => {
+        const id = `art_${Math.random().toString(16).slice(2,8)}`;
+        DB.artifacts.push({
+          id,
+          job_case_id: caseId,
+          type: data.type,
+          title: data.title,
+          created_at: nowIso(),
+          content_ref: data.content_ref || "text://(placeholder)",
+          used_in_event_ids: []
+        });
+        // touch case
+        const c = IDX.caseById()[caseId];
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        renderDetail(caseId);
+        renderJobsView();
+      }));
+
+      hook("btnNewBrief", () => openQuickDialog("New Decision Brief (demo)", "Creates a new version with a delta summary. (In production, an agent would generate this.)", buildBriefFields(caseId), (data) => {
+        const existing = IDX.briefsByCase(caseId);
+        const nextV = existing.length ? Math.max(...existing.map(b=>b.version)) + 1 : 1;
+        const id = `brief_${caseId}_v${nextV}`;
+        DB.briefs.push({
+          id,
+          job_case_id: caseId,
+          version: nextV,
+          created_at: nowIso(),
+          inputs: { jd_snapshot_id: IDX.snapshotByCase(caseId)?.id || null, profile_snapshot_id: "profile_001", constraints_hash: "demo" },
+          verdict: data.verdict,
+          confidence_band: data.confidence_band,
+          key_reasons: data.key_reasons.split("|").map(s => s.trim()).filter(Boolean),
+          gaps: data.gaps.split("|").map(s => s.trim()).filter(Boolean),
+          unknowns: data.unknowns.split("|").map(s => s.trim()).filter(Boolean),
+          evidence_refs: [],
+          completeness_band: data.completeness_band,
+          change_triggers: ["user_request"],
+          delta_summary: data.delta_summary
+        });
+        // set as current verdict
+        const c = IDX.caseById()[caseId];
+        c.current_verdict = { verdict: data.verdict, confidence_band: data.confidence_band, decision_brief_id: id };
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        renderDetail(caseId);
+        renderJobsView();
+      }));
+
+      // section buttons
+      $("#addEventBtn").onclick = () => document.getElementById("btnAddEvent")?.click();
+      $("#addCommBtn").onclick = () => openQuickDialog("Add communication", "Manual comm tracking (email/call/LinkedIn/other). No integrations.", buildCommFields(), (data) => {
+        addEvent(caseId, {
+          type: "communication",
+          occurred_at: data.occurred_at,
+          metadata: { channel: data.channel, direction: data.direction, linked_artifact_ids: [] },
+          note: data.note
+        });
+        renderDetail(caseId);
+        renderJobsView();
+      });
+
+      $("#addNoteBtn").onclick = () => openQuickDialog("Add note", "Capture context for future you (taggable, linkable).", buildNoteFields(), (data) => {
+        const id = `note_${Math.random().toString(16).slice(2,8)}`;
+        DB.notes.push({
+          id,
+          job_case_id: caseId,
+          created_at: nowIso(),
+          updated_at: nowIso(),
+          body: data.body,
+          tags: data.tags.split(",").map(s=>s.trim()).filter(Boolean),
+          linked_event_id: data.linked_event_id || null,
+          linked_decision_brief_id: data.linked_decision_brief_id || null
+        });
+        const c = IDX.caseById()[caseId];
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        renderDetail(caseId);
+        renderJobsView();
+      });
+
+      $("#addArtifactBtn").onclick = () => document.getElementById("btnAddArtifact")?.click();
+      $("#newBriefBtn").onclick = () => document.getElementById("btnNewBrief")?.click();
+      $("#editNextBtn").onclick = () => openQuickDialog("Edit next step & blockers", "Execution anchor (neutral, practical).", buildNextFields(caseId), (data) => {
+        const c = IDX.caseById()[caseId];
+        c.next_step = data.next_step;
+        c.blockers = data.blockers.split("|").map(s=>s.trim()).filter(Boolean);
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        renderDetail(caseId);
+        renderJobsView();
+      });
+
+      // close loop
+      $("#closeLoopBtn").onclick = () => $("#closeLoopDialog").showModal();
+
+      $("#confirmCloseLoop").onclick = (e) => {
+        // dialog closes automatically; we handle on close
+      };
+
+      $("#closeLoopDialog").addEventListener("close", () => {
+        // If confirm wasn't pressed, ignore. We can infer by activeElement? Safer: check returnValue
+        if($("#closeLoopDialog").returnValue !== "confirm") return;
+        const outcome = $("#closeOutcome").value;
+        const stage = $("#closeStage").value;
+        const note = $("#closeNote").value.trim();
+
+        // update case state
+        const c = IDX.caseById()[caseId];
+        c.current_state.macro_state = "Closed";
+        c.current_state.precise_state = outcome === "offer" ? "Offer received"
+          : outcome === "accepted" ? "Accepted"
+          : outcome === "withdrawn" ? "Withdrawn"
+          : outcome === "no_response" ? "No response"
+          : "Rejected";
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        c.timestamps.closed_at = nowIso();
+        c.flags.needs_attention = false;
+        c.flags.stale = false;
+
+        addEvent(caseId, {
+          type: outcome === "offer" ? "offer" : outcome === "accepted" ? "accepted" : outcome === "withdrawn" ? "withdrawn" : outcome === "no_response" ? "rejection" : "rejection",
+          occurred_at: nowIso(),
+          metadata: { stage: stage || "closed", outcome_reason: outcome, linked_artifact_ids: [] },
+          note: note || `Closed loop: ${c.current_state.precise_state}.`
+        });
+
+        // reset modal fields
+        $("#closeNote").value = "";
+        $("#closeStage").value = "";
+        $("#closeOutcome").value = "rejected";
+
+        renderDetail(caseId);
+        renderJobsView();
+      });
+    }
+
+    function addEvent(caseId, { type, occurred_at, metadata, note }){
+      const id = `evt_${Math.random().toString(16).slice(2,8)}`;
+      DB.events.push({
+        id,
+        job_case_id: caseId,
+        type,
+        occurred_at: occurred_at || nowIso(),
+        created_at: nowIso(),
+        metadata: metadata || {},
+        note: note || ""
+      });
+    }
+
+    function labelEventType(e){
+      const t = (e.type || "").toLowerCase();
+      if(t === "communication"){
+        const ch = e.metadata?.channel ? ` • ${e.metadata.channel}` : "";
+        const dir = e.metadata?.direction ? ` • ${e.metadata.direction}` : "";
+        return `Communication${ch}${dir}`;
+      }
+      if(t === "interview"){
+        const st = e.metadata?.stage ? ` • ${e.metadata.stage}` : "";
+        return `Interview${st}`;
+      }
+      if(t === "assignment") return "Assignment";
+      if(t === "applied") return "Applied";
+      if(t === "offer") return "Offer";
+      if(t === "accepted") return "Accepted";
+      if(t === "withdrawn") return "Withdrawn";
+      if(t === "rejection") return "Closed loop (rejection)";
+      if(t === "analyzed") return "Status update";
+      return (e.type || "Event").toString();
+    }
+
+    /*****************************************************************
+     * Quick dialog builder
+     *****************************************************************/
+    function openQuickDialog(title, desc, fieldsHTML, onConfirm){
+      $("#qdTitle").textContent = title;
+      $("#qdDesc").textContent = desc;
+      $("#qdFields").innerHTML = fieldsHTML;
+
+      const dlg = $("#quickDialog");
+      dlg.showModal();
+
+      const handler = () => {
+        dlg.removeEventListener("close", handler);
+        if(dlg.returnValue !== "confirm") return;
+        const data = collectQuickDialogData();
+        onConfirm(data);
+      };
+      dlg.addEventListener("close", handler);
+    }
+
+    function collectQuickDialogData(){
+      const data = {};
+      $$("#qdFields [data-name]").forEach(el => {
+        const name = el.getAttribute("data-name");
+        data[name] = (el.type === "checkbox") ? el.checked : el.value;
+      });
+      return data;
+    }
+
+    function buildStatusFields(caseId){
+      const c = IDX.caseById()[caseId];
+      const now = new Date().toISOString().slice(0,16);
+      return `
+        <label>
+          Macro state
+          <select data-name="macro_state">
+            ${LANE_ORDER.map(l => `<option value="${l}" ${l===laneFromCase(c) ? "selected":""}>${l}</option>`).join("")}
+          </select>
+        </label>
+        <label>
+          Precise state
+          <input data-name="precise_state" value="${escapeAttr(c.current_state?.precise_state || "")}" placeholder="e.g., Waiting, Round 2, Offer received" />
+        </label>
+        <label>
+          Occurred at
+          <input data-name="occurred_at" type="datetime-local" value="${now}" />
+        </label>
+      `;
+    }
+
+    function buildEventFields(mode){
+      const now = new Date().toISOString().slice(0,16);
+      return `
+        <label>
+          Type
+          <select data-name="type">
+            <option value="applied">Applied</option>
+            <option value="interview">Interview</option>
+            <option value="assignment">Assignment</option>
+            <option value="communication">Communication</option>
+            <option value="analyzed">Status update</option>
+          </select>
+        </label>
+        <label>
+          Stage (optional)
+          <input data-name="stage" placeholder="e.g., screen, round1, round2" />
+        </label>
+        <label>
+          Occurred at
+          <input data-name="occurred_at" type="datetime-local" value="${now}" />
+        </label>
+        <label>
+          Note
+          <textarea data-name="note" rows="3" placeholder="One sentence is enough."></textarea>
+        </label>
+      `;
+    }
+
+    function buildCommFields(){
+      const now = new Date().toISOString().slice(0,16);
+      return `
+        <label>
+          Channel
+          <select data-name="channel">
+            <option value="email">email</option>
+            <option value="call">call</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="other">other</option>
+          </select>
+        </label>
+        <label>
+          Direction
+          <select data-name="direction">
+            <option value="outbound">outbound</option>
+            <option value="inbound">inbound</option>
+          </select>
+        </label>
+        <label>
+          Occurred at
+          <input data-name="occurred_at" type="datetime-local" value="${now}" />
+        </label>
+        <label>
+          Notes
+          <textarea data-name="note" rows="3" placeholder="What happened? (Keep it neutral.)"></textarea>
+        </label>
+      `;
+    }
+
+    function buildNoteFields(){
+      return `
+        <label>
+          Note
+          <textarea data-name="body" rows="4" placeholder="Capture context for future you."></textarea>
+        </label>
+        <label>
+          Tags (comma-separated)
+          <input data-name="tags" placeholder="e.g., interview, positioning, gap" />
+        </label>
+        <label>
+          Link to event id (optional)
+          <input data-name="linked_event_id" placeholder="e.g., evt_103_comm_in" />
+        </label>
+        <label>
+          Link to decision brief id (optional)
+          <input data-name="linked_decision_brief_id" placeholder="e.g., brief_101_v2" />
+        </label>
+      `;
+    }
+
+    function buildArtifactFields(){
+      return `
+        <label>
+          Type
+          <select data-name="type">
+            <option value="resume">resume</option>
+            <option value="outreach">outreach</option>
+            <option value="cover_letter">cover_letter</option>
+            <option value="notes">notes</option>
+          </select>
+        </label>
+        <label>
+          Title
+          <input data-name="title" placeholder="e.g., Resume — Frontend (v5)" />
+        </label>
+        <label>
+          Content ref (optional)
+          <input data-name="content_ref" placeholder="e.g., blob://file.pdf or text://..." />
+        </label>
+      `;
+    }
+
+    function buildBriefFields(caseId){
+      const c = IDX.caseById()[caseId];
+      const current = c.current_verdict || {};
+      return `
+        <label>
+          Verdict
+          <select data-name="verdict">
+            <option value="Apply" ${current.verdict==="Apply"?"selected":""}>Apply</option>
+            <option value="Consider" ${current.verdict==="Consider"?"selected":""}>Consider</option>
+            <option value="Pass" ${current.verdict==="Pass"?"selected":""}>Pass</option>
+          </select>
+        </label>
+        <label>
+          Confidence band
+          <select data-name="confidence_band">
+            <option value="High" ${current.confidence_band==="High"?"selected":""}>High</option>
+            <option value="Med" ${current.confidence_band==="Med"?"selected":""}>Med</option>
+            <option value="Low" ${current.confidence_band==="Low"?"selected":""}>Low</option>
+          </select>
+        </label>
+        <label>
+          Completeness band
+          <select data-name="completeness_band">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </label>
+        <label>
+          Key reasons (pipe-separated)
+          <input data-name="key_reasons" placeholder="Reason 1 | Reason 2 | Reason 3" />
+        </label>
+        <label>
+          Gaps (pipe-separated)
+          <input data-name="gaps" placeholder="Gap 1 | Gap 2" />
+        </label>
+        <label>
+          Unknowns (pipe-separated)
+          <input data-name="unknowns" placeholder="Unknown 1 | Unknown 2" />
+        </label>
+        <label>
+          Delta summary (“What changed?”)
+          <textarea data-name="delta_summary" rows="3" placeholder="What changed since the last version?"></textarea>
+        </label>
+      `;
+    }
+
+    function buildNextFields(caseId){
+      const c = IDX.caseById()[caseId];
+      return `
+        <label>
+          Next step
+          <input data-name="next_step" value="${escapeAttr(c.next_step || "")}" placeholder="One concrete action." />
+        </label>
+        <label>
+          Blockers (pipe-separated)
+          <input data-name="blockers" value="${escapeAttr((c.blockers || []).join(" | "))}" placeholder="Waiting on response | Need referral | Need comp benchmark" />
+        </label>
+      `;
+    }
+
+    /*****************************************************************
+     * Page wiring + init
+     *****************************************************************/
+    function showView(name){
+      if(name === "jobs"){
+        $("#viewJobs").classList.remove("hidden");
+        $("#viewDetail").classList.add("hidden");
+      } else {
+        $("#viewJobs").classList.add("hidden");
+        $("#viewDetail").classList.remove("hidden");
+      }
+    }
+
+    function render(){
+      const r = ROUTE.parse();
+      if(r.name === "jobs"){
+        showView("jobs");
+        renderJobsView();
+      } else {
+        showView("detail");
+        renderDetail(r.caseId);
+      }
+    }
+
+    // topbar actions
+    $("#goJobs").addEventListener("click", () => ROUTE.go("/jobs"));
+    $("#backToJobs").addEventListener("click", () => ROUTE.go("/jobs"));
+
+    // drawer wiring
+    $("#drawerClose").addEventListener("click", closeDrawer);
+    $("#drawerOverlay").addEventListener("click", closeDrawer);
+    $("#drawerOpenFull").addEventListener("click", () => {
+      if(drawerCaseId) ROUTE.go(`/jobs/${drawerCaseId}`);
+      closeDrawer();
+    });
+    $("#drawerAddComm").addEventListener("click", () => {
+      if(!drawerCaseId) return;
+      openQuickDialog("Add communication", "Manual comm tracking (email/call/LinkedIn/other).", buildCommFields(), (data) => {
+        addEvent(drawerCaseId, {
+          type: "communication",
+          occurred_at: data.occurred_at,
+          metadata: { channel: data.channel, direction: data.direction, linked_artifact_ids: [] },
+          note: data.note
+        });
+        // touch case
+        const c = IDX.caseById()[drawerCaseId];
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        c.flags.stale = false;
+
+        // rerender jobs + drawer content
+        renderJobsView();
+        openDrawer(drawerCaseId);
+      });
+    });
+    $("#drawerUpdateStatus").addEventListener("click", () => {
+      if(!drawerCaseId) return;
+      openQuickDialog("Update status", "Change macro/precise state (manual, traceable).", buildStatusFields(drawerCaseId), (data) => {
+        const c = IDX.caseById()[drawerCaseId];
+        c.current_state.macro_state = data.macro_state;
+        c.current_state.precise_state = data.precise_state;
+        c.timestamps.updated_at = nowIso();
+        c.timestamps.last_activity_at = nowIso();
+        c.flags.stale = false;
+
+        addEvent(drawerCaseId, {
+          type: "analyzed",
+          occurred_at: data.occurred_at,
+          metadata: { stage: data.macro_state.toLowerCase() },
+          note: `Status updated to ${data.macro_state} • ${data.precise_state}.`
+        });
+
+        renderJobsView();
+        openDrawer(drawerCaseId);
+      });
+    });
+
+    // search/filter rerender
+    $("#search").addEventListener("input", () => renderJobsView());
+    $("#filterLane").addEventListener("change", () => renderJobsView());
+
+    // demo add job
+    $("#addJob").addEventListener("click", () => {
+      const id = `case_${Math.random().toString(16).slice(2,6)}`;
+      DB.cases.unshift({
+        id,
+        user_id: DB.user.id,
+        job_identity: { title: "New job case (demo)", company: "ExampleCo", location_policy: "Remote", role_tags: ["React"] },
+        source: { posting_url: "https://example.com/jobs/new", captured_from: "paste" },
+        current_state: { macro_state: "Analyzed", precise_state: "Considering" },
+        current_verdict: { verdict: "Consider", confidence_band: "Med", decision_brief_id: null },
+        next_step: "Capture JD snapshot and create Decision Brief",
+        blockers: [],
+        timestamps: { created_at: nowIso(), updated_at: nowIso(), last_activity_at: nowIso() },
+        flags: { needs_attention: true, stale: false }
+      });
+      renderJobsView();
+    });
+
+    // keyboard shortcut: G to go to /jobs
+    document.addEventListener("keydown", (e) => {
+      if(e.key.toLowerCase() === "g" && !isTypingInInput()){
+        ROUTE.go("/jobs");
+      }
+      if(e.key === "Escape"){
+        closeDrawer();
+      }
+    });
+
+    function isTypingInInput(){
+      const el = document.activeElement;
+      if(!el) return false;
+      const tag = el.tagName.toLowerCase();
+      return tag === "input" || tag === "textarea" || tag === "select";
+    }
+
+    window.addEventListener("hashchange", () => render());
+
+    // default route
+    if(!location.hash) ROUTE.go("/jobs");
+    render();
+
+    /*****************************************************************
+     * Escaping
+     *****************************************************************/
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function escapeAttr(str){ return escapeHtml(str).replaceAll("\n"," "); }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>De-Risking Plan (MVP)</title>
+
+  <!-- Tailwind CDN (minimal code, no build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Small fatigue-reduction tweaks (kept minimal) */
+    html { color-scheme: light; }
+    .soft-shadow { box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .line-clamp-2 {
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .line-clamp-3 {
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Header -->
+    <header class="mb-8">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">De-Risking Plan</h1>
+          <p class="mt-2 text-slate-600 max-w-3xl">
+            A bounded set of proof-based actions designed to reduce uncertainty in your job decisions.
+          </p>
+        </div>
+        <div class="hidden sm:block text-right">
+          <div class="text-xs text-slate-500">MVP • local file • CDN UI</div>
+          <div id="planMetaCompact" class="mt-1 text-xs text-slate-500 mono"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Feasibility Note -->
+    <section id="feasibilityNote" class="hidden mb-6">
+      <div class="soft-shadow bg-white border border-slate-200 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <div class="mt-0.5 h-2.5 w-2.5 rounded-full bg-slate-400"></div>
+          <div>
+            <div class="font-medium text-slate-900">Feasibility</div>
+            <p class="text-sm text-slate-600 mt-1">
+              Given your time constraints, this is a <span class="font-medium">satisficing</span> plan (reduce the biggest doubts cheaply),
+              not an optimizing plan (maximize total capability).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Decision Context -->
+    <section class="mb-6">
+      <div class="soft-shadow bg-white border border-slate-200 rounded-xl p-5">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-semibold">Decision Context</h2>
+            <p class="text-sm text-slate-600 mt-1">Why this plan exists, what it applies to, and how it stays bounded.</p>
+          </div>
+          <div class="text-sm text-slate-600">
+            <div class="mono text-xs text-slate-500">plan_id</div>
+            <div id="planId" class="mono"></div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="border border-slate-200 rounded-lg p-4">
+            <div class="text-xs text-slate-500 mono">generated_at</div>
+            <div id="generatedAt" class="mt-1 text-sm"></div>
+          </div>
+          <div class="border border-slate-200 rounded-lg p-4">
+            <div class="text-xs text-slate-500 mono">decision_scopes</div>
+            <div id="decisionScopes" class="mt-2 flex flex-wrap gap-2"></div>
+          </div>
+          <div class="border border-slate-200 rounded-lg p-4">
+            <div class="text-xs text-slate-500 mono">why_this_plan</div>
+            <ul class="mt-2 text-sm text-slate-700 list-disc pl-5 space-y-1">
+              <li>Reduce decision uncertainty with inspectable proof.</li>
+              <li>Cap active items to avoid noise and fatigue.</li>
+              <li>Reject low-signal activity (tutorial chasing, unverifiable work).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <span class="mono">active_item_cap:</span>
+          <span id="activeCap" class="mono text-slate-700"></span>
+          <span class="mx-1">•</span>
+          <button id="btnResetLocal" class="underline decoration-dotted hover:text-slate-700">reset local changes</button>
+          <span class="mx-1">•</span>
+          <span class="mono">storage:</span> <span class="mono text-slate-700">localStorage</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Decision Blockers -->
+    <section class="mb-6">
+      <div class="soft-shadow bg-white border border-slate-200 rounded-xl p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-semibold">Top Decision Blockers</h2>
+            <p class="text-sm text-slate-600 mt-1">The highest-impact uncertainties currently weakening decisions.</p>
+          </div>
+          <div class="text-xs text-slate-500 mono">ranked</div>
+        </div>
+
+        <div id="blockersList" class="mt-4 space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- Active Plan Items -->
+    <section class="mb-6">
+      <div class="soft-shadow bg-white border border-slate-200 rounded-xl p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-semibold">Active Plan Items</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              A maximum of <span id="activeCapInline" class="font-medium"></span> items appear here to protect clarity and attribution.
+            </p>
+          </div>
+          <div class="text-xs text-slate-500 mono">proof-first</div>
+        </div>
+
+        <div id="activeItems" class="mt-4 grid grid-cols-1 gap-4"></div>
+        <div id="noActiveItems" class="hidden mt-4 text-sm text-slate-600">No active plan items.</div>
+      </div>
+    </section>
+
+    <!-- Queued Items (Accordion) -->
+    <section class="mb-6">
+      <div class="soft-shadow bg-white border border-slate-200 rounded-xl p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-semibold">Queued Items</h2>
+            <p class="text-sm text-slate-600 mt-1">Collapsed by default to avoid overwhelm. Expand only when needed.</p>
+          </div>
+          <button id="btnToggleQueued" class="text-sm underline decoration-dotted text-slate-600 hover:text-slate-800">
+            Expand
+          </button>
+        </div>
+
+        <div id="queuedItems" class="hidden mt-4 space-y-3"></div>
+        <div id="noQueuedItems" class="hidden mt-4 text-sm text-slate-600">No queued items.</div>
+      </div>
+    </section>
+
+    <!-- What NOT to do -->
+    <section class="mb-6">
+      <div class="soft-shadow bg-white border border-slate-200 rounded-xl p-5">
+        <div class="flex items-start gap-3">
+          <div class="mt-1 h-2.5 w-2.5 rounded-full bg-slate-900"></div>
+          <div>
+            <h2 class="text-lg font-semibold">What NOT to do</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              These are common low-signal activities that increase noise without improving decision confidence.
+            </p>
+          </div>
+        </div>
+
+        <ul id="whatNotToDo" class="mt-4 text-sm text-slate-800 list-disc pl-5 space-y-2"></ul>
+      </div>
+    </section>
+
+    <!-- Feedback Loop (Footer) -->
+    <footer class="pb-6">
+      <div class="soft-shadow bg-white border border-slate-200 rounded-xl p-5">
+        <h2 class="text-lg font-semibold">Feedback Loop</h2>
+        <p class="text-sm text-slate-600 mt-1">
+          Completion changes future Decision Briefs by adjusting evidence and uncertainty — but does not guarantee outcomes.
+        </p>
+        <ul id="feedbackNotes" class="mt-4 text-sm text-slate-800 list-disc pl-5 space-y-2"></ul>
+        <div class="mt-4 text-xs text-slate-500">
+          This UI is intentionally minimal: no gamification, no massive backlogs, no “busywork” tracking.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Attach Proof Modal -->
+  <div id="modalBackdrop" class="hidden fixed inset-0 bg-slate-900/40"></div>
+  <div id="modalAttachProof" class="hidden fixed inset-0 flex items-center justify-center p-4">
+    <div class="w-full max-w-xl bg-white border border-slate-200 rounded-2xl soft-shadow">
+      <div class="p-5 border-b border-slate-200 flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500 mono">attach_proof</div>
+          <h3 id="modalTitle" class="text-lg font-semibold mt-1">Attach proof</h3>
+          <p id="modalSubtitle" class="text-sm text-slate-600 mt-1 line-clamp-2"></p>
+        </div>
+        <button id="btnCloseModal" class="text-slate-600 hover:text-slate-900" aria-label="Close">
+          ✕
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-sm font-medium">Label</label>
+          <input id="proofLabel" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" placeholder="e.g., Next.js repo + deployment" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">URL</label>
+          <input id="proofUrl" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" placeholder="https://..." />
+          <div class="mt-1 text-xs text-slate-500">Must be quickly verifiable by a third party.</div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Which uncertainty does this reduce?</label>
+          <textarea id="proofClaim" rows="3" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" placeholder="One short sentence."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Optional notes</label>
+          <textarea id="proofNotes" rows="2" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" placeholder="Context, verification tips, etc. (optional)"></textarea>
+        </div>
+
+        <div class="flex items-center justify-between gap-3 pt-2">
+          <div class="flex items-center gap-3">
+            <label class="text-sm text-slate-700 flex items-center gap-2">
+              <input id="proofStatusSubmitted" type="checkbox" class="rounded border-slate-300" />
+              Mark as <span class="font-medium">submitted</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btnCancelModal" class="px-3 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
+            <button id="btnSaveProof" class="px-3 py-2 text-sm rounded-lg bg-slate-900 text-white hover:bg-slate-800">Save proof</button>
+          </div>
+        </div>
+
+        <div id="modalError" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Confirmation Modal -->
+  <div id="modalSubmitBackdrop" class="hidden fixed inset-0 bg-slate-900/40"></div>
+  <div id="modalSubmit" class="hidden fixed inset-0 flex items-center justify-center p-4">
+    <div class="w-full max-w-xl bg-white border border-slate-200 rounded-2xl soft-shadow">
+      <div class="p-5 border-b border-slate-200 flex items-start justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-500 mono">mark_submitted</div>
+          <h3 class="text-lg font-semibold mt-1">Confirm submission</h3>
+          <p id="submitSubtitle" class="text-sm text-slate-600 mt-1 line-clamp-2"></p>
+        </div>
+        <button id="btnCloseSubmitModal" class="text-slate-600 hover:text-slate-900" aria-label="Close">
+          ✕
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-sm font-medium">Which uncertainty is reduced?</label>
+          <input id="submitUncertainty" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300" placeholder="One short sentence." />
+          <div class="mt-1 text-xs text-slate-500">Required. Keep it specific and test-like.</div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button id="btnCancelSubmit" class="px-3 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button id="btnConfirmSubmit" class="px-3 py-2 text-sm rounded-lg bg-slate-900 text-white hover:bg-slate-800">Mark submitted</button>
+        </div>
+
+        <div id="submitError" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /******************************************************************
+     * 0) Default mock data (used if window.__PLAN_DATA__ not provided)
+     ******************************************************************/
+    window.__PLAN_DATA__ = window.__PLAN_DATA__ || {
+      "user": {
+        "user_id": "u_001",
+        "status": "employed",
+        "time_budget_hours_per_week": 6,
+        "constraints": ["remote_only", "limited_time"]
+      },
+      "plan": {
+        "plan_id": "plan_2026_02",
+        "generated_at": "2026-02-02T18:00:00-07:00",
+        "active_item_cap": 3,
+        "decision_scopes": [
+          {"scope_id": "cluster_frontend_nextjs", "label": "Senior Frontend (Next.js) roles"},
+          {"scope_id": "role_senior_fullstack", "label": "Senior Full Stack roles"}
+        ],
+        "top_blockers": [
+          {
+            "blocker_id": "b1",
+            "title": "Execution realism gap: Next.js production proof missing",
+            "market_view": "In this role cluster, Next.js is frequently listed and is used as a screening proxy. Without proof, confidence drops.",
+            "impacted_scopes": ["cluster_frontend_nextjs"],
+            "severity": "high",
+            "frequency": "high"
+          },
+          {
+            "blocker_id": "b2",
+            "title": "External legibility gap: achievements lack inspectable artifacts",
+            "market_view": "Hiring managers overweight inspectable proof (repo/deployment/write-up) when resumes are otherwise similar.",
+            "impacted_scopes": ["cluster_frontend_nextjs", "role_senior_fullstack"],
+            "severity": "medium",
+            "frequency": "high"
+          }
+        ],
+        "plan_items": [
+          {
+            "item_id": "pi_001",
+            "status": "active",
+            "gap": {
+              "gap_id": "g_nextjs_prod",
+              "label": "No production-grade Next.js evidence",
+              "type": "hard_gap"
+            },
+            "decision_scope_ids": ["cluster_frontend_nextjs"],
+            "rationale": "This gap is a frequent screen-out in this role cluster; it weakens confidence even when React strength is high.",
+            "action_hypothesis": "If I publish a small but production-realistic Next.js app with good engineering signals, decision confidence for Next.js roles increases.",
+            "time_bound": {"start": "2026-02-02", "end": "2026-02-23"},
+            "proof_criteria": [
+              "Public repo with README describing architecture and trade-offs",
+              "Live deployment link (Vercel/Render/etc.)",
+              "One short write-up explaining production concerns (perf, caching, routing, auth, DX)"
+            ],
+            "not_allowed": [
+              "Watching a Next.js course without artifacts",
+              "Toy tutorial app with no deployment or explanation"
+            ],
+            "proof_artifacts": []
+          },
+          {
+            "item_id": "pi_002",
+            "status": "active",
+            "gap": {
+              "gap_id": "g_legible_proof",
+              "label": "Proof is not externally legible",
+              "type": "ambiguous_gap"
+            },
+            "decision_scope_ids": ["cluster_frontend_nextjs", "role_senior_fullstack"],
+            "rationale": "Current evidence is hard for a hiring manager to verify quickly; reduces credibility.",
+            "action_hypothesis": "If I create a decision-grade proof pack (portfolio proof index), screening confidence improves across multiple roles.",
+            "time_bound": {"start": "2026-02-02", "end": "2026-02-16"},
+            "proof_criteria": [
+              "One 'Proof Index' page with links to 3 artifacts",
+              "Each artifact includes: what doubt it resolves + how to verify",
+              "Optional: 1 peer review comment or feedback snippet"
+            ],
+            "not_allowed": [
+              "Adding more bullet points without evidence",
+              "Collecting certificates as a substitute for inspectable proof"
+            ],
+            "proof_artifacts": [
+              {
+                "artifact_id": "a_001",
+                "type": "link",
+                "label": "Proof Index Draft",
+                "url": "https://example.com/proof-index",
+                "submitted_at": "2026-02-02T19:10:00-07:00",
+                "user_claim": "This reduces uncertainty about whether my work is verifiable quickly.",
+                "status": "submitted"
+              }
+            ]
+          },
+          {
+            "item_id": "pi_003",
+            "status": "queued",
+            "gap": {
+              "gap_id": "g_startup_signal",
+              "label": "Limited startup context signal",
+              "type": "market_misalignment"
+            },
+            "decision_scope_ids": ["role_senior_fullstack"],
+            "rationale": "Some startups prefer scrappy shipping signals; this may matter depending on target companies.",
+            "action_hypothesis": "If I show rapid, scoped delivery with clear trade-offs, startup fit uncertainty decreases.",
+            "time_bound": {"start": "2026-02-17", "end": "2026-03-02"},
+            "proof_criteria": [
+              "Short release log with scope decisions",
+              "Deployment + metrics screenshot (basic is fine)"
+            ],
+            "not_allowed": ["Open-ended 'build something' with no proof definition"],
+            "proof_artifacts": []
+          }
+        ],
+        "what_not_to_do_global": [
+          "Do not add more than 3 active plan items.",
+          "Do not chase tutorials unless the plan item explicitly justifies it as the best available proof path.",
+          "Do not create artifacts that a third party cannot verify quickly.",
+          "Do not continue repeating actions that yield inconclusive proof—recommend strategy shift instead."
+        ],
+        "feedback_loop_notes": [
+          "Accepted proof reduces gap severity and updates confidence bands in future Decision Briefs.",
+          "Inconclusive proof does not count as progress; it is recorded as information."
+        ]
+      }
+    };
+
+    /******************************************************************
+     * 1) Persistence (localStorage)
+     ******************************************************************/
+    const STORAGE_KEY = "derisk_plan_mvp_v1";
+    function loadStateOrDefault() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(window.__PLAN_DATA__);
+        const parsed = JSON.parse(raw);
+        // Basic safety: if plan_id differs, prefer new input but keep local artifacts if possible.
+        const incoming = structuredClone(window.__PLAN_DATA__);
+        if (parsed?.plan?.plan_id && incoming?.plan?.plan_id && parsed.plan.plan_id !== incoming.plan.plan_id) {
+          return incoming;
+        }
+        return parsed;
+      } catch (e) {
+        console.warn("Failed to load state; using default.", e);
+        return structuredClone(window.__PLAN_DATA__);
+      }
+    }
+
+    function saveState(state) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+      catch (e) { console.warn("Failed to save state.", e); }
+    }
+
+    function resetLocal() {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+
+    /******************************************************************
+     * 2) Utilities
+     ******************************************************************/
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (typeof text === "string") node.textContent = text;
+      return node;
+    }
+
+    function formatDateTime(iso) {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleString(undefined, { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+      } catch {
+        return iso;
+      }
+    }
+
+    function chip(text, tone) {
+      // tone: slate | high | med | low
+      let cls = "text-xs px-2 py-1 rounded-full border ";
+      if (tone === "high") cls += "bg-slate-900 text-white border-slate-900";
+      else if (tone === "med") cls += "bg-slate-100 text-slate-900 border-slate-200";
+      else if (tone === "low") cls += "bg-white text-slate-700 border-slate-200";
+      else cls += "bg-slate-50 text-slate-700 border-slate-200";
+      return el("span", cls, text);
+    }
+
+    function mapScopeLabels(state) {
+      const map = {};
+      (state.plan.decision_scopes || []).forEach(s => map[s.scope_id] = s.label);
+      return map;
+    }
+
+    function typeLabel(t) {
+      if (t === "hard_gap") return "hard gap";
+      if (t === "ambiguous_gap") return "ambiguous";
+      if (t === "market_misalignment") return "market";
+      return t || "gap";
+    }
+
+    function normalize(state) {
+      const plan = state.plan || {};
+      plan.active_item_cap = Number(plan.active_item_cap || 3);
+      plan.plan_items = Array.isArray(plan.plan_items) ? plan.plan_items : [];
+      plan.top_blockers = Array.isArray(plan.top_blockers) ? plan.top_blockers : [];
+      plan.what_not_to_do_global = Array.isArray(plan.what_not_to_do_global) ? plan.what_not_to_do_global : [];
+      plan.feedback_loop_notes = Array.isArray(plan.feedback_loop_notes) ? plan.feedback_loop_notes : [];
+      state.user = state.user || { status: "unknown", time_budget_hours_per_week: null };
+      return state;
+    }
+
+    /******************************************************************
+     * 3) Rendering
+     ******************************************************************/
+    let STATE = normalize(loadStateOrDefault());
+    const SCOPE_LABELS = () => mapScopeLabels(STATE);
+
+    function renderHeaderMeta() {
+      const elMeta = document.getElementById("planMetaCompact");
+      elMeta.textContent = `${STATE.plan.plan_id} • cap=${STATE.plan.active_item_cap}`;
+    }
+
+    function renderDecisionContext() {
+      document.getElementById("planId").textContent = STATE.plan.plan_id || "—";
+      document.getElementById("generatedAt").textContent = formatDateTime(STATE.plan.generated_at || "");
+      document.getElementById("activeCap").textContent = String(STATE.plan.active_item_cap || 3);
+      document.getElementById("activeCapInline").textContent = String(STATE.plan.active_item_cap || 3);
+
+      const scopesWrap = document.getElementById("decisionScopes");
+      scopesWrap.innerHTML = "";
+      (STATE.plan.decision_scopes || []).forEach(s => {
+        const c = chip(s.label, "low");
+        c.classList.add("mono");
+        scopesWrap.appendChild(c);
+      });
+    }
+
+    function renderFeasibility() {
+      const note = document.getElementById("feasibilityNote");
+      const u = STATE.user || {};
+      if (u.status === "employed" && Number(u.time_budget_hours_per_week || 0) < 8) note.classList.remove("hidden");
+      else note.classList.add("hidden");
+    }
+
+    function renderBlockers() {
+      const list = document.getElementById("blockersList");
+      list.innerHTML = "";
+
+      const blockers = (STATE.plan.top_blockers || []).slice(0, 3);
+
+      if (!blockers.length) {
+        list.appendChild(el("div", "text-sm text-slate-600", "No blockers available."));
+        return;
+      }
+
+      const scopeLabels = SCOPE_LABELS();
+
+      blockers.forEach((b, idx) => {
+        const card = el("div", "border border-slate-200 rounded-xl p-4");
+        const top = el("div", "flex items-start justify-between gap-3");
+        const left = el("div", "");
+        const title = el("div", "font-medium text-slate-900", `${idx + 1}. ${b.title}`);
+        const meta = el("div", "mt-2 flex flex-wrap items-center gap-2");
+
+        const sevTone = (b.severity === "high") ? "high" : (b.severity === "medium") ? "med" : "low";
+        meta.appendChild(chip(`severity: ${b.severity || "—"}`, sevTone));
+        meta.appendChild(chip(`frequency: ${b.frequency || "—"}`, "slate"));
+
+        (b.impacted_scopes || []).forEach(sid => {
+          meta.appendChild(chip(scopeLabels[sid] || sid, "low"));
+        });
+
+        left.appendChild(title);
+        left.appendChild(meta);
+
+        const right = el("div", "text-right");
+        const btn = el("button", "text-sm underline decoration-dotted text-slate-600 hover:text-slate-900", "Details");
+        btn.setAttribute("data-open", "false");
+
+        const details = el("div", "hidden mt-3 text-sm text-slate-700");
+        details.textContent = b.market_view || "";
+
+        btn.addEventListener("click", () => {
+          const open = btn.getAttribute("data-open") === "true";
+          btn.setAttribute("data-open", String(!open));
+          btn.textContent = open ? "Details" : "Hide";
+          details.classList.toggle("hidden", open);
+        });
+
+        right.appendChild(btn);
+
+        top.appendChild(left);
+        top.appendChild(right);
+
+        card.appendChild(top);
+        card.appendChild(details);
+
+        list.appendChild(card);
+      });
+    }
+
+    function renderActiveItems() {
+      const wrap = document.getElementById("activeItems");
+      const empty = document.getElementById("noActiveItems");
+      wrap.innerHTML = "";
+
+      const cap = Number(STATE.plan.active_item_cap || 3);
+      const items = (STATE.plan.plan_items || []).filter(i => i.status === "active").slice(0, cap);
+
+      if (!items.length) {
+        empty.classList.remove("hidden");
+        return;
+      }
+      empty.classList.add("hidden");
+
+      items.forEach(item => wrap.appendChild(renderPlanItemCard(item)));
+      renderStrategyShiftCallouts(); // after rendering (so we can attach callouts if needed)
+    }
+
+    function renderQueuedItems(expanded) {
+      const wrap = document.getElementById("queuedItems");
+      const empty = document.getElementById("noQueuedItems");
+      wrap.innerHTML = "";
+
+      const queued = (STATE.plan.plan_items || []).filter(i => i.status === "queued");
+
+      if (!queued.length) {
+        empty.classList.remove("hidden");
+      } else {
+        empty.classList.add("hidden");
+        queued.forEach(item => wrap.appendChild(renderQueuedItemRow(item)));
+      }
+
+      wrap.classList.toggle("hidden", !expanded);
+      document.getElementById("btnToggleQueued").textContent = expanded ? "Collapse" : "Expand";
+    }
+
+    function renderWhatNotToDo() {
+      const ul = document.getElementById("whatNotToDo");
+      ul.innerHTML = "";
+      (STATE.plan.what_not_to_do_global || []).forEach(t => {
+        const li = el("li", "", t);
+        ul.appendChild(li);
+      });
+    }
+
+    function renderFeedbackNotes() {
+      const ul = document.getElementById("feedbackNotes");
+      ul.innerHTML = "";
+      (STATE.plan.feedback_loop_notes || []).forEach(t => {
+        ul.appendChild(el("li", "", t));
+      });
+    }
+
+    function renderPlanItemCard(item) {
+      const scopeLabels = SCOPE_LABELS();
+
+      const card = el("div", "border border-slate-200 rounded-xl p-4 bg-white");
+      card.id = `item_${item.item_id}`;
+
+      // Header row
+      const head = el("div", "flex items-start justify-between gap-4");
+      const left = el("div", "min-w-0");
+      const title = el("div", "flex flex-wrap items-center gap-2");
+      title.appendChild(el("div", "font-semibold text-slate-900", item.gap?.label || "Plan item"));
+
+      title.appendChild(chip(typeLabel(item.gap?.type), "low"));
+
+      const scopes = el("div", "mt-2 flex flex-wrap gap-2");
+      (item.decision_scope_ids || []).forEach(sid => scopes.appendChild(chip(scopeLabels[sid] || sid, "slate")));
+
+      left.appendChild(title);
+      left.appendChild(scopes);
+
+      const right = el("div", "text-right shrink-0");
+      right.appendChild(el("div", "text-xs text-slate-500 mono", "time_bound"));
+      right.appendChild(el("div", "text-sm text-slate-700 mono", `${item.time_bound?.start || "—"} → ${item.time_bound?.end || "—"}`));
+
+      head.appendChild(left);
+      head.appendChild(right);
+
+      // Body
+      const body = el("div", "mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4");
+
+      // Rationale
+      const rationale = el("div", "border border-slate-200 rounded-lg p-3");
+      rationale.appendChild(el("div", "text-xs text-slate-500 mono", "rationale"));
+      rationale.appendChild(el("div", "mt-1 text-sm text-slate-800 line-clamp-3", item.rationale || "—"));
+
+      // Hypothesis
+      const hypothesis = el("div", "border border-slate-200 rounded-lg p-3");
+      hypothesis.appendChild(el("div", "text-xs text-slate-500 mono", "action_hypothesis"));
+      hypothesis.appendChild(el("div", "mt-1 text-sm text-slate-800 line-clamp-3", item.action_hypothesis || "—"));
+
+      // Proof Criteria
+      const proof = el("div", "border border-slate-200 rounded-lg p-3");
+      proof.appendChild(el("div", "text-xs text-slate-500 mono", "proof_criteria"));
+      const ul = el("ul", "mt-2 text-sm text-slate-800 list-disc pl-5 space-y-1");
+      (item.proof_criteria || []).forEach(p => ul.appendChild(el("li", "", p)));
+      proof.appendChild(ul);
+
+      body.appendChild(rationale);
+      body.appendChild(hypothesis);
+      body.appendChild(proof);
+
+      // Proof Artifacts section
+      const artifacts = el("div", "mt-4 border border-slate-200 rounded-lg p-3");
+      const artifactsTop = el("div", "flex items-start justify-between gap-4");
+      const artifactsLeft = el("div", "");
+      artifactsLeft.appendChild(el("div", "text-xs text-slate-500 mono", "proof_artifacts"));
+      artifactsLeft.appendChild(el("div", "mt-1 text-sm text-slate-600", "Attach inspectable proof. Keep claims short and test-like."));
+
+      const artifactsRight = el("div", "flex items-center gap-2");
+      const btnAttach = el("button", "px-3 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50", "Attach proof");
+      btnAttach.addEventListener("click", () => openAttachModal(item.item_id));
+
+      const btnSubmit = el("button", "px-3 py-2 text-sm rounded-lg bg-slate-900 text-white hover:bg-slate-800", "Mark submitted");
+      btnSubmit.addEventListener("click", () => openSubmitModal(item.item_id));
+
+      artifactsRight.appendChild(btnAttach);
+      artifactsRight.appendChild(btnSubmit);
+
+      artifactsTop.appendChild(artifactsLeft);
+      artifactsTop.appendChild(artifactsRight);
+
+      const artifactsList = el("div", "mt-3 space-y-2");
+      const arts = Array.isArray(item.proof_artifacts) ? item.proof_artifacts : [];
+      if (!arts.length) {
+        artifactsList.appendChild(el("div", "text-sm text-slate-600", "No proof attached yet."));
+      } else {
+        arts.forEach(a => artifactsList.appendChild(renderArtifactRow(item.item_id, a)));
+      }
+
+      // "Not allowed" section (compact, optional expansion)
+      const notAllowedWrap = el("div", "mt-4");
+      const notAllowedBtn = el("button", "text-sm underline decoration-dotted text-slate-600 hover:text-slate-900", "What NOT to do for this item");
+      notAllowedBtn.setAttribute("data-open", "false");
+      const notAllowedBox = el("div", "hidden mt-2 border border-slate-200 rounded-lg p-3 bg-slate-50");
+      const na = el("ul", "text-sm text-slate-800 list-disc pl-5 space-y-1");
+      (item.not_allowed || []).forEach(t => na.appendChild(el("li", "", t)));
+      notAllowedBox.appendChild(na);
+
+      notAllowedBtn.addEventListener("click", () => {
+        const open = notAllowedBtn.getAttribute("data-open") === "true";
+        notAllowedBtn.setAttribute("data-open", String(!open));
+        notAllowedBtn.textContent = open ? "What NOT to do for this item" : "Hide";
+        notAllowedBox.classList.toggle("hidden", open);
+      });
+
+      notAllowedWrap.appendChild(notAllowedBtn);
+      notAllowedWrap.appendChild(notAllowedBox);
+
+      // Strategy shift callout placeholder (injected if needed)
+      const shift = el("div", "hidden mt-4 border border-slate-200 rounded-lg p-3 bg-white");
+      shift.id = `shift_${item.item_id}`;
+
+      artifacts.appendChild(artifactsTop);
+      artifacts.appendChild(artifactsList);
+
+      card.appendChild(head);
+      card.appendChild(body);
+      card.appendChild(artifacts);
+      card.appendChild(notAllowedWrap);
+      card.appendChild(shift);
+
+      return card;
+    }
+
+    function renderQueuedItemRow(item) {
+      const scopeLabels = SCOPE_LABELS();
+
+      const row = el("div", "border border-slate-200 rounded-xl p-4");
+      const top = el("div", "flex items-start justify-between gap-4");
+      const left = el("div", "min-w-0");
+      left.appendChild(el("div", "font-medium text-slate-900", item.gap?.label || item.item_id));
+      const meta = el("div", "mt-2 flex flex-wrap gap-2");
+      meta.appendChild(chip(typeLabel(item.gap?.type), "low"));
+      (item.decision_scope_ids || []).forEach(sid => meta.appendChild(chip(scopeLabels[sid] || sid, "slate")));
+      left.appendChild(meta);
+
+      const right = el("div", "text-right");
+      const btn = el("button", "text-sm underline decoration-dotted text-slate-600 hover:text-slate-900", "Details");
+      btn.setAttribute("data-open", "false");
+
+      const details = el("div", "hidden mt-3 text-sm text-slate-700");
+      details.innerHTML = `
+        <div class="mono text-xs text-slate-500">time_bound</div>
+        <div class="mono text-sm text-slate-700">${item.time_bound?.start || "—"} → ${item.time_bound?.end || "—"}</div>
+        <div class="mt-2 mono text-xs text-slate-500">rationale</div>
+        <div class="text-sm text-slate-800">${escapeHtml(item.rationale || "—")}</div>
+        <div class="mt-2 mono text-xs text-slate-500">action_hypothesis</div>
+        <div class="text-sm text-slate-800">${escapeHtml(item.action_hypothesis || "—")}</div>
+      `;
+
+      btn.addEventListener("click", () => {
+        const open = btn.getAttribute("data-open") === "true";
+        btn.setAttribute("data-open", String(!open));
+        btn.textContent = open ? "Details" : "Hide";
+        details.classList.toggle("hidden", open);
+      });
+
+      right.appendChild(btn);
+      top.appendChild(left);
+      top.appendChild(right);
+
+      row.appendChild(top);
+      row.appendChild(details);
+
+      return row;
+    }
+
+    function renderArtifactRow(itemId, artifact) {
+      const row = el("div", "border border-slate-200 rounded-lg p-3 bg-white");
+      const top = el("div", "flex items-start justify-between gap-4");
+      const left = el("div", "min-w-0");
+      const label = el("div", "text-sm font-medium text-slate-900", artifact.label || artifact.url || "Artifact");
+      const claim = el("div", "mt-1 text-sm text-slate-700 line-clamp-2", artifact.user_claim || "—");
+
+      const link = el("a", "mt-2 inline-block text-sm underline decoration-dotted text-slate-700 hover:text-slate-900", "Open link");
+      link.href = artifact.url || "#";
+      link.target = "_blank";
+      link.rel = "noreferrer";
+
+      left.appendChild(label);
+      left.appendChild(claim);
+      left.appendChild(link);
+
+      const right = el("div", "text-right shrink-0");
+      right.appendChild(chip(artifact.status || "draft", artifact.status === "submitted" ? "med" : "low"));
+      right.appendChild(el("div", "mt-1 text-xs text-slate-500 mono", artifact.submitted_at ? formatDateTime(artifact.submitted_at) : "—"));
+
+      // Tiny remove button (MVP)
+      const btnRemove = el("button", "mt-2 text-xs underline decoration-dotted text-slate-500 hover:text-slate-800", "remove");
+      btnRemove.addEventListener("click", () => {
+        removeArtifact(itemId, artifact.artifact_id);
+      });
+      right.appendChild(btnRemove);
+
+      top.appendChild(left);
+      top.appendChild(right);
+      row.appendChild(top);
+
+      return row;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    /******************************************************************
+     * 4) Event Handlers: Modal state + mutations
+     ******************************************************************/
+    let MODAL_ITEM_ID = null;
+
+    function openAttachModal(itemId) {
+      MODAL_ITEM_ID = itemId;
+      const item = findItem(itemId);
+      document.getElementById("modalTitle").textContent = `Attach proof`;
+      document.getElementById("modalSubtitle").textContent = item?.gap?.label || itemId;
+
+      // Clear fields
+      document.getElementById("proofLabel").value = "";
+      document.getElementById("proofUrl").value = "";
+      document.getElementById("proofClaim").value = "";
+      document.getElementById("proofNotes").value = "";
+      document.getElementById("proofStatusSubmitted").checked = false;
+      hideModalError();
+
+      showModal("modalAttachProof", "modalBackdrop");
+    }
+
+    function closeAttachModal() {
+      MODAL_ITEM_ID = null;
+      hideModal("modalAttachProof", "modalBackdrop");
+    }
+
+    function hideModalError() {
+      const e = document.getElementById("modalError");
+      e.classList.add("hidden");
+      e.textContent = "";
+    }
+
+    function showModalError(msg) {
+      const e = document.getElementById("modalError");
+      e.classList.remove("hidden");
+      e.textContent = msg;
+    }
+
+    function saveProofFromModal() {
+      const itemId = MODAL_ITEM_ID;
+      const label = document.getElementById("proofLabel").value.trim();
+      const url = document.getElementById("proofUrl").value.trim();
+      const claim = document.getElementById("proofClaim").value.trim();
+      const notes = document.getElementById("proofNotes").value.trim();
+      const submitted = document.getElementById("proofStatusSubmitted").checked;
+
+      if (!label) return showModalError("Label is required.");
+      if (!url || !isLikelyUrl(url)) return showModalError("A valid URL is required (must start with http:// or https://).");
+      if (!claim) return showModalError("Claim is required: which uncertainty does this reduce? Keep it one sentence.");
+
+      const item = findItem(itemId);
+      if (!item) return showModalError("Item not found.");
+
+      const now = new Date().toISOString();
+      const artifact = {
+        artifact_id: `a_${Math.random().toString(16).slice(2)}_${Date.now()}`,
+        type: "link",
+        label,
+        url,
+        submitted_at: submitted ? now : null,
+        user_claim: claim,
+        status: submitted ? "submitted" : "draft",
+        notes: notes || null
+      };
+
+      item.proof_artifacts = Array.isArray(item.proof_artifacts) ? item.proof_artifacts : [];
+      item.proof_artifacts.unshift(artifact);
+
+      saveState(STATE);
+      rerender();
+
+      closeAttachModal();
+    }
+
+    function isLikelyUrl(s) {
+      return /^https?:\/\/.+/i.test(s);
+    }
+
+    function removeArtifact(itemId, artifactId) {
+      const item = findItem(itemId);
+      if (!item || !Array.isArray(item.proof_artifacts)) return;
+      item.proof_artifacts = item.proof_artifacts.filter(a => a.artifact_id !== artifactId);
+      saveState(STATE);
+      rerender();
+    }
+
+    // Submit modal (requires uncertainty statement)
+    let SUBMIT_ITEM_ID = null;
+
+    function openSubmitModal(itemId) {
+      SUBMIT_ITEM_ID = itemId;
+      const item = findItem(itemId);
+      document.getElementById("submitSubtitle").textContent = item?.gap?.label || itemId;
+      document.getElementById("submitUncertainty").value = "";
+      hideSubmitError();
+      showModal("modalSubmit", "modalSubmitBackdrop");
+    }
+
+    function closeSubmitModal() {
+      SUBMIT_ITEM_ID = null;
+      hideModal("modalSubmit", "modalSubmitBackdrop");
+    }
+
+    function hideSubmitError() {
+      const e = document.getElementById("submitError");
+      e.classList.add("hidden");
+      e.textContent = "";
+    }
+
+    function showSubmitError(msg) {
+      const e = document.getElementById("submitError");
+      e.classList.remove("hidden");
+      e.textContent = msg;
+    }
+
+    function confirmSubmit() {
+      const itemId = SUBMIT_ITEM_ID;
+      const statement = document.getElementById("submitUncertainty").value.trim();
+      if (!statement) return showSubmitError("Required: describe which uncertainty is reduced (one short sentence).");
+
+      const item = findItem(itemId);
+      if (!item) return showSubmitError("Item not found.");
+
+      // MVP: we don't "complete" items automatically; we record a submission event.
+      // We store it as a lightweight entry to detect repeated inconclusive submissions later.
+      item.submissions = Array.isArray(item.submissions) ? item.submissions : [];
+      item.submissions.unshift({
+        submitted_at: new Date().toISOString(),
+        uncertainty_reduced: statement,
+        outcome: "pending_review" // can be accepted | partial | inconclusive
+      });
+
+      saveState(STATE);
+      rerender();
+      closeSubmitModal();
+    }
+
+    function findItem(itemId) {
+      return (STATE.plan.plan_items || []).find(i => i.item_id === itemId) || null;
+    }
+
+    /******************************************************************
+     * 5) Strategy shift callout logic
+     * If >=2 inconclusive outcomes recorded for same item, show callout.
+     ******************************************************************/
+    function renderStrategyShiftCallouts() {
+      const items = (STATE.plan.plan_items || []).filter(i => i.status === "active");
+      items.forEach(item => {
+        const shift = document.getElementById(`shift_${item.item_id}`);
+        if (!shift) return;
+
+        const subs = Array.isArray(item.submissions) ? item.submissions : [];
+        const inconclusiveCount = subs.filter(s => s.outcome === "inconclusive").length;
+
+        if (inconclusiveCount >= 2) {
+          shift.classList.remove("hidden");
+          shift.innerHTML = `
+            <div class="flex items-start gap-3">
+              <div class="mt-1 h-2.5 w-2.5 rounded-full bg-slate-400"></div>
+              <div>
+                <div class="font-medium text-slate-900">Recommend strategy shift</div>
+                <p class="mt-1 text-sm text-slate-600">
+                  This item has produced <span class="mono text-slate-700">${inconclusiveCount}</span> inconclusive submissions.
+                  Further effort here may have diminishing decision impact. Consider changing role cluster strategy or reframing proof.
+                </p>
+              </div>
+            </div>
+          `;
+        } else {
+          shift.classList.add("hidden");
+          shift.innerHTML = "";
+        }
+      });
+    }
+
+    /******************************************************************
+     * 6) Simple “review” controls (MVP)
+     * For testing the strategy-shift rule, allow toggling outcomes in-place
+     * without adding new UI sections. Keep it subtle.
+     ******************************************************************/
+    function attachInlineOutcomeControls() {
+      // Minimal: each active item gets a tiny "Set last outcome" dropdown if submissions exist.
+      const active = (STATE.plan.plan_items || []).filter(i => i.status === "active").slice(0, Number(STATE.plan.active_item_cap || 3));
+      active.forEach(item => {
+        const card = document.getElementById(`item_${item.item_id}`);
+        if (!card) return;
+
+        const subs = Array.isArray(item.submissions) ? item.submissions : [];
+        if (!subs.length) return;
+
+        // Prevent duplicate injection
+        if (card.querySelector(`[data-outcome-controls="${item.item_id}"]`)) return;
+
+        const controls = el("div", "mt-4 text-xs text-slate-500 flex flex-wrap items-center gap-2");
+        controls.setAttribute("data-outcome-controls", item.item_id);
+
+        controls.appendChild(el("span", "mono", "last_submission_outcome:"));
+
+        const sel = el("select", "text-xs rounded-md border border-slate-300 bg-white px-2 py-1 text-slate-700");
+        ["pending_review", "accepted", "partial", "inconclusive"].forEach(v => {
+          const opt = el("option", "", v);
+          opt.value = v;
+          sel.appendChild(opt);
+        });
+        sel.value = subs[0].outcome || "pending_review";
+        sel.addEventListener("change", () => {
+          subs[0].outcome = sel.value;
+          item.submissions = subs;
+          saveState(STATE);
+          rerender();
+        });
+
+        controls.appendChild(sel);
+
+        const hint = el("span", "ml-1", "(MVP: helps calibrate & trigger strategy-shift rule)");
+        controls.appendChild(hint);
+
+        card.appendChild(controls);
+      });
+    }
+
+    /******************************************************************
+     * 7) Modal show/hide
+     ******************************************************************/
+    function showModal(modalId, backdropId) {
+      document.getElementById(backdropId).classList.remove("hidden");
+      document.getElementById(modalId).classList.remove("hidden");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function hideModal(modalId, backdropId) {
+      document.getElementById(backdropId).classList.add("hidden");
+      document.getElementById(modalId).classList.add("hidden");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    /******************************************************************
+     * 8) Wiring & rerender
+     ******************************************************************/
+    let queuedExpanded = false;
+
+    function rerender() {
+      STATE = normalize(STATE);
+      renderHeaderMeta();
+      renderFeasibility();
+      renderDecisionContext();
+      renderBlockers();
+      renderActiveItems();
+      renderQueuedItems(queuedExpanded);
+      renderWhatNotToDo();
+      renderFeedbackNotes();
+      attachInlineOutcomeControls();
+    }
+
+    // Buttons
+    document.getElementById("btnResetLocal").addEventListener("click", resetLocal);
+
+    document.getElementById("btnToggleQueued").addEventListener("click", () => {
+      queuedExpanded = !queuedExpanded;
+      renderQueuedItems(queuedExpanded);
+    });
+
+    // Attach proof modal events
+    document.getElementById("btnCloseModal").addEventListener("click", closeAttachModal);
+    document.getElementById("btnCancelModal").addEventListener("click", closeAttachModal);
+    document.getElementById("btnSaveProof").addEventListener("click", saveProofFromModal);
+    document.getElementById("modalBackdrop").addEventListener("click", closeAttachModal);
+
+    // Submit modal events
+    document.getElementById("btnCloseSubmitModal").addEventListener("click", closeSubmitModal);
+    document.getElementById("btnCancelSubmit").addEventListener("click", closeSubmitModal);
+    document.getElementById("btnConfirmSubmit").addEventListener("click", confirmSubmit);
+    document.getElementById("modalSubmitBackdrop").addEventListener("click", closeSubmitModal);
+
+    // Initial render
+    rerender();
+  </script>
+</body>
+</html>

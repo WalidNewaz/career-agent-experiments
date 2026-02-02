@@ -2,805 +2,3231 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ClarityBrief — Resume results</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ClarityBrief — Resume Analysis</title>
   <style>
+    /* ====== Modern SaaS-ish baseline (no external CSS) ====== */
     :root{
-      --bg:#0b1220;
-      --panel:#0f1a2e;
-      --panel2:#0c172b;
-      --stroke:rgba(255,255,255,.10);
-      --stroke2:rgba(255,255,255,.14);
-      --text:#e8eefc;
-      --muted:rgba(232,238,252,.72);
-      --muted2:rgba(232,238,252,.58);
-      --brand:#6ee7ff;
-      --brand2:#a78bfa;
-      --good:#34d399;
-      --warn:#fbbf24;
-      --bad:#fb7185;
-      --shadow: 0 18px 50px rgba(0,0,0,.35);
-      --radius: 16px;
-      --radius2: 22px;
-      --max: 1100px;
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.55);
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 14px;
+
+      --ok: #57d38c;
+      --warn: #f7c843;
+      --bad: #ff6b7a;
+
+      --accent: #7c8cff;
+      --accent2: #6ee7ff;
+      --chip: rgba(255,255,255,.10);
+
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family:var(--sans);
-      color:var(--text);
+      font-family: var(--sans);
+      color: var(--text);
       background:
-        radial-gradient(1200px 700px at 20% 0%, rgba(110,231,255,.18), transparent 55%),
-        radial-gradient(900px 700px at 90% 10%, rgba(167,139,250,.14), transparent 55%),
-        radial-gradient(900px 700px at 50% 100%, rgba(52,211,153,.08), transparent 60%),
-        linear-gradient(180deg, #070c16, #0b1220 55%, #070c16);
+        radial-gradient(1200px 800px at 10% -10%, rgba(124,140,255,.28), transparent 60%),
+        radial-gradient(900px 700px at 100% 0%, rgba(110,231,255,.16), transparent 55%),
+        radial-gradient(900px 600px at 40% 120%, rgba(87,211,140,.10), transparent 60%),
+        linear-gradient(180deg, #070a14 0%, var(--bg) 55%, #070a14 100%);
+      overflow-x:hidden;
     }
-    a{color:inherit; text-decoration:none}
-    .wrap{max-width:var(--max); margin:0 auto; padding: 22px 18px 64px}
 
-    /* Topbar */
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:1160px; margin:0 auto; padding: 18px 18px 60px}
     .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 14px 14px;
-      border: 1px solid var(--stroke);
-      background: rgba(15,26,46,.55);
+      position: sticky;
+      top: 0;
+      z-index: 20;
       backdrop-filter: blur(10px);
-      border-radius: var(--radius2);
-      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+      -webkit-backdrop-filter: blur(10px);
+      background: rgba(7,10,20,.55);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .brand{
-      display:flex; align-items:center; gap:10px; font-weight:750; letter-spacing:.2px;
+    .topbar .inner{
+      max-width:1160px; margin:0 auto;
+      padding: 12px 18px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:650; letter-spacing:.2px;}
     .logo{
-      width:34px; height:34px; border-radius: 12px;
-      background: linear-gradient(135deg, rgba(110,231,255,.95), rgba(167,139,250,.9));
-      box-shadow: 0 10px 25px rgba(110,231,255,.12);
-      position:relative;
-    }
-    .logo:after{
-      content:"";
-      position:absolute; inset:9px;
-      border-radius: 10px;
-      background: rgba(11,18,32,.70);
+      width:34px; height:34px; border-radius: 11px;
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(255,255,255,.85), rgba(255,255,255,.10)),
+        linear-gradient(135deg, rgba(124,140,255,.95), rgba(110,231,255,.7));
+      box-shadow: 0 12px 30px rgba(124,140,255,.18);
       border: 1px solid rgba(255,255,255,.18);
     }
-    .nav{
-      display:flex; align-items:center; gap:10px;
-      font-size: 14px;
-      color: var(--muted);
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
+    .nav{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
     .pill{
-      padding: 6px 10px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      font-size: 12px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
       color: var(--muted);
+      font-size: 12px;
       white-space:nowrap;
     }
+    .pill .dot{width:7px; height:7px; border-radius:50%; background: var(--ok); box-shadow:0 0 0 3px rgba(87,211,140,.12)}
     .link{
-      color: rgba(232,238,252,.85);
-      text-decoration: underline;
-      text-underline-offset: 2px;
+      padding: 8px 10px;
+      border-radius: 10px;
       font-size: 13px;
+      color: var(--muted);
+      border: 1px solid transparent;
+    }
+    .link:hover{background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.08); color: rgba(255,255,255,.86)}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.55fr .95fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr; }
     }
 
-    /* Onboarding strip */
-    .strip{
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: var(--radius2);
-      border: 1px solid var(--stroke);
-      background: rgba(15,26,46,.42);
-      backdrop-filter: blur(10px);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .pageHead{
+      margin: 26px 0 14px;
+      display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;
     }
-    .steps{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
+    .h1{
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin:0;
+      font-weight: 760;
+    }
+    .subhead{
+      margin-top: 6px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 14px;
+      max-width: 70ch;
     }
-    .step{
-      display:inline-flex; align-items:center; gap:8px;
+
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.90);
+      font-weight: 650;
+      font-size: 13px;
+      cursor:pointer;
+      box-shadow: 0 10px 26px rgba(0,0,0,.22);
+    }
+    .btn:hover{background: rgba(255,255,255,.08)}
+    .btn.primary{
+      border-color: rgba(124,140,255,.35);
+      background: linear-gradient(135deg, rgba(124,140,255,.95), rgba(110,231,255,.72));
+      color: #0b1020;
+      box-shadow: 0 12px 40px rgba(124,140,255,.22);
+    }
+    .btn.ghost{
+      background: transparent;
+      border-color: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+      box-shadow: none;
+    }
+    .btn.small{padding: 9px 12px; border-radius: 12px; font-weight: 640}
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding: 14px;
+    }
+    .cardHeader{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      margin-bottom: 10px;
+    }
+    .cardTitle{
+      font-weight: 720;
+      letter-spacing: .2px;
+      margin:0;
+      font-size: 14px;
+    }
+    .cardKicker{
+      color: var(--muted2);
+      font-size: 12px;
+      margin-top: 5px;
+      line-height: 1.35;
+    }
+    .divider{
+      height:1px; background: rgba(255,255,255,.09);
+      margin: 12px 0;
+    }
+
+    .scoreRow{
+      display:grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+    @media (max-width: 720px){
+      .scoreRow{grid-template-columns: 1fr;}
+    }
+
+    .scoreBig{
+      padding: 16px;
+      border-radius: 18px;
+      background:
+        radial-gradient(500px 260px at 20% 0%, rgba(124,140,255,.30), transparent 60%),
+        radial-gradient(420px 240px at 100% 10%, rgba(110,231,255,.18), transparent 60%),
+        rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+      min-height: 160px;
+    }
+    .scoreBig .label{font-size:12px; color: rgba(255,255,255,.72)}
+    .scoreBig .value{
+      display:flex; align-items:baseline; gap:10px;
+      margin-top: 10px;
+    }
+    .scoreBig .num{
+      font-size: 46px;
+      font-weight: 820;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .scoreBig .badge{
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.86);
+      white-space:nowrap;
+    }
+    .meter{
+      margin-top: 12px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .meter > div{
+      height:100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(124,140,255,.95), rgba(110,231,255,.75));
+      transition: width .6s ease;
+    }
+    .scoreBig .meta{
+      margin-top: 10px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .meta .kv{
       padding: 7px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-    }
-    .step .n{
-      width:18px; height:18px; border-radius: 7px;
-      display:flex; align-items:center; justify-content:center;
-      font-family: var(--mono);
-      font-size: 11px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
-      color: rgba(232,238,252,.85);
-    }
-    .step.active{
-      border-color: rgba(110,231,255,.35);
-      background: rgba(110,231,255,.08);
-      color: rgba(232,238,252,.92);
-    }
-    .step.active .n{
-      border-color: rgba(110,231,255,.45);
-      background: rgba(110,231,255,.14);
-    }
-    .eta{
-      color: var(--muted2);
-      font-size: 13px;
+      background: rgba(255,255,255,.06);
     }
 
-    /* Sections */
-    .grid{
-      margin-top: 16px;
-      display:grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns: 1fr}
-    }
-    .panel{
-      background: rgba(15,26,46,.55);
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      padding: 20px;
-      backdrop-filter: blur(10px);
-    }
-    h1{
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: -0.3px;
-    }
-    .sub{
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-      max-width: 78ch;
-    }
-
-    /* Summary header */
-    .summaryTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-    .readiness{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 16px;
+    .subscores{
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.05);
       border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      min-width: 260px;
-    }
-    .badge{
-      width: 34px; height: 34px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
       display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family: var(--mono);
-      font-weight: 900;
-      color: rgba(232,238,252,.88);
-      flex: 0 0 auto;
-    }
-    .badge.good{border-color: rgba(52,211,153,.45); background: rgba(52,211,153,.12)}
-    .badge.fair{border-color: rgba(251,191,36,.40); background: rgba(251,191,36,.10)}
-    .badge.poor{border-color: rgba(251,113,133,.40); background: rgba(251,113,133,.10)}
-    .readiness .k{font-size: 12px; color: var(--muted2)}
-    .readiness .v{font-size: 14px; font-weight: 900}
-
-    .meters{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
+      flex-direction:column;
       gap: 10px;
-      min-width: 320px;
-      flex: 1;
+      min-height: 160px;
     }
-    @media (max-width: 520px){
-      .meters{grid-template-columns: 1fr; min-width: unset; width:100%}
+    .subscore{
+      display:flex; align-items:center; justify-content:space-between; gap: 12px;
     }
-    .meter{
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-    }
-    .meter .top{
-      display:flex; justify-content:space-between; align-items:baseline; gap:10px;
-    }
-    .meter .label{font-weight: 850; font-size: 13px}
-    .meter .val{font-family: var(--mono); color: rgba(232,238,252,.86); font-size: 12px}
-    .bar{
-      margin-top: 10px;
-      height: 10px;
+    .subscore .name{color: rgba(255,255,255,.78); font-size: 12px}
+    .subscore .bar{
+      flex:1;
+      height: 8px;
       border-radius: 999px;
+      background: rgba(255,255,255,.10);
       border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
       overflow:hidden;
     }
-    .bar > i{
-      display:block;
+    .subscore .bar > div{
       height:100%;
-      width: 0%;
-      background: linear-gradient(90deg, rgba(110,231,255,.85), rgba(167,139,250,.75));
-      transition: width .4s ease;
+      width:0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(87,211,140,.95), rgba(110,231,255,.65));
+      transition: width .6s ease;
     }
-    .meter .hint{
-      margin-top: 8px;
-      color: var(--muted2);
+    .subscore .val{
+      width: 36px;
+      text-align:right;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+      font-family: var(--mono);
+      color: rgba(255,255,255,.82);
       font-size: 12px;
-      line-height: 1.45;
     }
 
-    /* Sections list */
-    .sectionTitle{
-      margin: 0;
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: .2px;
-      text-transform: uppercase;
-      color: rgba(232,238,252,.82);
-    }
-    .sectionCard{
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: var(--radius2);
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-    }
-    .items{
-      margin-top: 10px;
+    .insightGrid{
       display:grid;
-      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
+    @media (max-width: 720px){ .insightGrid{grid-template-columns: 1fr;} }
+
+    .callout{
+      border-radius: 16px;
+      padding: 12px 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+    }
+    .callout h4{margin:0 0 6px; font-size: 13px; letter-spacing:.2px}
+    .callout p{margin:0; color: var(--muted); font-size: 12px; line-height: 1.45}
+
+    .list{display:flex; flex-direction:column; gap: 10px;}
     .item{
       padding: 12px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.02);
+      background: rgba(255,255,255,.05);
     }
-    .itemTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .itemText{
-      font-size: 13px;
-      line-height: 1.5;
-      color: rgba(232,238,252,.90);
-      font-weight: 750;
-    }
+    .itemTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+    .itemTitle{font-weight:720; font-size: 13px; margin:0}
+    .itemDesc{margin:6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px}
     .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 6px 9px;
+      display:inline-flex; align-items:center; gap:7px;
+      font-size: 12px;
+      padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-      flex: 0 0 auto;
-    }
-    .dot{
-      width:8px; height:8px; border-radius:999px;
-      background: var(--brand);
-      box-shadow: 0 0 0 4px rgba(110,231,255,.10);
-    }
-    .dot.high{background: var(--good); box-shadow:0 0 0 4px rgba(52,211,153,.10)}
-    .dot.medium{background: var(--warn); box-shadow:0 0 0 4px rgba(251,191,36,.10)}
-    .dot.low{background: var(--bad); box-shadow:0 0 0 4px rgba(251,113,133,.10)}
-
-    details{
-      margin-top: 8px;
-      border-radius: 14px;
       border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.02);
-      overflow:hidden;
-    }
-    summary{
-      cursor:pointer;
-      padding: 10px 10px;
-      list-style:none;
-      font-weight: 850;
-      color: rgba(232,238,252,.86);
-      font-size: 12px;
-    }
-    summary::-webkit-details-marker{display:none}
-    .detailsBody{
-      padding: 0 10px 10px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    /* Right rail */
-    .railCard{
-      padding: 16px;
-      border-radius: var(--radius2);
-      border: 1px solid rgba(255,255,255,.10);
-      background:
-        radial-gradient(900px 400px at 15% 0%, rgba(110,231,255,.10), transparent 55%),
-        radial-gradient(700px 450px at 90% 10%, rgba(167,139,250,.10), transparent 55%),
-        rgba(12,23,43,.62);
-    }
-    .railCard h2{
-      margin:0;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: .25px;
-      color: rgba(232,238,252,.84);
-      font-weight: 900;
-    }
-    .railCard p{
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .list{
-      margin: 12px 0 0;
-      padding: 0;
-      list-style:none;
-      display:grid;
-      gap: 10px;
-    }
-    .li{
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      display:flex;
-      gap: 10px;
-      align-items:flex-start;
-    }
-    .num{
-      width: 24px; height: 24px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.04);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family: var(--mono);
-      font-weight: 900;
-      font-size: 12px;
-      color: rgba(232,238,252,.86);
-      flex: 0 0 auto;
-      margin-top: 1px;
-    }
-    .li b{display:block; font-size: 13px}
-    .li span{display:block; margin-top: 2px; font-size: 12px; color: var(--muted); line-height: 1.45}
-
-    .ctaRow{
-      margin-top: 12px;
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      gap:10px;
-      padding: 11px 14px;
-      border-radius: 14px;
-      border: 1px solid var(--stroke2);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-weight: 800;
-      cursor:pointer;
-      transition: .15s ease;
-      user-select:none;
+      background: var(--chip);
+      color: rgba(255,255,255,.78);
       white-space:nowrap;
     }
-    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06)}
-    .btn:active{transform: translateY(0px)}
-    .btn.primary{
-      border-color: rgba(110,231,255,.35);
-      background: linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.18));
-      box-shadow: 0 14px 40px rgba(110,231,255,.10);
-    }
-    .btn.primary:hover{
-      border-color: rgba(110,231,255,.50);
-      box-shadow: 0 14px 45px rgba(110,231,255,.14);
+    .chip strong{font-weight:720; color: rgba(255,255,255,.88)}
+    .chip.imp.high{border-color: rgba(255,107,122,.35); background: rgba(255,107,122,.10)}
+    .chip.imp.med{border-color: rgba(247,200,67,.35); background: rgba(247,200,67,.10)}
+    .chip.imp.low{border-color: rgba(87,211,140,.35); background: rgba(87,211,140,.10)}
+    .chip.eff.high{border-color: rgba(255,255,255,.16)}
+    .chip.eff.med{border-color: rgba(255,255,255,.16)}
+    .chip.eff.low{border-color: rgba(255,255,255,.16)}
+
+    .mini{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 10px 12px;
+      border-radius: 14px;
+      overflow:auto;
+      max-height: 200px;
     }
 
-    .note{
-      margin-top: 12px;
-      padding: 12px;
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 980px){ .twoCol{grid-template-columns: 1fr;} }
+
+    .accordion{
       border-radius: 16px;
-      border: 1px dashed rgba(255,255,255,.18);
-      background: rgba(255,255,255,.02);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      overflow:hidden;
+    }
+    .accHead{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 10px;
+      padding: 12px 12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .accHead:hover{background: rgba(255,255,255,.06)}
+    .accTitle{margin:0; font-size: 13px; font-weight: 720}
+    .accMeta{color: var(--muted2); font-size: 12px}
+    .accBody{display:none; padding: 0 12px 12px}
+    .accBody.open{display:block}
+    .accBody .p{margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5}
+    .accBody .bul{margin: 10px 0 0; padding-left: 16px; color: var(--muted); font-size: 12px}
+    .accBody .bul li{margin: 6px 0}
+
+    .rightRail .card{position: sticky; top: 76px;}
+    @media (max-width: 980px){ .rightRail .card{position: static;} }
+
+    .hint{
+      color: rgba(255,255,255,.70);
+      font-size: 12px;
+      line-height: 1.45;
     }
 
-    .footer{
-      margin-top: 22px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      display:flex;
-      gap: 10px;
-      align-items:flex-start;
-      justify-content:space-between;
-      flex-wrap: wrap;
-      color: var(--muted2);
-      font-size: 13px;
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(10,14,28,.82);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 10px 12px;
+      border-radius: 999px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.45);
+      color: rgba(255,255,255,.85);
+      font-size: 12px;
+      display:none;
+      gap: 8px;
+      align-items:center;
+      z-index: 60;
     }
-    .footer a{color: var(--muted); text-decoration: underline; text-underline-offset: 2px}
-    .muted{color: var(--muted)}
+    .toast .dot{width:7px; height:7px; border-radius:50%; background: var(--accent2)}
     .kbd{
       font-family: var(--mono);
       font-size: 11px;
-      padding: 3px 7px;
+      padding: 2px 6px;
       border-radius: 8px;
       border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: rgba(232,238,252,.85);
-      white-space:nowrap;
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.75);
     }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <!-- Top Bar -->
-    <header class="topbar">
-      <div class="brand" aria-label="Product">
-        <a href="01_landing.html" style="display:flex;align-items:center;gap:10px;">
-          <div class="logo" aria-hidden="true"></div>
-          <div>
-            <div style="display:flex;align-items:baseline;gap:8px;">
-              <div style="font-size:15px;">ClarityBrief</div>
-              <div style="font-size:12px;color:var(--muted);font-weight:650;">Resume results</div>
-            </div>
-          </div>
-        </a>
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>ClarityBrief</div>
       </div>
-
-      <nav class="nav" aria-label="Top navigation">
-        <span class="pill" id="trialPill">Trial: Day 1 of 7</span>
+      <div class="nav">
+        <span class="pill" id="trialPill"><span class="dot"></span> Trial: Day <span id="trialDay">1</span> of 7</span>
         <a class="link" href="07_done.html">Home</a>
+        <a class="link" href="03_resume_intake.html">Resume</a>
         <a class="link" href="09_job_intake.html">Analyze a job</a>
-        <a class="link" href="08_preferences.html">Preferences</a>
         <a class="link" href="12_saved_briefs.html">Saved briefs</a>
         <a class="link" href="13_trends.html">Trends</a>
-      </nav>
-    </header>
-
-    <!-- Onboarding strip -->
-    <div class="strip" aria-label="Onboarding progress">
-      <div class="steps">
-        <span class="step"><span class="n">1</span>Account</span>
-        <span class="step"><span class="n">2</span>Resume</span>
-        <span class="step active"><span class="n">3</span>Results</span>
-        <span class="step"><span class="n">4</span>Confirm</span>
-        <span class="step"><span class="n">5</span>Done</span>
       </div>
-      <div class="eta">Review what we inferred, then confirm.</div>
     </div>
-
-    <div class="grid" aria-label="Results layout">
-      <!-- Left: main results -->
-      <main class="panel" aria-label="Resume analysis results">
-        <h1>Your resume analysis</h1>
-        <p class="sub">
-          These scores describe <b>analysis readiness</b> — how confidently the system can reason from your resume text.
-          They are not a “hireability” rating. Uncertainty stays visible so you can make controlled decisions.
-        </p>
-
-        <div class="summaryTop" aria-label="Summary">
-          <div class="readiness" aria-label="Readiness label">
-            <div class="badge" id="readinessBadge">R</div>
-            <div>
-              <div class="k">Profile readiness</div>
-              <div class="v" id="readinessLabel">—</div>
-              <div class="k" id="generatedAt" style="margin-top:2px;">—</div>
-            </div>
-          </div>
-
-          <div class="meters" aria-label="Score meters">
-            <div class="meter">
-              <div class="top">
-                <div class="label">Structure</div>
-                <div class="val"><span id="structureVal">—</span>/100</div>
-              </div>
-              <div class="bar"><i id="structureBar"></i></div>
-              <div class="hint">Roles + dates clarity. Missing timelines reduce confidence.</div>
-            </div>
-
-            <div class="meter">
-              <div class="top">
-                <div class="label">Evidence strength</div>
-                <div class="val"><span id="evidenceVal">—</span>/100</div>
-              </div>
-              <div class="bar"><i id="evidenceBar"></i></div>
-              <div class="hint">Outcomes + specificity. “Did X” beats “responsible for Y”.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sections injected by JS -->
-        <div class="sectionCard" style="margin-top: 14px;" aria-label="Seniority & scope">
-          <div class="sectionTitle">Seniority & scope signals</div>
-          <div class="items" id="seniorityList"></div>
-        </div>
-
-        <div class="sectionCard" aria-label="Domain indicators">
-          <div class="sectionTitle">Industry / domain indicators</div>
-          <div class="items" id="domainList"></div>
-        </div>
-
-        <div class="sectionCard" aria-label="Strengths">
-          <div class="sectionTitle">Strengths</div>
-          <div class="items" id="strengthsList"></div>
-        </div>
-
-        <div class="sectionCard" aria-label="Gaps">
-          <div class="sectionTitle">Gaps & missing evidence</div>
-          <div class="items" id="gapsList"></div>
-        </div>
-
-        <div class="sectionCard" aria-label="Uncertainty">
-          <div class="sectionTitle">Uncertainties to confirm</div>
-          <div class="items" id="uncertaintiesList"></div>
-        </div>
-
-        <div class="note" aria-label="Guidance note">
-          <b>How to use this:</b> Treat “gaps” as levers to increase decision confidence. You can proceed with uncertainty,
-          but your future job-fit analysis will be more accurate if you confirm timeline and scope.
-        </div>
-      </main>
-
-      <!-- Right: next steps / trial rail -->
-      <aside class="panel" aria-label="Next steps">
-        <div class="railCard">
-          <h2>Next step</h2>
-          <p>
-            Confirm the structured interpretation. We’ll ask you to verify only the fields that matter most for decision quality
-            (titles, companies, dates, current role).
-          </p>
-
-          <div class="ctaRow">
-            <a class="btn primary" href="06_confirm.html">
-              Review & confirm profile <span aria-hidden="true">→</span>
-            </a>
-            <a class="btn" href="03_resume_intake.html">Edit resume text</a>
-          </div>
-
-          <div class="note">
-            <b>Why confirm?</b> In later analyses, small timeline errors can distort seniority and fit conclusions.
-            Confirmation gives you control over what the system believes.
-          </div>
-        </div>
-
-        <div class="sectionCard" style="margin-top: 12px;">
-          <div class="sectionTitle">Top improvements (fastest wins)</div>
-          <ul class="list" id="improvementsList"></ul>
-        </div>
-
-        <div class="sectionCard" style="margin-top: 12px;">
-          <div class="sectionTitle">Model boundary</div>
-          <div class="muted" style="margin-top:8px; font-size: 13px; line-height: 1.55;">
-            We don’t verify truth. We do flag when claims lack supporting evidence or when the text is too ambiguous to
-            support a strong conclusion.
-          </div>
-          <div style="margin-top:10px; color: var(--muted2); font-size: 12px;">
-            Tip: If you’re targeting Staff/Architect roles, add explicit scope indicators:
-            <span class="kbd">ownership</span>, <span class="kbd">scale</span>, <span class="kbd">stakeholders</span>.
-          </div>
-        </div>
-      </aside>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer" aria-label="Footer">
-      <div>
-        <div style="font-weight:850; color: rgba(232,238,252,.80);">ClarityBrief</div>
-        <div style="margin-top:4px;">Clarity, confidence, and control — not persuasion.</div>
-      </div>
-      <div style="display:flex; gap: 14px; flex-wrap:wrap;">
-        <a href="#" onclick="alert('Placeholder: privacy policy'); return false;">Privacy</a>
-        <a href="#" onclick="alert('Placeholder: terms'); return false;">Terms</a>
-      </div>
-    </footer>
   </div>
 
-  <script>
-    function getUser(){
-      try { return JSON.parse(localStorage.getItem('cb_mock_user') || 'null'); }
-      catch { return null; }
-    }
-    function computeTrialDay(user){
-      if(!user?.trialStartISO) return 1;
-      const start = new Date(user.trialStartISO);
-      const now = new Date();
-      const diffDays = Math.max(0, Math.floor((now - start) / (1000*60*60*24)));
-      return Math.min((user.trialDays || 7), diffDays + 1);
-    }
-    function updateTrialPill(){
-      const user = getUser();
-      const day = computeTrialDay(user);
-      const total = user?.trialDays || 7;
-      document.getElementById('trialPill').textContent = `Trial: Day ${day} of ${total}`;
-    }
-
-    function dotClass(conf){
-      const c = (conf || '').toLowerCase();
-      if(c === 'high') return 'dot high';
-      if(c === 'medium') return 'dot medium';
-      return 'dot low';
-    }
-
-    function whyText(sectionKey){
-      const map = {
-        seniority: "Seniority signals influence what roles are plausible targets and how strict job requirements should be interpreted.",
-        domain: "Domain indicators affect how transferable your experience is to similar industries and how a hiring team may read your background.",
-        strengths: "Strengths are evidence-backed claims you can rely on in downstream fit analysis and positioning.",
-        gaps: "Gaps are missing evidence or missing structure that reduce decision confidence and often drive rejection risk in strict roles.",
-        uncertainties: "Uncertainties are items we could not infer confidently. Confirming them reduces fragile assumptions in later job decisions."
-      };
-      return map[sectionKey] || "This affects how confidently the system can reason from your inputs.";
-    }
-
-    function itemTemplate(text, confidence, sectionKey){
-      const conf = (confidence || 'low').toLowerCase();
-      const label = conf.charAt(0).toUpperCase() + conf.slice(1);
-      return `
-        <div class="item">
-          <div class="itemTop">
-            <div class="itemText">${escapeHtml(text)}</div>
-            <span class="chip"><span class="${dotClass(conf)}"></span>${label}</span>
-          </div>
-          <details>
-            <summary>Why it matters</summary>
-            <div class="detailsBody">${whyText(sectionKey)}</div>
-          </details>
+  <div class="wrap">
+    <div class="pageHead">
+      <div>
+        <h1 class="h1">Resume analysis</h1>
+        <div class="subhead">
+          A critical, evidence-first read of what your resume currently signals — with uncertainty made explicit.
+          No embellishment. Employers verify.
         </div>
-      `;
+      </div>
+      <div class="btnRow">
+        <button class="btn ghost" id="btnRerun">Re-run analysis</button>
+        <button class="btn" id="btnConfirm">Confirm / edit parsed profile</button>
+        <button class="btn primary" id="btnSave">Save to profile</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <div>
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <p class="cardTitle">Readiness snapshot</p>
+              <div class="cardKicker" id="snapshotKicker">Based on your latest pasted resume text.</div>
+            </div>
+            <span class="pill" id="readinessPill"><span class="dot"></span> <span id="readinessLabel">Ready</span></span>
+          </div>
+
+          <div class="scoreRow">
+            <div class="scoreBig">
+              <div class="label">Overall score</div>
+              <div class="value">
+                <div class="num" id="overallScore">—</div>
+                <div class="badge" id="overallBand">—</div>
+              </div>
+              <div class="meter" aria-label="Overall score meter"><div id="overallMeter"></div></div>
+              <div class="meta">
+                <span class="kv">Seniority signal: <strong id="bandText">—</strong> <span style="color:var(--muted2)">· conf</span> <span id="bandConf" class="kbd">—</span></span>
+                <span class="kv">Structure: <strong id="structureQuick">—</strong></span>
+                <span class="kv">Evidence: <strong id="evidenceQuick">—</strong></span>
+              </div>
+            </div>
+
+            <div class="subscores" aria-label="Subscores">
+              <div class="subscore">
+                <div class="name">Clarity</div>
+                <div class="bar"><div id="bar_clarity"></div></div>
+                <div class="val" id="val_clarity">—</div>
+              </div>
+              <div class="subscore">
+                <div class="name">Evidence strength</div>
+                <div class="bar"><div id="bar_evidence_strength"></div></div>
+                <div class="val" id="val_evidence_strength">—</div>
+              </div>
+              <div class="subscore">
+                <div class="name">Seniority signals</div>
+                <div class="bar"><div id="bar_seniority_signals"></div></div>
+                <div class="val" id="val_seniority_signals">—</div>
+              </div>
+              <div class="subscore">
+                <div class="name">Structure completeness</div>
+                <div class="bar"><div id="bar_structure_completeness"></div></div>
+                <div class="val" id="val_structure_completeness">—</div>
+              </div>
+              <div class="subscore">
+                <div class="name">Role focus</div>
+                <div class="bar"><div id="bar_role_focus"></div></div>
+                <div class="val" id="val_role_focus">—</div>
+              </div>
+              <div class="subscore">
+                <div class="name">Credibility signals</div>
+                <div class="bar"><div id="bar_credibility_signals"></div></div>
+                <div class="val" id="val_credibility_signals">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="insightGrid">
+            <div class="callout" id="topInsightA">
+              <h4>Most limiting factor</h4>
+              <p id="mostLimiting">—</p>
+            </div>
+            <div class="callout" id="topInsightB">
+              <h4>Fastest confidence lift</h4>
+              <p id="fastLift">—</p>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="twoCol">
+            <div class="card" style="padding:14px; background: rgba(255,255,255,.045);">
+              <div class="cardHeader" style="margin-bottom:8px;">
+                <div>
+                  <p class="cardTitle">Top gaps</p>
+                  <div class="cardKicker">Prioritized by decision impact — actionable, non-embellishing.</div>
+                </div>
+                <span class="pill"><span class="dot" style="background:var(--warn)"></span> <span id="gapCount">0</span> items</span>
+              </div>
+              <div class="list" id="gapsList"></div>
+            </div>
+
+            <div class="card" style="padding:14px; background: rgba(255,255,255,.045);">
+              <div class="cardHeader" style="margin-bottom:8px;">
+                <div>
+                  <p class="cardTitle">Red flags & data quality</p>
+                  <div class="cardKicker">Not accusations — just risks to credibility or interpretability.</div>
+                </div>
+                <span class="pill"><span class="dot" style="background:var(--bad)"></span> <span id="flagCount">0</span> items</span>
+              </div>
+              <div class="list" id="flagsList"></div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="cardHeader">
+            <div>
+              <p class="cardTitle">Seniority calibration</p>
+              <div class="cardKicker">What your resume evidence currently supports — and what would be needed for higher bands.</div>
+            </div>
+            <span class="pill"><span class="dot" style="background:var(--accent2)"></span> Evidence-first</span>
+          </div>
+
+          <div class="twoCol">
+            <div class="item">
+              <div class="itemTop">
+                <p class="itemTitle">Estimated band</p>
+                <span class="chip"><strong id="calBand">—</strong> <span style="color:var(--muted2)">conf</span> <span class="kbd" id="calConf">—</span></span>
+              </div>
+              <p class="itemDesc" id="calSummary">—</p>
+              <div class="chips" id="supportSignals"></div>
+            </div>
+
+            <div class="item">
+              <div class="itemTop">
+                <p class="itemTitle">Targets that may be premature</p>
+                <span class="pill" style="padding:7px 10px;"><span class="dot" style="background:var(--warn)"></span> Not a no — a “not yet shown”</span>
+              </div>
+              <div id="prematureTargets"></div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="cardHeader">
+            <div>
+              <p class="cardTitle">Rewrite suggestions</p>
+              <div class="cardKicker">These rewrites do not add facts. If key details are missing, you’ll see questions instead.</div>
+            </div>
+            <span class="pill"><span class="dot" style="background:var(--ok)"></span> Non-embellishing</span>
+          </div>
+
+          <div class="list" id="rewritesList"></div>
+
+          <div class="divider"></div>
+
+          <div class="cardHeader">
+            <div>
+              <p class="cardTitle">Questions to resolve uncertainty</p>
+              <div class="cardKicker">Answering these increases confidence and prevents wrong conclusions later.</div>
+            </div>
+            <span class="pill"><span class="dot" style="background:var(--accent)"></span> P0 first</span>
+          </div>
+
+          <div class="twoCol">
+            <div class="item">
+              <div class="itemTop">
+                <p class="itemTitle">Priority questions</p>
+                <span class="pill" style="padding:7px 10px;"><span class="dot" style="background:var(--warn)"></span> <span id="p0Count">0</span> P0</span>
+              </div>
+              <div class="list" id="questionsList"></div>
+            </div>
+
+            <div class="item">
+              <div class="itemTop">
+                <p class="itemTitle">Guardrails</p>
+                <span class="pill" style="padding:7px 10px;"><span class="dot" style="background:var(--bad)"></span> Boundaries</span>
+              </div>
+              <div class="hint" id="guardrailsText">—</div>
+              <div class="divider"></div>
+              <div class="hint">
+                Tip: If you know the truth but not the number, write what’s verifiable (scope, system area, constraints) and add a question to retrieve metrics later.
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="accordion" id="accDebug">
+            <div class="accHead" role="button" tabindex="0" aria-expanded="false">
+              <div>
+                <p class="accTitle">Debug / traceability (for you)</p>
+                <div class="accMeta">Shows the raw agent output and span coverage. Helpful during experimentation.</div>
+              </div>
+              <div class="pill"><span class="dot" style="background:rgba(255,255,255,.6)"></span> Toggle</div>
+            </div>
+            <div class="accBody" id="accBody">
+              <div class="p">Span coverage: <span class="kbd" id="spanCount">—</span> spans · <span class="kbd" id="roleCount">—</span> roles</div>
+              <div class="p">Latest run id: <span class="kbd" id="runId">—</span></div>
+              <div class="p">Generated: <span class="kbd" id="genAt">—</span></div>
+              <div class="p">Raw JSON (localStorage: <span class="kbd">cb_mock_resume_agent_output</span>)</div>
+              <pre class="mini" id="rawJson">—</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT RAIL -->
+      <div class="rightRail">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <p class="cardTitle">What this means</p>
+              <div class="cardKicker">How to interpret scores without getting discouraged.</div>
+            </div>
+          </div>
+          <div class="hint">
+            Your score is not “your worth.” It’s a measure of how confidently an employer can infer scope, impact, and seniority from the text.
+            You can raise confidence by adding <b>specific ownership</b>, <b>scope</b>, and <b>verifiable outcomes</b>.
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="cardHeader" style="margin-bottom:6px;">
+            <div>
+              <p class="cardTitle">Next best actions</p>
+              <div class="cardKicker">A fast plan you can execute today.</div>
+            </div>
+          </div>
+
+          <div class="list" id="quickPlan"></div>
+
+          <div class="divider"></div>
+
+          <div class="callout">
+            <h4>Boundary note</h4>
+            <p>
+              We won’t help you embellish. If the resume doesn’t support a claim, we treat it as uncertain and ask for evidence.
+              Employers verify; we optimize clarity and decision quality.
+            </p>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btnRow" style="justify-content:flex-start;">
+            <button class="btn small" id="btnCopyP0">Copy P0 questions</button>
+            <button class="btn small" id="btnCopyPlan">Copy 30-min plan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span class="dot"></span><span id="toastText">Saved.</span></div>
+
+  <script>
+    // ====== LocalStorage keys ======
+    // Input:  cb_mock_resume_agent_output (full JSON from agent)
+    // Output: cb_mock_resume_results (summarized for profile usage)
+    // Optional: cb_mock_user (trial day, etc.)
+    // Optional: cb_mock_profile_confirmed (used elsewhere)
+
+    function $(id){ return document.getElementById(id); }
+    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+    function pct(n){ return clamp(Math.round(n),0,100) + "%"; }
+    function esc(s){
+      return (s ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+    function toast(msg){
+      const t = $("toast");
+      $("toastText").textContent = msg;
+      t.style.display = "inline-flex";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>{ t.style.display="none"; }, 1600);
+    }
+    function todayISO(){
+      return new Date().toISOString();
+    }
+    function bandFromScore(score){
+      if (score >= 80) return {label:"Strong", tone:"ok"};
+      if (score >= 65) return {label:"Good foundation", tone:"warn"};
+      if (score >= 50) return {label:"Needs evidence", tone:"warn"};
+      return {label:"High ambiguity", tone:"bad"};
+    }
+    function toneDot(tone){
+      if (tone==="ok") return "var(--ok)";
+      if (tone==="warn") return "var(--warn)";
+      return "var(--bad)";
+    }
+    function capitalizeWords(s){
+      if (!s) return s;
+      return s.replaceAll("_"," ").replace(/\b\w/g, c => c.toUpperCase());
     }
 
-    function escapeHtml(s){
-      return String(s || '')
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replaceAll('"','&quot;')
-        .replaceAll("'","&#039;");
-    }
+    // ====== Fallback mock output (only used if localStorage missing) ======
+    let MOCK_AGENT_OUTPUT = {
+      "schema_version":"resume_agent_output.v1",
+      "run":{"run_id":"run_mock_001","generated_at_iso":"2026-01-31T22:41:00Z","agent_name":"resume_parse_and_score","agent_notes":"Mock output used because cb_mock_resume_agent_output not found."},
+      "input":{"resume_text":"(mock)","input_format":"plain_text"},
+      "resume_spans":[
+        {"span_id":"s1","text":"Senior Frontend Engineer — FinBank — 2022-03 to Present","char_start":0,"char_end":54,"section_hint":"experience"},
+        {"span_id":"s2","text":"Worked on a React migration from legacy UI to modern stack.","char_start":55,"char_end":115,"section_hint":"experience"},
+        {"span_id":"s3","text":"Improved performance and fixed bugs across multiple pages.","char_start":116,"char_end":176,"section_hint":"experience"}
+      ],
+      "profile_structured":{
+        "candidate":{"name":"Alex Morgan","location":"Denver, CO","email":"alexmorgan@email.com","phone":"(555) 111-2222"},
+        "headline_summary":{"headline":"Senior Frontend Engineer","summary":"8+ years building React/TypeScript apps in FinTech; interest in architecture/performance."},
+        "roles":[
+          {"role_id":"r1","title":"Senior Frontend Engineer","company":"FinBank","employment_type":"contract","location":null,"start_date":"2022-03","end_date":null,"is_current":true,
+            "bullets":[
+              {"bullet_id":"r1b1","text":"Worked on a React migration from legacy UI to modern stack.","span_ids":["s2"],
+               "impact_signals":{"has_metric":false,"has_scope":true,"has_outcome":false,"has_ownership":false},
+               "clarity_flags":["vague_verb","missing_outcome","unclear_ownership"]
+              },
+              {"bullet_id":"r1b2","text":"Improved performance and fixed bugs across multiple pages.","span_ids":["s3"],
+               "impact_signals":{"has_metric":false,"has_scope":true,"has_outcome":false,"has_ownership":false},
+               "clarity_flags":["missing_metric","missing_outcome","overly_generic"]
+              }
+            ],
+            "seniority_signals":{"architecture":"some","leadership":"none","cross_team_influence":"some","ownership_scope":"feature","domain_depth":"some"}
+          }
+        ],
+        "skills":{"hard_skills":["React","TypeScript","GraphQL"],"soft_skills":["Collaboration"],"tools":["Git"],"domains":["FinTech"]},
+        "education":[{"school":"State University","degree":"B.S.","field":"Computer Science","start_date":"2013-09","end_date":"2017-05"}],
+        "links":{"linkedin":"linkedin.com/in/alexmorgan","github":"github.com/alexmorgan","portfolio":null,"other":[]},
+        "artifacts":{"talks":[],"papers":[],"projects":[],"certifications":[]}
+      },
+      "field_level_confidence":{
+        "candidate":{"name":0.95,"location":0.85,"email":0.95,"phone":0.95},
+        "roles":[{"role_id":"r1","title":0.9,"company":0.8,"dates":0.85,"bullets":0.9}],
+        "skills":0.8,"education":0.75,"links":0.7
+      },
+      "resume_quality_scores":{
+        "overall":61,
+        "subscores":{"clarity":62,"evidence_strength":42,"seniority_signals":58,"structure_completeness":86,"role_focus":78,"credibility_signals":64},
+        "score_reasons":[
+          {"dimension":"evidence_strength","reason":"Most bullets describe activities but don’t show measurable outcomes or impact.","severity":"high","span_ids":["s2","s3"]},
+          {"dimension":"clarity","reason":"Vague verbs and unclear ownership reduce auditability.","severity":"medium","span_ids":["s2"]},
+          {"dimension":"structure_completeness","reason":"Core sections appear present; contact + dates mostly intact.","severity":"low","span_ids":["s1"]}
+        ]
+      },
+      "seniority_calibration":{
+        "estimated_band":"senior",
+        "confidence":0.62,
+        "signals_supporting":[
+          {"signal":"Modern frontend stack focus (React/TS/GraphQL)","why":"Consistent focus across roles.","span_ids":["s1"]},
+          {"signal":"Some cross-team integration work","why":"Mentions integration / collaboration.","span_ids":["s2"]}
+        ],
+        "signals_missing":[
+          {"signal":"Quantified impact","why_it_matters":"Distinguishes work performed from results delivered.","how_to_provide_evidence":"Add metrics (perf, conversion, incidents) only if verifiable."},
+          {"signal":"System ownership","why_it_matters":"Staff+ requires owning systems, not just features.","how_to_provide_evidence":"State end-to-end ownership boundaries and tradeoffs, if true."}
+        ],
+        "premature_targets":[
+          {"target_band":"staff","why_premature":"Resume lacks repeated system ownership and measurable impact evidence.","evidence_needed":["End-to-end ownership of a major system area","Impact metrics tied to outcomes","Cross-team influence at scale"]},
+          {"target_band":"principal","why_premature":"No org-level direction-setting evidence is shown.","evidence_needed":["Org-wide standards/strategy influence","Cross-org initiatives with measurable outcomes"]}
+        ]
+      },
+      "top_gaps":[
+        {"gap_id":"g1","title":"Outcomes are missing from bullets","description":"Bullets list tasks without stating results or impact.","category":"evidence","impact":"high","effort":"medium","span_ids":["s2","s3"],
+         "next_actions":["Pick 3 bullets and add outcome + scope (no invented metrics).","If numbers unknown, add verifiable scope and ask for metrics."]
+        },
+        {"gap_id":"g2","title":"Ownership scope is unclear","description":"It’s not clear what you owned vs contributed to.","category":"clarity","impact":"high","effort":"low","span_ids":["s2"],
+         "next_actions":["Replace 'worked on' with explicit ownership verbs if accurate.","Name the product area / flow / component set."]
+        }
+      ],
+      "red_flags":[
+        {"flag_id":"rf1","type":"vague_bullets","description":"Several bullets use vague verbs and generic outcomes.","severity":"medium","span_ids":["s2","s3"],"user_prompt":"What part did you own, and what changed as a result (even qualitatively)?"}
+      ],
+      "fix_plan":{
+        "minutes_30":["Rewrite 2 vague bullets with ownership + scope.","Add one scope marker to each role (product area, users, team size if known)."],
+        "hours_2":["Add verifiable outcomes to 3 bullets (metrics only if known).","Add 1 proof link (repo/demo/blog) if available."],
+        "days_7":["Collect metrics from past work (perf/tickets/incidents).","Add 1–2 system-level decision bullets if true."],
+        "guardrails":["Do not add facts you can’t verify.","If a number is unknown, ask for it or state scope without exaggeration.","Employers verify; clarity beats embellishment."]
+      },
+      "suggested_rewrites":[
+        {"rewrite_id":"rw1","original_bullet":"Worked on a React migration from legacy UI to modern stack.","span_ids":["s2"],
+         "rewrite_variants":[
+           {"variant_id":"rw1v1","text":"Contributed to migrating a legacy UI to a React-based frontend as part of a modernization effort.","uses_only_provided_facts":true},
+           {"variant_id":"rw1v2","text":"Implemented portions of a legacy-to-React UI migration, supporting the team’s move to a modern frontend stack.","uses_only_provided_facts":true}
+         ],
+         "missing_info_questions":["What part did you own (pages/components/flows)?","What improved after the migration (maintainability, performance, release cadence)?"]
+        },
+        {"rewrite_id":"rw2","original_bullet":"Improved performance and fixed bugs across multiple pages.","span_ids":["s3"],
+         "rewrite_variants":[
+           {"variant_id":"rw2v1","text":"Improved frontend performance and resolved bugs across multiple pages in the application.","uses_only_provided_facts":true},
+           {"variant_id":"rw2v2","text":"Addressed performance issues and defects across multiple pages to improve overall user experience.","uses_only_provided_facts":true}
+         ],
+         "missing_info_questions":["Which performance metric improved (load time, bundle size, runtime)?","Which area/pages did you own?"]
+        },
+        {"rewrite_id":"rw3","original_bullet":"(weak bullet)","span_ids":["s2"],
+         "rewrite_variants":[
+           {"variant_id":"rw3v1","text":"Collaborated with adjacent teams to integrate API-driven UI changes into the frontend.","uses_only_provided_facts":true}
+         ],
+         "missing_info_questions":["Which API or integration was involved?","What outcome did it enable (feature delivery, fewer defects, faster iteration)?"]
+        }
+      ],
+      "questions_for_user":[
+        {"question_id":"q1","question":"For your most recent role, what product area did you own (pages/components/flows) and what was the scope (users/traffic/team size if known)?","why_needed":"Ownership + scope improves seniority calibration and reduces ambiguity.","priority":"p0"},
+        {"question_id":"q2","question":"Do you have any verifiable outcomes (performance changes, conversion, error rate, time saved, tickets reduced)?","why_needed":"Evidence strength drives confidence and credibility.","priority":"p0"},
+        {"question_id":"q3","question":"Do you have a portfolio/proof link you want included (repo/demo/blog/talk)?","why_needed":"Credibility signals and verification hooks improve trust.","priority":"p1"}
+      ]
+    };
 
-    function setMeter(barId, valId, value){
-      const v = Math.max(0, Math.min(100, Number(value || 0)));
-      document.getElementById(valId).textContent = String(v);
-      document.getElementById(barId).style.width = v + '%';
-    }
+    /* Sample Agent Output */
+    MOCK_AGENT_OUTPUT = {
+      "schema_version": "resume_agent_output.v1",
+      "run": {
+        "run_id": "run_5592c39e01",
+        "generated_at_iso": "2026-02-01T03:01:52Z",
+        "agent_name": "resume_parse_and_score",
+        "agent_notes": "Parsed resume text into structured JSON with detailed role and bullet extraction. Scored clarity and seniority signals with noted gaps in explicit leadership claims and some vague impact metrics. Contact info partially structured. Education and certifications extracted. Suggested questions for missing email confirmation and phone number. Suggested rewrites for some vague bullets."
+      },
+      "input": {
+        "resume_text": "# Walid Newaz\n\n### Senior Software Engineer \u2014 Backend & Knowledge Systems\n### Denver, CO | Remote (US)\n\nmdwalid@gmail.com | linkedin.com/in/walid-newaz/\n\n## SUMMARY\nSenior Software Engineer with 15+ years of experience building full-stack, cloud-native applications and platforms. Strong background in backend systems, security-sensitive environments, and scalable web architectures, with a current focus on AI-enabled knowledge retrieval, RAG pipelines, and provenance-driven systems.\n\n## SKILLS\n**Languages**: TypeScript, JavaScript, Python, Java, SQL\n**Frontend**: React (18/19), Next.js, TailwindCSS, Design Systems\n**Backend**: FastAPI, Node.js, NestJS, REST, GraphQL\n**Data & Storage**: PostgreSQL, pgvector, Redis, PostGIS\n**AI / RAG**: Document ingestion, chunking strategies, embeddings, retrieval, citation, provenance, LangChain, LangGraph, OpenAI, Gemini 3\n**Cloud & DevOps**: AWS (S3, EC2, Lambda, RDS, SNS), Docker, CI/CD\n**Practices**: System design, API design, cross-team collaboration, translating requirements into specs\n\n## EXPERIENCE\n\n### Bank of America \u2014 Software Engineer\nDenver, CO | JUL 2024 - JUN 2025\n\n_Security Operations Platform (SOP):_\n\u2014 Designed and implemented **frontend applications** for a large-scale security operations platform supporting multiple internal teams.\n\u2014 Established a **React-based design system** (React, TailwindCSS) to ensure consistency across multiple security micro-applications.\n\u2014 Led development of a **security analytics application** that improved operational efficiency by ~50% through automated scanning and quarantine workflows.\n\n_Backend & Search Systems:_\n\u2014 Built **high-performance APIs** using Python, FastAPI, and SQLAlchemy for managing threat intelligence and malicious email detection.\n\u2014 Designed a **unified federated search experience**, integrating multiple internal data sources behind a cohesive UI and API layer.\n\u2014 Collaborated closely with security analysts, product owners, and platform teams to translate operational needs into scalable software solutions.\n\n### Travvit LLC \u2014 Software Engineer\nDenver, CO | JAN 2023 - JUN 2024\n\n_Full-Stack GIS Platform:_\n\u2014 Led the design and built a **cloud-native, full-stack web application** for outdoor trip planning and experience sharing.\n\u2014 Implemented rich **geospatial features** using React, Mapbox, Leaflet, and PostGIS for capturing, editing, and visualizing spatial data.\n\u2014 Built backend services using Docker, NestJS, TypeORM, Redis, and PostgreSQL.\n\n_Scalability & SEO:_\n\u2014 Introduced **server-side rendering** and SEO optimization strategies, significantly improving discoverability.\n\u2014 Implemented AWS Lambda workflows to automate sitemap generation and content updates.\n\u2014 Designed an email-based notification and invitation system to improve onboarding and user engagement.\n\n### Phase Change Software LLC \u2014 Java Software Engineer\nGolden, CO | MAR 2022 - NOV 2022\n\n_AI-Driven Legacy System Analysis:_\n\u2014 Contributed to an AI platform focused on **modernizing legacy mainframe systems** through knowledge extraction and reasoning.\n\u2014 Designed parsing strategies for COBOL and SQL to generate **intermediate representations (IRs)** used by downstream reasoning systems.\n\u2014 Transformed extracted concepts into **Prolog-based knowledge artifacts**, supporting retrieval and simulation subsystems.\n\u2014 Collaborated with cross-functional teams to align AI outputs with business and modernization goals.\n\n### Zayo Group LLC \u2014 Software Engineer\nBoulder, CO | OCT 2018 - MAR 2022\n\n_Cloud-Native CPQ & Integration Platforms:_\n\u2014 Built and maintained **full-stack applications and microservices** supporting quoting, ordering, and service provisioning.\n\u2014 Integrated multiple third-party carrier APIs and implemented **MEF 3.0 specifications** for Ethernet service provisioning across US and EU partners.\n\u2014 Designed reusable **platform libraries** for permissions, caching, validation, and feature management, improving performance and deployment flexibility.\n\u2014 Worked extensively with AWS, Salesforce integrations, and PostgreSQL in security- and scalability-sensitive environments.\n\n_Integration service:_\n\u2014 Designed and implemented microservice to canonicalize 3rd Party data, using custom API and workflow handlers.\n\u2014 Integrated multiple 3rd party APIs with Zayo's Tranzact platform, enabling efficient location search, quoting, and Internet service provisioning, that was used to access network inventories of multiple Zayo partners in the US, and EU.\n\u2014 Implemented the MEF 3.0 API, a Carrier Ethernet network and services provisioning specification, within the Integration Service, which provided Zayo access to the inventory of US and EU ISPs.\n\n_Platform support libraries:_\n\u2014 Designed and implemented libraries for managing user permissions, and cache management libraries that allowed 10x speed for cache tokens in the microservices environment.\n\u2014 Implemented node.js library to run load test simulations for JavaScript and TypeScript packages, and microservice request/response handling under various traffic conditions.\n\u2014 Implemented data validation library for request/response route handlers, for REST and Kafka message queues.\n\u2014 Implemented feature management library to control new feature releases for React and NodeJS applications, that allowed the disentanglement of feature deployment, and publication dates.\n\n### MotionPoint Co \u2014 Web Engineer/Developer\nCoconut Creek, FL | FEB 2010 - SEP 2018\n\n\u2014 Developed and supported large-scale, proxy-based translation platforms serving thousands of SMB and Fortune 500 websites.\n\u2014 Built internal monitoring, feedback, and analytics tools using Python/Django, AngularJS, and MySQL.\n\u2014 Trained junior engineers and new hires; authored internal documentation and training materials.\n\u2014 Regularly translated technical issues and solutions for non-technical stakeholders and clients.\n\n_Configure platform services:_\n\u2014 Configured servers, applications, and web crawlers for running proxy-based translated sites for several thousand websites and webapps belonging to SMBs and Fortune 500 companies.\n\u2014 Used knowledge of web technologies, HTML, CSS, JavaScript, Flash, HTTP , DNS, TCP/IP , SSL to debug client websites and set up each translation application accordingly.\n\u2014 Worked on 20K + issues to provide expedient services for various Fortune 500 client websites.\n\n_Develop add-on applications:_\n\u2014 Developed front -end web applications to capture user feedback from multiple translated websites, using jQuery and jQuery UI, with JSP/JDBC backend. Notably deployed on multilingual sites for: Verizon Wireless, Grainger, and Travelocity, among other sites.\n\u2014 Developed an application to monitor the health of 3000+ translation application servers, using Python/Django, AngularJS, and MySQL.\n\u2014 Developed Javascript application to serve custom localized sections within a page, to support multivariate testing on key landing pages.\n\n_Train junior engineers and new hires:_\n\u2014 Developed full-stack training and documentation portal application using the MERN stack.\n\u2014 Trained new hires on various MotionPoint other web technologies, to address errors, and optimizations for translated websites.\n\n_Improve department processes:_\n\u2014 Worked on internal projects for improving department efficiency, process flows and workflow automation.\n\u2014 Worked within a highly collaborative Agile team environment, engineering, translation, marketing, and SecOps.\n\u2014 Translated technical problems and solutions to upper management and clients.\n\n### RedTown Tech LLC \u2014 Software Developer\nWest Palm Beach, FL | MAY 2006 - JAN 2010\n\n_Web applications and landing pages:_\n\u2014 Developed lead capture and management software for the education industry from various sources. Technologies used include PHP, JQuery and MySQL.\n\u2014 Developed software to capture points obtained by users of web based games, into their own virtual wallets. Key technologies used include PHP, HTML, CSS, JavaScript, AngularJS, and MongoDB.\n\n## INDEPENDENT WORK & PORTFOLIO (ONGOING)\n\n_AI-Powered Personal Research Assistant:_\n\u2014 This work builds on prior experience designing **knowledge representations and retrieval systems** in enterprise and legacy-modernization contexts.\n\u2014 Designed the end-to-end **RAG pipeline architecture, including ingestion, canonicalization, retrieval, and observability** concerns.\n\u2014 Implementing chunking strategies, vector search (pgvector), and deletion/forgetting workflows aligned with GDPR principles.\n\u2014 Focused on observability, evaluation, and trustworthiness rather than autonomous agent behavior.\n\n## EDUCATION\n\n**Florida Atlantic University**, Computer Engineering \u2014 BSE\nMAY 2003 | Boca Raton, FL\n\n## CERTIFICATION\n\nOracle Certified Associate, Java SE 7 Programmer, CompTIA A+, CompTIA Net +\nCoursera: Machine Learning, Python for Everybody, Specialization, Java Development\n\n## ADDITIONAL SKILLS\n\n\u2014 Translating business objectives to software requirements\n\u2014 Delivering projects within time and resource constraints\n\u2014 End-to-end testing\n\u2014 SaaS & IaaS Technologies ( e.g., AWS)\n\u2014 Object -Oriented Methodologies\n\u2014 Design Patterns\n\u2014 GIS Applications and libraries\n\u2014 Data Science\n",
+        "input_format": "plain_text"
+      },
+      "resume_spans": [
+        {
+          "span_id": "span_1",
+          "text": "Walid Newaz",
+          "char_start": 2,
+          "char_end": 13,
+          "section_hint": "header"
+        },
+        {
+          "span_id": "span_2",
+          "text": "Senior Software Engineer \u2014 Backend & Knowledge Systems",
+          "char_start": 16,
+          "char_end": 67,
+          "section_hint": "header"
+        },
+        {
+          "span_id": "span_3",
+          "text": "Denver, CO | Remote (US)",
+          "char_start": 68,
+          "char_end": 89,
+          "section_hint": "header"
+        },
+        {
+          "span_id": "span_4",
+          "text": "mdwalid@gmail.com | linkedin.com/in/walid-newaz/",
+          "char_start": 91,
+          "char_end": 136,
+          "section_hint": "links"
+        },
+        {
+          "span_id": "span_5",
+          "text": "Senior Software Engineer with 15+ years of experience building full-stack, cloud-native applications and platforms. Strong background in backend systems, security-sensitive environments, and scalable web architectures, with a current focus on AI-enabled knowledge retrieval, RAG pipelines, and provenance-driven systems.",
+          "char_start": 139,
+          "char_end": 316,
+          "section_hint": "summary"
+        },
+        {
+          "span_id": "span_6",
+          "text": "Languages: TypeScript, JavaScript, Python, Java, SQL",
+          "char_start": 320,
+          "char_end": 370,
+          "section_hint": "skills"
+        },
+        {
+          "span_id": "span_7",
+          "text": "Frontend: React (18/19), Next.js, TailwindCSS, Design Systems",
+          "char_start": 371,
+          "char_end": 426,
+          "section_hint": "skills"
+        },
+        {
+          "span_id": "span_8",
+          "text": "Backend: FastAPI, Node.js, NestJS, REST, GraphQL",
+          "char_start": 427,
+          "char_end": 474,
+          "section_hint": "skills"
+        },
+        {
+          "span_id": "span_9",
+          "text": "Data & Storage: PostgreSQL, pgvector, Redis, PostGIS",
+          "char_start": 475,
+          "char_end": 525,
+          "section_hint": "skills"
+        },
+        {
+          "span_id": "span_10",
+          "text": "AI / RAG: Document ingestion, chunking strategies, embeddings, retrieval, citation, provenance, LangChain, LangGraph, OpenAI, Gemini 3",
+          "char_start": 526,
+          "char_end": 615,
+          "section_hint": "skills"
+        },
+        {
+          "span_id": "span_11",
+          "text": "Cloud & DevOps: AWS (S3, EC2, Lambda, RDS, SNS), Docker, CI/CD",
+          "char_start": 616,
+          "char_end": 668,
+          "section_hint": "skills"
+        },
+        {
+          "span_id": "span_12",
+          "text": "Practices: System design, API design, cross-team collaboration, translating requirements into specs",
+          "char_start": 669,
+          "char_end": 742,
+          "section_hint": "skills"
+        },
+        {
+          "span_id": "span_13",
+          "text": "Bank of America \u2014 Software Engineer\nDenver, CO | JUL 2024 - JUN 2025",
+          "char_start": 745,
+          "char_end": 796,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_14",
+          "text": "Security Operations Platform (SOP):",
+          "char_start": 798,
+          "char_end": 829,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_15",
+          "text": "Designed and implemented frontend applications for a large-scale security operations platform supporting multiple internal teams.",
+          "char_start": 831,
+          "char_end": 913,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_16",
+          "text": "Established a React-based design system (React, TailwindCSS) to ensure consistency across multiple security micro-applications.",
+          "char_start": 914,
+          "char_end": 1000,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_17",
+          "text": "Led development of a security analytics application that improved operational efficiency by ~50% through automated scanning and quarantine workflows.",
+          "char_start": 1001,
+          "char_end": 1099,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_18",
+          "text": "Backend & Search Systems:",
+          "char_start": 1101,
+          "char_end": 1125,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_19",
+          "text": "Built high-performance APIs using Python, FastAPI, and SQLAlchemy for managing threat intelligence and malicious email detection.",
+          "char_start": 1126,
+          "char_end": 1207,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_20",
+          "text": "Designed a unified federated search experience, integrating multiple internal data sources behind a cohesive UI and API layer.",
+          "char_start": 1208,
+          "char_end": 1288,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_21",
+          "text": "Collaborated closely with security analysts, product owners, and platform teams to translate operational needs into scalable software solutions.",
+          "char_start": 1289,
+          "char_end": 1371,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_22",
+          "text": "Travvit LLC \u2014 Software Engineer\nDenver, CO | JAN 2023 - JUN 2024",
+          "char_start": 1373,
+          "char_end": 1423,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_23",
+          "text": "Full-Stack GIS Platform:",
+          "char_start": 1425,
+          "char_end": 1447,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_24",
+          "text": "Led the design and built a cloud-native, full-stack web application for outdoor trip planning and experience sharing.",
+          "char_start": 1448,
+          "char_end": 1523,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_25",
+          "text": "Implemented rich geospatial features using React, Mapbox, Leaflet, and PostGIS for capturing, editing, and visualizing spatial data.",
+          "char_start": 1524,
+          "char_end": 1607,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_26",
+          "text": "Built backend services using Docker, NestJS, TypeORM, Redis, and PostgreSQL.",
+          "char_start": 1608,
+          "char_end": 1666,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_27",
+          "text": "Scalability & SEO:",
+          "char_start": 1668,
+          "char_end": 1686,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_28",
+          "text": "Introduced server-side rendering and SEO optimization strategies, significantly improving discoverability.",
+          "char_start": 1687,
+          "char_end": 1754,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_29",
+          "text": "Implemented AWS Lambda workflows to automate sitemap generation and content updates.",
+          "char_start": 1755,
+          "char_end": 1813,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_30",
+          "text": "Designed an email-based notification and invitation system to improve onboarding and user engagement.",
+          "char_start": 1814,
+          "char_end": 1877,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_31",
+          "text": "Phase Change Software LLC \u2014 Java Software Engineer\nGolden, CO | MAR 2022 - NOV 2022",
+          "char_start": 1879,
+          "char_end": 1936,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_32",
+          "text": "AI-Driven Legacy System Analysis:",
+          "char_start": 1938,
+          "char_end": 1967,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_33",
+          "text": "Contributed to an AI platform focused on modernizing legacy mainframe systems through knowledge extraction and reasoning.",
+          "char_start": 1968,
+          "char_end": 2053,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_34",
+          "text": "Designed parsing strategies for COBOL and SQL to generate intermediate representations (IRs) used by downstream reasoning systems.",
+          "char_start": 2054,
+          "char_end": 2142,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_35",
+          "text": "Transformed extracted concepts into Prolog-based knowledge artifacts, supporting retrieval and simulation subsystems.",
+          "char_start": 2143,
+          "char_end": 2218,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_36",
+          "text": "Collaborated with cross-functional teams to align AI outputs with business and modernization goals.",
+          "char_start": 2219,
+          "char_end": 2287,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_37",
+          "text": "Zayo Group LLC \u2014 Software Engineer\nBoulder, CO | OCT 2018 - MAR 2022",
+          "char_start": 2289,
+          "char_end": 2338,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_38",
+          "text": "Cloud-Native CPQ & Integration Platforms:",
+          "char_start": 2340,
+          "char_end": 2375,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_39",
+          "text": "Built and maintained full-stack applications and microservices supporting quoting, ordering, and service provisioning.",
+          "char_start": 2376,
+          "char_end": 2448,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_40",
+          "text": "Integrated multiple third-party carrier APIs and implemented MEF 3.0 specifications for Ethernet service provisioning across US and EU partners.",
+          "char_start": 2449,
+          "char_end": 2546,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_41",
+          "text": "Designed reusable platform libraries for permissions, caching, validation, and feature management, improving performance and deployment flexibility.",
+          "char_start": 2547,
+          "char_end": 2637,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_42",
+          "text": "Worked extensively with AWS, Salesforce integrations, and PostgreSQL in security- and scalability-sensitive environments.",
+          "char_start": 2638,
+          "char_end": 2707,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_43",
+          "text": "Integration service:",
+          "char_start": 2709,
+          "char_end": 2728,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_44",
+          "text": "Designed and implemented microservice to canonicalize 3rd Party data, using custom API and workflow handlers.",
+          "char_start": 2729,
+          "char_end": 2799,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_45",
+          "text": "Integrated multiple 3rd party APIs with Zayo's Tranzact platform, enabling efficient location search, quoting, and Internet service provisioning, that was used to access network inventories of multiple Zayo partners in the US, and EU.",
+          "char_start": 2800,
+          "char_end": 2916,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_46",
+          "text": "Implemented the MEF 3.0 API, a Carrier Ethernet network and services provisioning specification, within the Integration Service, which provided Zayo access to the inventory of US and EU ISPs.",
+          "char_start": 2917,
+          "char_end": 3007,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_47",
+          "text": "Platform support libraries:",
+          "char_start": 3009,
+          "char_end": 3033,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_48",
+          "text": "Designed and implemented libraries for managing user permissions, and cache management libraries that allowed 10x speed for cache tokens in the microservices environment.",
+          "char_start": 3034,
+          "char_end": 3122,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_49",
+          "text": "Implemented node.js library to run load test simulations for JavaScript and TypeScript packages, and microservice request/response handling under various traffic conditions.",
+          "char_start": 3123,
+          "char_end": 3218,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_50",
+          "text": "Implemented data validation library for request/response route handlers, for REST and Kafka message queues.",
+          "char_start": 3219,
+          "char_end": 3286,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_51",
+          "text": "Implemented feature management library to control new feature releases for React and NodeJS applications, that allowed the disentanglement of feature deployment, and publication dates.",
+          "char_start": 3287,
+          "char_end": 3389,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_52",
+          "text": "MotionPoint Co \u2014 Web Engineer/Developer\nCoconut Creek, FL | FEB 2010 - SEP 2018",
+          "char_start": 3391,
+          "char_end": 3449,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_53",
+          "text": "Developed and supported large-scale, proxy-based translation platforms serving thousands of SMB and Fortune 500 websites.",
+          "char_start": 3451,
+          "char_end": 3520,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_54",
+          "text": "Built internal monitoring, feedback, and analytics tools using Python/Django, AngularJS, and MySQL.",
+          "char_start": 3521,
+          "char_end": 3577,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_55",
+          "text": "Trained junior engineers and new hires; authored internal documentation and training materials.",
+          "char_start": 3578,
+          "char_end": 3634,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_56",
+          "text": "Regularly translated technical issues and solutions for non-technical stakeholders and clients.",
+          "char_start": 3635,
+          "char_end": 3694,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_57",
+          "text": "Configure platform services:",
+          "char_start": 3696,
+          "char_end": 3719,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_58",
+          "text": "Configured servers, applications, and web crawlers for running proxy-based translated sites for several thousand websites and webapps belonging to SMBs and Fortune 500 companies.",
+          "char_start": 3720,
+          "char_end": 3815,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_59",
+          "text": "Used knowledge of web technologies, HTML, CSS, JavaScript, Flash, HTTP , DNS, TCP/IP , SSL to debug client websites and set up each translation application accordingly.",
+          "char_start": 3816,
+          "char_end": 3907,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_60",
+          "text": "Worked on 20K + issues to provide expedient services for various Fortune 500 client websites.",
+          "char_start": 3908,
+          "char_end": 3964,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_61",
+          "text": "Develop add-on applications:",
+          "char_start": 3966,
+          "char_end": 3989,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_62",
+          "text": "Developed front -end web applications to capture user feedback from multiple translated websites, using jQuery and jQuery UI, with JSP/JDBC backend. Notably deployed on multilingual sites for: Verizon Wireless, Grainger, and Travelocity, among other sites.",
+          "char_start": 3990,
+          "char_end": 4107,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_63",
+          "text": "Developed an application to monitor the health of 3000+ translation application servers, using Python/Django, AngularJS, and MySQL.",
+          "char_start": 4108,
+          "char_end": 4182,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_64",
+          "text": "Developed Javascript application to serve custom localized sections within a page, to support multivariate testing on key landing pages.",
+          "char_start": 4183,
+          "char_end": 4255,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_65",
+          "text": "Train junior engineers and new hires:",
+          "char_start": 4257,
+          "char_end": 4285,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_66",
+          "text": "Developed full-stack training and documentation portal application using the MERN stack.",
+          "char_start": 4286,
+          "char_end": 4343,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_67",
+          "text": "Trained new hires on various MotionPoint other web technologies, to address errors, and optimizations for translated websites.",
+          "char_start": 4344,
+          "char_end": 4416,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_68",
+          "text": "Improve department processes:",
+          "char_start": 4418,
+          "char_end": 4442,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_69",
+          "text": "Worked on internal projects for improving department efficiency, process flows and workflow automation.",
+          "char_start": 4443,
+          "char_end": 4515,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_70",
+          "text": "Worked within a highly collaborative Agile team environment, engineering, translation, marketing, and SecOps.",
+          "char_start": 4516,
+          "char_end": 4587,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_71",
+          "text": "Translated technical problems and solutions to upper management and clients.",
+          "char_start": 4588,
+          "char_end": 4637,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_72",
+          "text": "RedTown Tech LLC \u2014 Software Developer\nWest Palm Beach, FL | MAY 2006 - JAN 2010",
+          "char_start": 4639,
+          "char_end": 4698,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_73",
+          "text": "Web applications and landing pages:",
+          "char_start": 4700,
+          "char_end": 4726,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_74",
+          "text": "Developed lead capture and management software for the education industry from various sources. Technologies used include PHP, JQuery and MySQL.",
+          "char_start": 4727,
+          "char_end": 4819,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_75",
+          "text": "Developed software to capture points obtained by users of web based games, into their own virtual wallets. Key technologies used include PHP, HTML, CSS, JavaScript, AngularJS, and MongoDB.",
+          "char_start": 4820,
+          "char_end": 4916,
+          "section_hint": "experience"
+        },
+        {
+          "span_id": "span_76",
+          "text": "INDEPENDENT WORK & PORTFOLIO (ONGOING)",
+          "char_start": 4918,
+          "char_end": 4953,
+          "section_hint": "projects"
+        },
+        {
+          "span_id": "span_77",
+          "text": "AI-Powered Personal Research Assistant:",
+          "char_start": 4955,
+          "char_end": 4987,
+          "section_hint": "projects"
+        },
+        {
+          "span_id": "span_78",
+          "text": "This work builds on prior experience designing knowledge representations and retrieval systems in enterprise and legacy-modernization contexts.",
+          "char_start": 4988,
+          "char_end": 5071,
+          "section_hint": "projects"
+        },
+        {
+          "span_id": "span_79",
+          "text": "Designed the end-to-end RAG pipeline architecture, including ingestion, canonicalization, retrieval, and observability concerns.",
+          "char_start": 5072,
+          "char_end": 5147,
+          "section_hint": "projects"
+        },
+        {
+          "span_id": "span_80",
+          "text": "Implementing chunking strategies, vector search (pgvector), and deletion/forgetting workflows aligned with GDPR principles.",
+          "char_start": 5148,
+          "char_end": 5219,
+          "section_hint": "projects"
+        },
+        {
+          "span_id": "span_81",
+          "text": "Focused on observability, evaluation, and trustworthiness rather than autonomous agent behavior.",
+          "char_start": 5220,
+          "char_end": 5276,
+          "section_hint": "projects"
+        },
+        {
+          "span_id": "span_82",
+          "text": "Florida Atlantic University, Computer Engineering \u2014 BSE\nMAY 2003 | Boca Raton, FL",
+          "char_start": 5278,
+          "char_end": 5333,
+          "section_hint": "education"
+        },
+        {
+          "span_id": "span_83",
+          "text": "Oracle Certified Associate, Java SE 7 Programmer, CompTIA A+, CompTIA Net +\nCoursera: Machine Learning, Python for Everybody, Specialization, Java Development",
+          "char_start": 5335,
+          "char_end": 5437,
+          "section_hint": "artifacts"
+        },
+        {
+          "span_id": "span_84",
+          "text": "Translating business objectives to software requirements\nDelivering projects within time and resource constraints\nEnd-to-end testing\nSaaS & IaaS Technologies ( e.g., AWS)\nObject -Oriented Methodologies\nDesign Patterns\nGIS Applications and libraries\nData Science",
+          "char_start": 5439,
+          "char_end": 5559,
+          "section_hint": "skills"
+        }
+      ],
+      "profile_structured": {
+        "candidate": {
+          "name": "Walid Newaz",
+          "location": "Denver, CO | Remote (US)",
+          "email": "mdwalid@gmail.com",
+          "phone": null
+        },
+        "headline_summary": {
+          "headline": "Senior Software Engineer \u2014 Backend & Knowledge Systems",
+          "summary": "Senior Software Engineer with 15+ years of experience building full-stack, cloud-native applications and platforms. Strong background in backend systems, security-sensitive environments, and scalable web architectures, with a current focus on AI-enabled knowledge retrieval, RAG pipelines, and provenance-driven systems."
+        },
+        "roles": [
+          {
+            "role_id": "role_1",
+            "title": "Software Engineer",
+            "company": "Bank of America",
+            "employment_type": "unknown",
+            "location": "Denver, CO",
+            "start_date": "2024-07",
+            "end_date": "2025-06",
+            "is_current": false,
+            "bullets": [
+              {
+                "bullet_id": "role_1_bullet_1",
+                "text": "Designed and implemented frontend applications for a large-scale security operations platform supporting multiple internal teams.",
+                "span_ids": [
+                  "span_15"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_1_bullet_2",
+                "text": "Established a React-based design system (React, TailwindCSS) to ensure consistency across multiple security micro-applications.",
+                "span_ids": [
+                  "span_16"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_1_bullet_3",
+                "text": "Led development of a security analytics application that improved operational efficiency by ~50% through automated scanning and quarantine workflows.",
+                "span_ids": [
+                  "span_17"
+                ],
+                "impact_signals": {
+                  "has_metric": true,
+                  "has_scope": true,
+                  "has_outcome": true,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "none"
+                ]
+              },
+              {
+                "bullet_id": "role_1_bullet_4",
+                "text": "Built high-performance APIs using Python, FastAPI, and SQLAlchemy for managing threat intelligence and malicious email detection.",
+                "span_ids": [
+                  "span_19"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_1_bullet_5",
+                "text": "Designed a unified federated search experience, integrating multiple internal data sources behind a cohesive UI and API layer.",
+                "span_ids": [
+                  "span_20"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_1_bullet_6",
+                "text": "Collaborated closely with security analysts, product owners, and platform teams to translate operational needs into scalable software solutions.",
+                "span_ids": [
+                  "span_21"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              }
+            ],
+            "seniority_signals": {
+              "architecture": "some",
+              "leadership": "some",
+              "cross_team_influence": "some",
+              "ownership_scope": "feature",
+              "domain_depth": "strong"
+            }
+          },
+          {
+            "role_id": "role_2",
+            "title": "Software Engineer",
+            "company": "Travvit LLC",
+            "employment_type": "unknown",
+            "location": "Denver, CO",
+            "start_date": "2023-01",
+            "end_date": "2024-06",
+            "is_current": false,
+            "bullets": [
+              {
+                "bullet_id": "role_2_bullet_1",
+                "text": "Led the design and built a cloud-native, full-stack web application for outdoor trip planning and experience sharing.",
+                "span_ids": [
+                  "span_24"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_2_bullet_2",
+                "text": "Implemented rich geospatial features using React, Mapbox, Leaflet, and PostGIS for capturing, editing, and visualizing spatial data.",
+                "span_ids": [
+                  "span_25"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_2_bullet_3",
+                "text": "Built backend services using Docker, NestJS, TypeORM, Redis, and PostgreSQL.",
+                "span_ids": [
+                  "span_26"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_2_bullet_4",
+                "text": "Introduced server-side rendering and SEO optimization strategies, significantly improving discoverability.",
+                "span_ids": [
+                  "span_28"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": true,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "none"
+                ]
+              },
+              {
+                "bullet_id": "role_2_bullet_5",
+                "text": "Implemented AWS Lambda workflows to automate sitemap generation and content updates.",
+                "span_ids": [
+                  "span_29"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_2_bullet_6",
+                "text": "Designed an email-based notification and invitation system to improve onboarding and user engagement.",
+                "span_ids": [
+                  "span_30"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": true,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "none"
+                ]
+              }
+            ],
+            "seniority_signals": {
+              "architecture": "some",
+              "leadership": "some",
+              "cross_team_influence": "some",
+              "ownership_scope": "feature",
+              "domain_depth": "strong"
+            }
+          },
+          {
+            "role_id": "role_3",
+            "title": "Java Software Engineer",
+            "company": "Phase Change Software LLC",
+            "employment_type": "unknown",
+            "location": "Golden, CO",
+            "start_date": "2022-03",
+            "end_date": "2022-11",
+            "is_current": false,
+            "bullets": [
+              {
+                "bullet_id": "role_3_bullet_1",
+                "text": "Contributed to an AI platform focused on modernizing legacy mainframe systems through knowledge extraction and reasoning.",
+                "span_ids": [
+                  "span_33"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_3_bullet_2",
+                "text": "Designed parsing strategies for COBOL and SQL to generate intermediate representations (IRs) used by downstream reasoning systems.",
+                "span_ids": [
+                  "span_34"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_3_bullet_3",
+                "text": "Transformed extracted concepts into Prolog-based knowledge artifacts, supporting retrieval and simulation subsystems.",
+                "span_ids": [
+                  "span_35"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_3_bullet_4",
+                "text": "Collaborated with cross-functional teams to align AI outputs with business and modernization goals.",
+                "span_ids": [
+                  "span_36"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              }
+            ],
+            "seniority_signals": {
+              "architecture": "some",
+              "leadership": "none",
+              "cross_team_influence": "some",
+              "ownership_scope": "feature",
+              "domain_depth": "strong"
+            }
+          },
+          {
+            "role_id": "role_4",
+            "title": "Software Engineer",
+            "company": "Zayo Group LLC",
+            "employment_type": "unknown",
+            "location": "Boulder, CO",
+            "start_date": "2018-10",
+            "end_date": "2022-03",
+            "is_current": false,
+            "bullets": [
+              {
+                "bullet_id": "role_4_bullet_1",
+                "text": "Built and maintained full-stack applications and microservices supporting quoting, ordering, and service provisioning.",
+                "span_ids": [
+                  "span_39"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_2",
+                "text": "Integrated multiple third-party carrier APIs and implemented MEF 3.0 specifications for Ethernet service provisioning across US and EU partners.",
+                "span_ids": [
+                  "span_40"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_3",
+                "text": "Designed reusable platform libraries for permissions, caching, validation, and feature management, improving performance and deployment flexibility.",
+                "span_ids": [
+                  "span_41"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": true,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "none"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_4",
+                "text": "Worked extensively with AWS, Salesforce integrations, and PostgreSQL in security- and scalability-sensitive environments.",
+                "span_ids": [
+                  "span_42"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_5",
+                "text": "Designed and implemented microservice to canonicalize 3rd Party data, using custom API and workflow handlers.",
+                "span_ids": [
+                  "span_44"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_6",
+                "text": "Integrated multiple 3rd party APIs with Zayo's Tranzact platform, enabling efficient location search, quoting, and Internet service provisioning, that was used to access network inventories of multiple Zayo partners in the US, and EU.",
+                "span_ids": [
+                  "span_45"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_7",
+                "text": "Implemented the MEF 3.0 API, a Carrier Ethernet network and services provisioning specification, within the Integration Service, which provided Zayo access to the inventory of US and EU ISPs.",
+                "span_ids": [
+                  "span_46"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_8",
+                "text": "Designed and implemented libraries for managing user permissions, and cache management libraries that allowed 10x speed for cache tokens in the microservices environment.",
+                "span_ids": [
+                  "span_48"
+                ],
+                "impact_signals": {
+                  "has_metric": true,
+                  "has_scope": true,
+                  "has_outcome": true,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "none"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_9",
+                "text": "Implemented node.js library to run load test simulations for JavaScript and TypeScript packages, and microservice request/response handling under various traffic conditions.",
+                "span_ids": [
+                  "span_49"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_10",
+                "text": "Implemented data validation library for request/response route handlers, for REST and Kafka message queues.",
+                "span_ids": [
+                  "span_50"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_4_bullet_11",
+                "text": "Implemented feature management library to control new feature releases for React and NodeJS applications, that allowed the disentanglement of feature deployment, and publication dates.",
+                "span_ids": [
+                  "span_51"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": true,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "none"
+                ]
+              }
+            ],
+            "seniority_signals": {
+              "architecture": "strong",
+              "leadership": "some",
+              "cross_team_influence": "some",
+              "ownership_scope": "feature",
+              "domain_depth": "strong"
+            }
+          },
+          {
+            "role_id": "role_5",
+            "title": "Web Engineer/Developer",
+            "company": "MotionPoint Co",
+            "employment_type": "unknown",
+            "location": "Coconut Creek, FL",
+            "start_date": "2010-02",
+            "end_date": "2018-09",
+            "is_current": false,
+            "bullets": [
+              {
+                "bullet_id": "role_5_bullet_1",
+                "text": "Developed and supported large-scale, proxy-based translation platforms serving thousands of SMB and Fortune 500 websites.",
+                "span_ids": [
+                  "span_53"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_2",
+                "text": "Built internal monitoring, feedback, and analytics tools using Python/Django, AngularJS, and MySQL.",
+                "span_ids": [
+                  "span_54"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_3",
+                "text": "Trained junior engineers and new hires; authored internal documentation and training materials.",
+                "span_ids": [
+                  "span_55"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_metric",
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_4",
+                "text": "Regularly translated technical issues and solutions for non-technical stakeholders and clients.",
+                "span_ids": [
+                  "span_56"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_5",
+                "text": "Configured servers, applications, and web crawlers for running proxy-based translated sites for several thousand websites and webapps belonging to SMBs and Fortune 500 companies.",
+                "span_ids": [
+                  "span_58"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_6",
+                "text": "Used knowledge of web technologies, HTML, CSS, JavaScript, Flash, HTTP , DNS, TCP/IP , SSL to debug client websites and set up each translation application accordingly.",
+                "span_ids": [
+                  "span_59"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_7",
+                "text": "Worked on 20K + issues to provide expedient services for various Fortune 500 client websites.",
+                "span_ids": [
+                  "span_60"
+                ],
+                "impact_signals": {
+                  "has_metric": true,
+                  "has_scope": true,
+                  "has_outcome": true,
+                  "has_ownership": false
+                },
+                "clarity_flags": [
+                  "unclear_ownership"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_8",
+                "text": "Developed front -end web applications to capture user feedback from multiple translated websites, using jQuery and jQuery UI, with JSP/JDBC backend. Notably deployed on multilingual sites for: Verizon Wireless, Grainger, and Travelocity, among other sites.",
+                "span_ids": [
+                  "span_62"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_9",
+                "text": "Developed an application to monitor the health of 3000+ translation application servers, using Python/Django, AngularJS, and MySQL.",
+                "span_ids": [
+                  "span_63"
+                ],
+                "impact_signals": {
+                  "has_metric": true,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_10",
+                "text": "Developed Javascript application to serve custom localized sections within a page, to support multivariate testing on key landing pages.",
+                "span_ids": [
+                  "span_64"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_11",
+                "text": "Developed full-stack training and documentation portal application using the MERN stack.",
+                "span_ids": [
+                  "span_66"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_12",
+                "text": "Trained new hires on various MotionPoint other web technologies, to address errors, and optimizations for translated websites.",
+                "span_ids": [
+                  "span_67"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_13",
+                "text": "Worked on internal projects for improving department efficiency, process flows and workflow automation.",
+                "span_ids": [
+                  "span_69"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_14",
+                "text": "Worked within a highly collaborative Agile team environment, engineering, translation, marketing, and SecOps.",
+                "span_ids": [
+                  "span_70"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_5_bullet_15",
+                "text": "Translated technical problems and solutions to upper management and clients.",
+                "span_ids": [
+                  "span_71"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              }
+            ],
+            "seniority_signals": {
+              "architecture": "some",
+              "leadership": "some",
+              "cross_team_influence": "some",
+              "ownership_scope": "feature",
+              "domain_depth": "strong"
+            }
+          },
+          {
+            "role_id": "role_6",
+            "title": "Software Developer",
+            "company": "RedTown Tech LLC",
+            "employment_type": "unknown",
+            "location": "West Palm Beach, FL",
+            "start_date": "2006-05",
+            "end_date": "2010-01",
+            "is_current": false,
+            "bullets": [
+              {
+                "bullet_id": "role_6_bullet_1",
+                "text": "Developed lead capture and management software for the education industry from various sources. Technologies used include PHP, JQuery and MySQL.",
+                "span_ids": [
+                  "span_74"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              },
+              {
+                "bullet_id": "role_6_bullet_2",
+                "text": "Developed software to capture points obtained by users of web based games, into their own virtual wallets. Key technologies used include PHP, HTML, CSS, JavaScript, AngularJS, and MongoDB.",
+                "span_ids": [
+                  "span_75"
+                ],
+                "impact_signals": {
+                  "has_metric": false,
+                  "has_scope": true,
+                  "has_outcome": false,
+                  "has_ownership": true
+                },
+                "clarity_flags": [
+                  "missing_outcome"
+                ]
+              }
+            ],
+            "seniority_signals": {
+              "architecture": "none",
+              "leadership": "none",
+              "cross_team_influence": "none",
+              "ownership_scope": "task",
+              "domain_depth": "some"
+            }
+          }
+        ],
+        "skills": {
+          "hard_skills": [
+            "TypeScript",
+            "JavaScript",
+            "Python",
+            "Java",
+            "SQL",
+            "React",
+            "Next.js",
+            "TailwindCSS",
+            "FastAPI",
+            "Node.js",
+            "NestJS",
+            "REST",
+            "GraphQL",
+            "PostgreSQL",
+            "pgvector",
+            "Redis",
+            "PostGIS",
+            "Document ingestion",
+            "chunking strategies",
+            "embeddings",
+            "retrieval",
+            "citation",
+            "provenance",
+            "LangChain",
+            "LangGraph",
+            "OpenAI",
+            "Gemini 3",
+            "AWS",
+            "Docker",
+            "CI/CD",
+            "System design",
+            "API design",
+            "cross-team collaboration",
+            "translating requirements into specs",
+            "PHP",
+            "JQuery",
+            "MySQL",
+            "MongoDB",
+            "Python/Django",
+            "AngularJS",
+            "Mapbox",
+            "Leaflet",
+            "TypeORM",
+            "Redis",
+            "Kafka",
+            "Salesforce",
+            "SaaS",
+            "IaaS",
+            "Object-Oriented Methodologies",
+            "Design Patterns",
+            "GIS Applications",
+            "Data Science"
+          ],
+          "soft_skills": [
+            "cross-team collaboration",
+            "translating requirements into specs",
+            "translating business objectives to software requirements",
+            "delivering projects within time and resource constraints",
+            "end-to-end testing",
+            "training junior engineers",
+            "collaborative Agile team environment",
+            "translating technical problems and solutions to non-technical stakeholders"
+          ],
+          "tools": [
+            "React",
+            "TailwindCSS",
+            "FastAPI",
+            "Node.js",
+            "NestJS",
+            "Docker",
+            "AWS",
+            "CI/CD",
+            "Mapbox",
+            "Leaflet",
+            "TypeORM",
+            "SQLAlchemy",
+            "JSP/JDBC",
+            "MERN stack",
+            "Kafka",
+            "Salesforce"
+          ],
+          "domains": [
+            "backend systems",
+            "security-sensitive environments",
+            "scalable web architectures",
+            "AI-enabled knowledge retrieval",
+            "RAG pipelines",
+            "provenance-driven systems",
+            "cloud-native applications",
+            "legacy modernization",
+            "geospatial information systems",
+            "translation platforms",
+            "education software",
+            "gaming software"
+          ]
+        },
+        "education": [
+          {
+            "school": "Florida Atlantic University",
+            "degree": "BSE",
+            "field": "Computer Engineering",
+            "start_date": null,
+            "end_date": "2003-05"
+          }
+        ],
+        "links": {
+          "linkedin": "linkedin.com/in/walid-newaz/",
+          "github": null,
+          "portfolio": null,
+          "other": []
+        },
+        "artifacts": {
+          "talks": [],
+          "papers": [],
+          "projects": [
+            "AI-Powered Personal Research Assistant: This work builds on prior experience designing knowledge representations and retrieval systems in enterprise and legacy-modernization contexts. Designed the end-to-end RAG pipeline architecture, including ingestion, canonicalization, retrieval, and observability concerns. Implementing chunking strategies, vector search (pgvector), and deletion/forgetting workflows aligned with GDPR principles. Focused on observability, evaluation, and trustworthiness rather than autonomous agent behavior."
+          ],
+          "certifications": [
+            "Oracle Certified Associate, Java SE 7 Programmer",
+            "CompTIA A+",
+            "CompTIA Net +",
+            "Coursera: Machine Learning",
+            "Python for Everybody",
+            "Specialization",
+            "Java Development"
+          ]
+        }
+      },
+      "field_level_confidence": {
+        "candidate": {
+          "name": 1,
+          "location": 0.9,
+          "email": 0.95,
+          "phone": 0
+        },
+        "roles": [
+          {
+            "role_id": "role_1",
+            "title": 1,
+            "company": 1,
+            "dates": 0.9,
+            "bullets": 0.85
+          },
+          {
+            "role_id": "role_2",
+            "title": 1,
+            "company": 1,
+            "dates": 0.9,
+            "bullets": 0.85
+          },
+          {
+            "role_id": "role_3",
+            "title": 1,
+            "company": 1,
+            "dates": 0.9,
+            "bullets": 0.8
+          },
+          {
+            "role_id": "role_4",
+            "title": 1,
+            "company": 1,
+            "dates": 0.9,
+            "bullets": 0.85
+          },
+          {
+            "role_id": "role_5",
+            "title": 1,
+            "company": 1,
+            "dates": 0.9,
+            "bullets": 0.75
+          },
+          {
+            "role_id": "role_6",
+            "title": 1,
+            "company": 1,
+            "dates": 0.9,
+            "bullets": 0.8
+          }
+        ],
+        "skills": 0.9,
+        "education": 0.9,
+        "links": 0.9
+      },
+      "resume_quality_scores": {
+        "overall": 82,
+        "subscores": {
+          "clarity": 75,
+          "evidence_strength": 70,
+          "seniority_signals": 75,
+          "structure_completeness": 90,
+          "role_focus": 85,
+          "credibility_signals": 85
+        },
+        "score_reasons": [
+          {
+            "dimension": "clarity",
+            "reason": "Many bullets lack explicit outcomes or metrics; some ownership is unclear.",
+            "severity": "medium",
+            "span_ids": [
+              "span_15",
+              "span_16",
+              "span_19",
+              "span_20",
+              "span_21",
+              "span_24",
+              "span_25",
+              "span_26",
+              "span_29",
+              "span_30",
+              "span_33",
+              "span_34",
+              "span_35",
+              "span_36",
+              "span_39",
+              "span_40",
+              "span_42",
+              "span_44",
+              "span_45",
+              "span_46",
+              "span_49",
+              "span_50",
+              "span_53",
+              "span_54",
+              "span_55",
+              "span_56",
+              "span_58",
+              "span_59",
+              "span_60",
+              "span_62",
+              "span_63",
+              "span_64",
+              "span_66",
+              "span_67",
+              "span_69",
+              "span_70",
+              "span_71",
+              "span_74",
+              "span_75"
+            ]
+          },
+          {
+            "dimension": "evidence_strength",
+            "reason": "Limited quantified impact metrics; only a few bullets provide numeric improvements.",
+            "severity": "medium",
+            "span_ids": [
+              "span_17",
+              "span_28",
+              "span_48",
+              "span_60",
+              "span_63"
+            ]
+          },
+          {
+            "dimension": "seniority_signals",
+            "reason": "Leadership and cross-team influence signals present but no explicit management or direct reports mentioned.",
+            "severity": "medium",
+            "span_ids": [
+              "span_17",
+              "span_55",
+              "span_66"
+            ]
+          },
+          {
+            "dimension": "structure_completeness",
+            "reason": "Resume well structured with clear sections and consistent formatting.",
+            "severity": "low",
+            "span_ids": []
+          },
+          {
+            "dimension": "role_focus",
+            "reason": "Roles clearly focused on software engineering with relevant skills and domain expertise.",
+            "severity": "low",
+            "span_ids": []
+          },
+          {
+            "dimension": "credibility_signals",
+            "reason": "Certifications and education listed; LinkedIn provided; no phone number found.",
+            "severity": "medium",
+            "span_ids": [
+              "span_4",
+              "span_83"
+            ]
+          }
+        ]
+      },
+      "seniority_calibration": {
+        "estimated_band": "senior",
+        "confidence": 0.8,
+        "signals_supporting": [
+          {
+            "signal": "15+ years experience with multiple full-stack and backend roles",
+            "why": "Demonstrates deep domain knowledge and sustained career progression",
+            "span_ids": [
+              "span_5",
+              "span_13",
+              "span_22",
+              "span_31",
+              "span_37",
+              "span_52",
+              "span_72"
+            ]
+          },
+          {
+            "signal": "Led design and development of features and systems with cross-team collaboration",
+            "why": "Indicates some leadership and ownership at feature and system level",
+            "span_ids": [
+              "span_17",
+              "span_24",
+              "span_55"
+            ]
+          },
+          {
+            "signal": "Implemented reusable platform libraries and integrations with external APIs",
+            "why": "Shows architectural and system design involvement",
+            "span_ids": [
+              "span_41",
+              "span_44",
+              "span_48"
+            ]
+          }
+        ],
+        "signals_missing": [
+          {
+            "signal": "Explicit leadership or management roles",
+            "why_it_matters": "Management experience is key for roles above senior level",
+            "how_to_provide_evidence": "Add bullets describing team leadership, direct reports, or project management responsibilities"
+          },
+          {
+            "signal": "Clear metrics for most impact statements",
+            "why_it_matters": "Quantified outcomes strengthen seniority and impact claims",
+            "how_to_provide_evidence": "Include numeric improvements, scale, or business impact for key projects"
+          }
+        ],
+        "premature_targets": [
+          {
+            "target_band": "staff",
+            "why_premature": "No explicit leadership or management experience shown",
+            "evidence_needed": [
+              "Team leadership or management responsibilities",
+              "Broader organizational impact",
+              "Mentorship or coaching roles with measurable outcomes"
+            ]
+          },
+          {
+            "target_band": "principal",
+            "why_premature": "Lacks evidence of strategic influence or organizational leadership",
+            "evidence_needed": [
+              "Cross-organization initiatives led",
+              "High-level architecture ownership",
+              "Recognition or awards for technical leadership"
+            ]
+          }
+        ]
+      },
+      "top_gaps": [
+        {
+          "gap_id": "gap_1",
+          "title": "Missing phone number",
+          "description": "No phone number found in contact information, which may reduce recruiter ability to contact quickly.",
+          "category": "credibility",
+          "impact": "medium",
+          "effort": "low",
+          "span_ids": [
+            "span_4"
+          ],
+          "next_actions": [
+            "Add phone number to contact section"
+          ]
+        },
+        {
+          "gap_id": "gap_2",
+          "title": "Lack of explicit leadership or management evidence",
+          "description": "No clear statements about managing teams, mentoring, or leadership beyond feature ownership.",
+          "category": "seniority",
+          "impact": "high",
+          "effort": "medium",
+          "span_ids": [
+            "span_17",
+            "span_55",
+            "span_66"
+          ],
+          "next_actions": [
+            "Add bullets describing leadership, mentoring, or management roles"
+          ]
+        },
+        {
+          "gap_id": "gap_3",
+          "title": "Many bullets lack quantified impact or clear outcomes",
+          "description": "Most role bullets describe activities without metrics or clear business outcomes.",
+          "category": "evidence",
+          "impact": "high",
+          "effort": "medium",
+          "span_ids": [
+            "span_15",
+            "span_16",
+            "span_19",
+            "span_20",
+            "span_21",
+            "span_24",
+            "span_25",
+            "span_26",
+            "span_29",
+            "span_33",
+            "span_34",
+            "span_35",
+            "span_36",
+            "span_39",
+            "span_40",
+            "span_42",
+            "span_44",
+            "span_45",
+            "span_46",
+            "span_49",
+            "span_50",
+            "span_53",
+            "span_54",
+            "span_56",
+            "span_58",
+            "span_59",
+            "span_62",
+            "span_64",
+            "span_66",
+            "span_67",
+            "span_69",
+            "span_70",
+            "span_71",
+            "span_74",
+            "span_75"
+          ],
+          "next_actions": [
+            "Add metrics or business impact statements to key bullets"
+          ]
+        }
+      ],
+      "red_flags": [
+        {
+          "flag_id": "flag_1",
+          "type": "missing_dates",
+          "description": "Employment dates are present but no explicit employment type (full_time, contract) specified.",
+          "severity": "low",
+          "span_ids": [
+            "span_13",
+            "span_22",
+            "span_31",
+            "span_37",
+            "span_52",
+            "span_72"
+          ],
+          "user_prompt": "Please confirm employment types (full_time, contract, etc.) for each role."
+        },
+        {
+          "flag_id": "flag_2",
+          "type": "missing_contact_info",
+          "description": "No phone number found in contact information.",
+          "severity": "medium",
+          "span_ids": [
+            "span_4"
+          ],
+          "user_prompt": "Please provide a phone number for contact."
+        },
+        {
+          "flag_id": "flag_3",
+          "type": "vague_bullets",
+          "description": "Many bullets lack clear outcomes or metrics, reducing clarity and impact.",
+          "severity": "medium",
+          "span_ids": [
+            "span_15",
+            "span_16",
+            "span_19",
+            "span_20",
+            "span_21",
+            "span_24",
+            "span_25",
+            "span_26",
+            "span_29",
+            "span_33",
+            "span_34",
+            "span_35",
+            "span_36",
+            "span_39",
+            "span_40",
+            "span_42",
+            "span_44",
+            "span_45",
+            "span_46",
+            "span_49",
+            "span_50",
+            "span_53",
+            "span_54",
+            "span_56",
+            "span_58",
+            "span_59",
+            "span_62",
+            "span_64",
+            "span_66",
+            "span_67",
+            "span_69",
+            "span_70",
+            "span_71",
+            "span_74",
+            "span_75"
+          ],
+          "user_prompt": "Please provide clearer outcomes and metrics for key accomplishments."
+        }
+      ],
+      "fix_plan": {
+        "minutes_30": [
+          "Add phone number to contact information.",
+          "Confirm employment types for each role."
+        ],
+        "hours_2": [
+          "Review bullets and add quantified impact metrics where possible.",
+          "Clarify ownership and outcomes in vague bullets."
+        ],
+        "days_7": [
+          "Add explicit leadership or management experience if applicable.",
+          "Add more detailed project outcomes and business impact statements."
+        ],
+        "guardrails": [
+          "Do not invent metrics or outcomes; only add verifiable facts.",
+          "Avoid vague verbs without clear outcomes.",
+          "Ensure consistency in date formats and employment types."
+        ]
+      },
+      "suggested_rewrites": [
+        {
+          "rewrite_id": "rewrite_1",
+          "original_bullet": "Designed and implemented frontend applications for a large-scale security operations platform supporting multiple internal teams.",
+          "span_ids": [
+            "span_15"
+          ],
+          "rewrite_variants": [
+            {
+              "variant_id": "rewrite_1_v1",
+              "text": "Designed and implemented frontend applications for a large-scale security operations platform used by multiple internal teams."
+            }
+          ],
+          "missing_info_questions": [
+            "Can you provide specific outcomes or improvements resulting from these frontend applications?"
+          ]
+        },
+        {
+          "rewrite_id": "rewrite_2",
+          "original_bullet": "Established a React-based design system (React, TailwindCSS) to ensure consistency across multiple security micro-applications.",
+          "span_ids": [
+            "span_16"
+          ],
+          "rewrite_variants": [
+            {
+              "variant_id": "rewrite_2_v1",
+              "text": "Established a React-based design system using React and TailwindCSS to ensure UI consistency across multiple security micro-applications."
+            }
+          ],
+          "missing_info_questions": [
+            "What was the impact of the design system on development efficiency or user experience?"
+          ]
+        },
+        {
+          "rewrite_id": "rewrite_3",
+          "original_bullet": "Built high-performance APIs using Python, FastAPI, and SQLAlchemy for managing threat intelligence and malicious email detection.",
+          "span_ids": [
+            "span_19"
+          ],
+          "rewrite_variants": [
+            {
+              "variant_id": "rewrite_3_v1",
+              "text": "Built high-performance APIs with Python, FastAPI, and SQLAlchemy to manage threat intelligence and detect malicious emails."
+            }
+          ],
+          "missing_info_questions": [
+            "Can you quantify the performance improvements or security impact of these APIs?"
+          ]
+        }
+      ],
+      "questions_for_user": [
+        {
+          "question_id": "q_1",
+          "question": "What is your phone number to include in the contact information?",
+          "why_needed": "Phone number is missing, which is important for recruiter contact.",
+          "priority": "p0"
+        },
+        {
+          "question_id": "q_2",
+          "question": "Can you confirm the employment type (full_time, contract, part_time, intern) for each role listed?",
+          "why_needed": "Employment type is currently unknown for all roles; this information improves clarity and credibility.",
+          "priority": "p1"
+        },
+        {
+          "question_id": "q_3",
+          "question": "Can you provide specific metrics or outcomes for the bullets that currently lack quantified impact?",
+          "why_needed": "Adding metrics strengthens evidence of impact and seniority.",
+          "priority": "p1"
+        },
+        {
+          "question_id": "q_4",
+          "question": "Do you have any leadership or management experience (e.g., managing teams, mentoring) that can be added?",
+          "why_needed": "Explicit leadership experience is missing and important for seniority calibration.",
+          "priority": "p0"
+        }
+      ]
+    };
 
-    function setReadiness(label){
-      const el = document.getElementById('readinessLabel');
-      const badge = document.getElementById('readinessBadge');
-      el.textContent = label || '—';
-
-      const l = String(label || '').toLowerCase();
-      badge.className = 'badge';
-      if(l.includes('strong')){
-        badge.classList.add('good'); badge.textContent = '✓';
-      } else if(l.includes('fair')){
-        badge.classList.add('fair'); badge.textContent = '≈';
-      } else {
-        badge.classList.add('poor'); badge.textContent = '!';
+    function loadAgentOutput(){
+      let raw = localStorage.getItem("cb_mock_resume_agent_output");
+      if (!raw) return { data: MOCK_AGENT_OUTPUT, source: "mock" };
+      try{
+        const obj = JSON.parse(raw);
+        return { data: obj, source: "localStorage" };
+      }catch(e){
+        console.warn("Failed to parse cb_mock_resume_agent_output; using mock.", e);
+        return { data: MOCK_AGENT_OUTPUT, source: "mock_parse_fail" };
       }
     }
 
-    function render(){
-      // Fallback if user lands here directly.
-      const fallback = {
-        generatedAtISO: new Date().toISOString(),
-        scores: { structure: 68, evidence_strength: 61, readiness_label: "Fair" },
-        signals: {
-          seniority: [
-            { label: "Scope ownership language present (medium)", confidence: "medium" },
-            { label: "Leadership evidence unclear (low)", confidence: "low" }
-          ],
-          domain: [
-            { label: "General web engineering signals", confidence: "medium" }
-          ]
-        },
-        strengths: [
-          { text: "Modern frontend stack signals present (React/TypeScript).", confidence: "high" }
-        ],
-        gaps: [
-          { text: "Some roles missing dates or clear progression markers.", confidence: "medium" },
-          { text: "Outcomes/metrics are sparse in several bullets.", confidence: "medium" }
-        ],
-        uncertainties: [
-          { text: "Exact title/scope for current role needs confirmation.", confidence: "low" }
-        ],
-        top_improvements: [
-          "Add month/year dates for each role",
-          "Convert 2–3 bullets into outcome bullets",
-          "Clarify scope (ownership, scale, stakeholders)"
-        ]
-      };
-
-      let data = fallback;
-      try {
-        const raw = localStorage.getItem('cb_mock_resume_results');
-        if(raw) data = JSON.parse(raw);
-      } catch (_) {}
-
-      // Summary
-      setReadiness(data?.scores?.readiness_label);
-      setMeter('structureBar', 'structureVal', data?.scores?.structure);
-      setMeter('evidenceBar', 'evidenceVal', data?.scores?.evidence_strength);
-
-      const ts = data?.generatedAtISO ? new Date(data.generatedAtISO) : new Date();
-      document.getElementById('generatedAt').textContent =
-        `Generated: ${ts.toLocaleString()}`;
-
-      // Lists
-      const seniority = (data?.signals?.seniority || []).map(x =>
-        itemTemplate(x.label, x.confidence, 'seniority')
-      ).join('');
-      document.getElementById('seniorityList').innerHTML = seniority || `<div class="muted">No signals detected.</div>`;
-
-      const domain = (data?.signals?.domain || []).map(x =>
-        itemTemplate(x.label, x.confidence, 'domain')
-      ).join('');
-      document.getElementById('domainList').innerHTML = domain || `<div class="muted">No domain indicators detected.</div>`;
-
-      const strengths = (data?.strengths || []).map(x =>
-        itemTemplate(x.text, x.confidence, 'strengths')
-      ).join('');
-      document.getElementById('strengthsList').innerHTML = strengths || `<div class="muted">No strengths extracted.</div>`;
-
-      const gaps = (data?.gaps || []).map(x =>
-        itemTemplate(x.text, x.confidence, 'gaps')
-      ).join('');
-      document.getElementById('gapsList').innerHTML = gaps || `<div class="muted">No gaps identified.</div>`;
-
-      const uncs = (data?.uncertainties || []).map(x =>
-        itemTemplate(x.text, x.confidence, 'uncertainties')
-      ).join('');
-      document.getElementById('uncertaintiesList').innerHTML = uncs || `<div class="muted">No uncertainties listed.</div>`;
-
-      // Improvements
-      const improvements = (data?.top_improvements || []).slice(0, 5);
-      document.getElementById('improvementsList').innerHTML = improvements.map((t, i) => `
-        <li class="li">
-          <div class="num">${i+1}</div>
-          <div>
-            <b>${escapeHtml(t)}</b>
-            <span>Improves downstream decision confidence.</span>
-          </div>
-        </li>
-      `).join('') || `<li class="muted">No suggestions.</li>`;
+    function loadUser(){
+      let raw = localStorage.getItem("cb_mock_user");
+      if (!raw) return { trial_day: 1, trial_total: 7 };
+      try{
+        const obj = JSON.parse(raw);
+        const day = Number(obj.trial_day ?? obj.day ?? 1);
+        const total = Number(obj.trial_total ?? obj.total ?? 7);
+        return { trial_day: clamp(day,1,999), trial_total: clamp(total,1,999) };
+      }catch(e){
+        return { trial_day: 1, trial_total: 7 };
+      }
     }
 
-    updateTrialPill();
+    function setTrialPill(){
+      const u = loadUser();
+      $("trialDay").textContent = u.trial_day;
+      // Keep pill text consistent even if total changes
+      $("trialPill").childNodes.forEach(()=>{});
+    }
+
+    function render(){
+      setTrialPill();
+
+      const { data: out, source } = loadAgentOutput();
+
+      // Snapshot kicker
+      const genAt = out?.run?.generated_at_iso || null;
+      $("snapshotKicker").textContent = genAt
+        ? `Last analyzed ${new Date(genAt).toLocaleString()} · source: ${source}`
+        : `Based on your latest pasted resume text · source: ${source}`;
+
+      // Overall score + band
+      const overall = Number(out?.resume_quality_scores?.overall ?? 0);
+      $("overallScore").textContent = isFinite(overall) ? overall : "—";
+      $("overallMeter").style.width = pct(overall);
+
+      const band = bandFromScore(overall);
+      $("overallBand").textContent = band.label;
+
+      // Readiness pill tone
+      $("readinessLabel").textContent = band.label;
+      $("readinessPill").querySelector(".dot").style.background = toneDot(band.tone);
+
+      // Subscores
+      const subs = out?.resume_quality_scores?.subscores || {};
+      const keys = [
+        "clarity",
+        "evidence_strength",
+        "seniority_signals",
+        "structure_completeness",
+        "role_focus",
+        "credibility_signals"
+      ];
+      keys.forEach(k=>{
+        const v = Number(subs[k] ?? 0);
+        const bar = $("bar_"+k);
+        const val = $("val_"+k);
+        if (bar) bar.style.width = pct(v);
+        if (val) val.textContent = isFinite(v) ? v : "—";
+      });
+
+      // Quick mini tags
+      $("structureQuick").textContent = (subs.structure_completeness ?? "—");
+      $("evidenceQuick").textContent = (subs.evidence_strength ?? "—");
+
+      // Seniority calibration
+      const cal = out?.seniority_calibration || {};
+      const estBand = cal.estimated_band || "unknown";
+      const conf = typeof cal.confidence === "number" ? cal.confidence : null;
+
+      $("bandText").textContent = capitalizeWords(estBand);
+      $("bandConf").textContent = conf !== null ? conf.toFixed(2) : "—";
+      $("calBand").textContent = capitalizeWords(estBand);
+      $("calConf").textContent = conf !== null ? conf.toFixed(2) : "—";
+
+      // Build a short summary from missing signals
+      const missing = Array.isArray(cal.signals_missing) ? cal.signals_missing : [];
+      const missingTitles = missing.slice(0,2).map(x => x.signal).filter(Boolean);
+      $("calSummary").textContent = missingTitles.length
+        ? `The biggest missing signals are: ${missingTitles.join(" · ")}.`
+        : `This estimate is based on what’s explicitly stated in the resume text.`;
+
+      // Supporting signals chips
+      const supportWrap = $("supportSignals");
+      supportWrap.innerHTML = "";
+      (Array.isArray(cal.signals_supporting) ? cal.signals_supporting : []).slice(0,5).forEach(s=>{
+        const el = document.createElement("span");
+        el.className = "chip";
+        el.innerHTML = `<strong>${esc(s.signal || "Signal")}</strong>`;
+        supportWrap.appendChild(el);
+      });
+
+      // Premature targets
+      const premWrap = $("prematureTargets");
+      premWrap.innerHTML = "";
+      const prem = Array.isArray(cal.premature_targets) ? cal.premature_targets : [];
+      if (!prem.length){
+        premWrap.innerHTML = `<div class="hint">No premature targets flagged.</div>`;
+      } else {
+        prem.slice(0,4).forEach(p=>{
+          const box = document.createElement("div");
+          box.className = "item";
+          box.style.marginTop = "10px";
+          box.innerHTML = `
+            <div class="itemTop">
+              <p class="itemTitle">${esc(capitalizeWords(p.target_band || "target"))}</p>
+              <span class="chip imp med"><strong>Evidence needed</strong></span>
+            </div>
+            <p class="itemDesc">${esc(p.why_premature || "")}</p>
+            <ul class="hint" style="margin:10px 0 0; padding-left:16px;">
+              ${(Array.isArray(p.evidence_needed)?p.evidence_needed:[]).slice(0,4).map(x=>`<li style="margin:6px 0;">${esc(x)}</li>`).join("")}
+            </ul>
+          `;
+          premWrap.appendChild(box);
+        });
+      }
+
+      // Most limiting factor & fast lift (derive from score_reasons + gaps)
+      const reasons = Array.isArray(out?.resume_quality_scores?.score_reasons) ? out.resume_quality_scores.score_reasons : [];
+      const topReason = reasons.find(r => (r.severity==="high")) || reasons[0];
+      $("mostLimiting").textContent = topReason
+        ? `${capitalizeWords(topReason.dimension)}: ${topReason.reason}`
+        : "—";
+
+      const gaps = Array.isArray(out?.top_gaps) ? out.top_gaps : [];
+      const fast = gaps.find(g => g.effort==="low" && (g.impact==="high" || g.impact==="medium")) || gaps[0];
+      $("fastLift").textContent = fast
+        ? `${fast.title} — ${fast.next_actions?.[0] || "Start with the first next action."}`
+        : "—";
+
+      // Gaps list
+      $("gapCount").textContent = gaps.length;
+      const gapsList = $("gapsList");
+      gapsList.innerHTML = "";
+      if (!gaps.length){
+        gapsList.innerHTML = `<div class="hint">No gaps detected. If this seems wrong, re-run analysis with the full resume text.</div>`;
+      } else {
+        gaps.slice(0,6).forEach(g=>{
+          const item = document.createElement("div");
+          item.className = "item";
+          const imp = g.impact || "medium";
+          const eff = g.effort || "medium";
+          item.innerHTML = `
+            <div class="itemTop">
+              <p class="itemTitle">${esc(g.title || "Gap")}</p>
+              <div class="chips" style="margin-top:0;">
+                <span class="chip imp ${imp==="high"?"high":imp==="low"?"low":"med"}"><strong>Impact</strong> ${esc(imp)}</span>
+                <span class="chip eff ${esc(eff)}"><strong>Effort</strong> ${esc(eff)}</span>
+                <span class="chip"><strong>${esc(capitalizeWords(g.category||""))}</strong></span>
+              </div>
+            </div>
+            <p class="itemDesc">${esc(g.description || "")}</p>
+            <div class="chips">
+              ${(Array.isArray(g.next_actions)?g.next_actions:[]).slice(0,3).map(a=>`<span class="chip">${esc(a)}</span>`).join("")}
+            </div>
+          `;
+          gapsList.appendChild(item);
+        });
+      }
+
+      // Flags list
+      const flags = Array.isArray(out?.red_flags) ? out.red_flags : [];
+      $("flagCount").textContent = flags.length;
+      const flagsList = $("flagsList");
+      flagsList.innerHTML = "";
+      if (!flags.length){
+        flagsList.innerHTML = `<div class="hint">No red flags detected. If you expect flags (missing dates, vague bullets), re-run analysis with the complete resume.</div>`;
+      } else {
+        flags.slice(0,6).forEach(f=>{
+          const item = document.createElement("div");
+          item.className = "item";
+          const sev = f.severity || "medium";
+          const sevTone = sev==="high" ? "high" : sev==="low" ? "low" : "med";
+          item.innerHTML = `
+            <div class="itemTop">
+              <p class="itemTitle">${esc(capitalizeWords(f.type||"flag"))}</p>
+              <span class="chip imp ${sevTone}"><strong>Severity</strong> ${esc(sev)}</span>
+            </div>
+            <p class="itemDesc">${esc(f.description || "")}</p>
+            <div class="callout" style="margin-top:10px;">
+              <h4 style="margin:0 0 4px; font-size:12px;">Resolve prompt</h4>
+              <p style="margin:0; font-size:12px; color:var(--muted);">${esc(f.user_prompt || "")}</p>
+            </div>
+          `;
+          flagsList.appendChild(item);
+        });
+      }
+
+      // Rewrites
+      const rewrites = Array.isArray(out?.suggested_rewrites) ? out.suggested_rewrites : [];
+      const rewritesList = $("rewritesList");
+      rewritesList.innerHTML = "";
+      if (!rewrites.length){
+        rewritesList.innerHTML = `<div class="hint">No rewrite suggestions found.</div>`;
+      } else {
+        rewrites.slice(0,3).forEach((rw, idx)=>{
+          const variants = Array.isArray(rw.rewrite_variants) ? rw.rewrite_variants : [];
+          const missQ = Array.isArray(rw.missing_info_questions) ? rw.missing_info_questions : [];
+          const box = document.createElement("div");
+          box.className = "item";
+          box.innerHTML = `
+            <div class="itemTop">
+              <p class="itemTitle">Rewrite ${idx+1}</p>
+              <span class="pill" style="padding:7px 10px;"><span class="dot" style="background:var(--ok)"></span> Uses provided facts</span>
+            </div>
+            <div class="callout" style="margin-top:10px;">
+              <h4 style="margin:0 0 4px; font-size:12px;">Original bullet</h4>
+              <p style="margin:0; font-size:12px; color:var(--muted);">${esc(rw.original_bullet || "")}</p>
+            </div>
+            <div class="divider"></div>
+            <div class="twoCol">
+              <div>
+                <div class="hint" style="margin-bottom:8px;"><b>Rewrite variants</b></div>
+                ${variants.slice(0,3).map(v=>`
+                  <div class="callout" style="margin-top:8px;">
+                    <h4 style="margin:0 0 4px; font-size:12px;">Variant</h4>
+                    <p style="margin:0; font-size:12px; color:var(--muted);">${esc(v.text || "")}</p>
+                  </div>
+                `).join("")}
+              </div>
+              <div>
+                <div class="hint" style="margin-bottom:8px;"><b>If you want higher confidence, answer:</b></div>
+                <ul class="hint" style="margin:0; padding-left:16px;">
+                  ${missQ.slice(0,4).map(q=>`<li style="margin:6px 0;">${esc(q)}</li>`).join("") || `<li style="margin:6px 0;">No additional info requested.</li>`}
+                </ul>
+              </div>
+            </div>
+          `;
+          rewritesList.appendChild(box);
+        });
+      }
+
+      // Questions
+      const qs = Array.isArray(out?.questions_for_user) ? out.questions_for_user : [];
+      const questionsList = $("questionsList");
+      questionsList.innerHTML = "";
+      const p0 = qs.filter(q => q.priority === "p0");
+      $("p0Count").textContent = p0.length;
+
+      const sortedQs = qs.slice().sort((a,b)=>{
+        const order = {p0:0,p1:1,p2:2};
+        return (order[a.priority] ?? 9) - (order[b.priority] ?? 9);
+      });
+
+      if (!sortedQs.length){
+        questionsList.innerHTML = `<div class="hint">No questions were generated. If data is missing, re-run analysis with the full resume text.</div>`;
+      } else {
+        sortedQs.slice(0,8).forEach(q=>{
+          const item = document.createElement("div");
+          item.className = "item";
+          const pr = q.priority || "p2";
+          const tone = pr==="p0" ? "high" : pr==="p1" ? "med" : "low";
+          item.innerHTML = `
+            <div class="itemTop">
+              <p class="itemTitle">${esc(q.question || "")}</p>
+              <span class="chip imp ${tone}"><strong>${esc(pr.toUpperCase())}</strong></span>
+            </div>
+            <p class="itemDesc">${esc(q.why_needed || "")}</p>
+          `;
+          questionsList.appendChild(item);
+        });
+      }
+
+      // Guardrails
+      const guards = out?.fix_plan?.guardrails || [];
+      $("guardrailsText").innerHTML = (Array.isArray(guards) && guards.length)
+        ? `<ul style="margin:0; padding-left:16px;">${guards.slice(0,6).map(g=>`<li style="margin:6px 0;">${esc(g)}</li>`).join("")}</ul>`
+        : `<div class="hint">No guardrails provided.</div>`;
+
+      // Quick plan (30 minutes)
+      const plan = out?.fix_plan?.minutes_30 || [];
+      const qp = $("quickPlan");
+      qp.innerHTML = "";
+      (Array.isArray(plan) ? plan : []).slice(0,5).forEach((p,i)=>{
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="itemTop">
+            <p class="itemTitle">Step ${i+1}</p>
+            <span class="pill" style="padding:7px 10px;"><span class="dot" style="background:var(--accent2)"></span> 30-min plan</span>
+          </div>
+          <p class="itemDesc">${esc(p)}</p>
+        `;
+        qp.appendChild(el);
+      });
+      if (!(Array.isArray(plan) && plan.length)){
+        qp.innerHTML = `<div class="hint">No quick plan available.</div>`;
+      }
+
+      // Debug accordion
+      $("spanCount").textContent = (out?.resume_spans?.length ?? 0);
+      $("roleCount").textContent = (out?.profile_structured?.roles?.length ?? 0);
+      $("runId").textContent = out?.run?.run_id ?? "—";
+      $("genAt").textContent = out?.run?.generated_at_iso ?? "—";
+      $("rawJson").textContent = JSON.stringify(out, null, 2);
+
+      // Wire buttons
+      $("btnRerun").onclick = ()=> location.href = "03_resume_intake.html";
+      $("btnConfirm").onclick = ()=> location.href = "05_profile_verify.html";
+
+      $("btnSave").onclick = ()=>{
+        // Store a compact summary for profile usage.
+        const summary = {
+          savedAtISO: todayISO(),
+          run: out.run ?? null,
+          scores: out.resume_quality_scores ?? null,
+          seniority: out.seniority_calibration ?? null,
+          top_gaps: (out.top_gaps ?? []).slice(0,6),
+          red_flags: (out.red_flags ?? []).slice(0,6),
+          p0_questions: (out.questions_for_user ?? []).filter(q=>q.priority==="p0").slice(0,8),
+          candidate: out.profile_structured?.candidate ?? null,
+          headline_summary: out.profile_structured?.headline_summary ?? null
+        };
+        localStorage.setItem("cb_mock_resume_results", JSON.stringify(summary));
+        toast("Saved to profile.");
+      };
+
+      $("btnCopyP0").onclick = async ()=>{
+        const p0qs = (out.questions_for_user ?? []).filter(q=>q.priority==="p0").map(q=>`- ${q.question}`).join("\n");
+        const txt = p0qs || "(No P0 questions found.)";
+        try{ await navigator.clipboard.writeText(txt); toast("Copied P0 questions."); }catch(e){ toast("Copy failed."); }
+      };
+
+      $("btnCopyPlan").onclick = async ()=>{
+        const planTxt = (out.fix_plan?.minutes_30 ?? []).map((x,i)=>`${i+1}. ${x}`).join("\n");
+        const txt = planTxt || "(No 30-min plan found.)";
+        try{ await navigator.clipboard.writeText(txt); toast("Copied 30-min plan."); }catch(e){ toast("Copy failed."); }
+      };
+
+      // Debug accordion toggle
+      const head = $("accDebug").querySelector(".accHead");
+      const body = $("accBody");
+      function toggleAcc(){
+        const open = body.classList.toggle("open");
+        head.setAttribute("aria-expanded", open ? "true" : "false");
+        body.classList.toggle("open", open);
+      }
+      head.onclick = toggleAcc;
+      head.onkeydown = (e)=>{ if(e.key==="Enter" || e.key===" "){ e.preventDefault(); toggleAcc(); } };
+    }
+
     render();
   </script>
 </body>
