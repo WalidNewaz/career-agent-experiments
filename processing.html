@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Audit | Career Navigator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .dot-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col transition-colors duration-700" id="body-bg">
+
+    <main class="flex-grow flex items-center justify-center px-6">
+        <div class="max-w-lg w-full text-center">
+            
+            <div class="mb-10 relative">
+                <div class="w-24 h-24 mx-auto rounded-3xl flex items-center justify-center shadow-2xl relative z-10 transition-colors duration-700" id="icon-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white animate-spin-slow" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="animation: spin 3s linear infinite;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                </div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-24 h-24 rounded-3xl animate-ping opacity-20 transition-colors duration-700" id="pulse-ring"></div>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-bold mb-2 tracking-tight">Agent is working...</h2>
+            <p class="text-slate-500 mb-10 h-6 overflow-hidden" id="status-text">Initializing neural audit...</p>
+
+            <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden mb-6 relative shadow-inner">
+                <div id="progress-bar" class="h-full w-0 transition-all duration-500 ease-out relative">
+                    <div class="absolute inset-0 shimmer"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-xl p-6 text-left shadow-2xl overflow-hidden border border-slate-800">
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                    <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest pl-2">System Log</span>
+                </div>
+                <div id="log-container" class="font-mono text-xs space-y-2 text-slate-300">
+                    <p class="text-blue-400">>> Establishing secure agent session...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Configuration for different audit types
+        const configs = {
+            resume: {
+                color: 'bg-blue-600',
+                ring: 'bg-blue-400',
+                messages: [
+                    "Parsing experience segments...",
+                    "Scanning for impact metrics...",
+                    "Checking keyword density...",
+                    "Comparing against benchmarks...",
+                    "Finalizing performance report..."
+                ],
+                logs: [
+                    "Checking ATS compatibility markers...",
+                    "Scanning for active verb usage...",
+                    "Identifying quantitative achievements...",
+                    "Mapping semantic clusters to role targets..."
+                ]
+            },
+            job: {
+                color: 'bg-indigo-600',
+                ring: 'bg-indigo-400',
+                messages: [
+                    "Contextualizing Job Description...",
+                    "Mapping resume to requirements...",
+                    "Analyzing cultural alignment...",
+                    "Calculating fit probability...",
+                    "Drafting decision brief..."
+                ],
+                logs: [
+                    "Extracting primary responsibilities...",
+                    "Weighting skill priority levels...",
+                    "Running gap analysis on experience...",
+                    "Synthesizing interview talk-tracks..."
+                ]
+            }
+        };
+
+        // 1. Detect Type from URL (e.g., /audit/resume/processing)
+        const path = window.location.pathname;
+        const type = path.includes('resume') ? 'resume' : 'job';
+        const config = configs[type];
+
+        // 2. Apply Theme
+        document.getElementById('icon-box').classList.add(config.color);
+        document.getElementById('pulse-ring').classList.add(config.ring);
+        document.getElementById('progress-bar').classList.add(config.color);
+
+        // 3. Animation Logic
+        let step = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const statusText = document.getElementById('status-text');
+        const logContainer = document.getElementById('log-container');
+
+        const totalSteps = 100;
+        const duration = 6000; // 6 seconds for demo
+        const interval = duration / totalSteps;
+
+        const updateUI = setInterval(() => {
+            step++;
+            progressBar.style.width = step + '%';
+
+            // Update main status message
+            if (step % 20 === 0) {
+                const msgIndex = Math.floor(step / 21);
+                if(config.messages[msgIndex]) {
+                    statusText.classList.add('dot-pulse');
+                    statusText.innerText = config.messages[msgIndex];
+                }
+            }
+
+            // Update log entries
+            if (step % 25 === 0) {
+                const logIndex = Math.floor(step / 26);
+                if(config.logs[logIndex]) {
+                    const p = document.createElement('p');
+                    p.innerHTML = `<span class="text-green-500">>></span> ${config.logs[logIndex]}`;
+                    p.className = 'animate-pulse';
+                    logContainer.appendChild(p);
+                }
+            }
+
+            if (step >= 100) {
+                clearInterval(updateUI);
+                statusText.innerText = "Audit complete. Redirecting...";
+                // Redirect logic
+                setTimeout(() => {
+                    const resultPath = type === 'resume' ? 'report' : 'brief';
+                    window.location.href = `/audit/${type}/${resultPath}`;
+                }, 800);
+            }
+        }, interval);
+    </script>
+</body>
+</html>
