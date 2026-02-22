@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing | Career Navigator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .popular-badge {
+            background: linear-gradient(90deg, #4f46e5 0%, #6366f1 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <nav class="p-6 bg-white/80 sticky top-0 z-50 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <span class="font-bold text-xl tracking-tight">CareerNavigator</span>
+            </a>
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                <a href="/audit/resume" class="hover:text-indigo-600">Resume Audit</a>
+                <a href="/audit/job" class="hover:text-indigo-600">Job Fit</a>
+                <a href="/login" class="hover:text-indigo-600">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-20">
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-4">
+                Invest in your next big move.
+            </h1>
+            <p class="text-lg text-slate-500 max-w-2xl mx-auto mb-10">
+                Stop guessing. Use AI-driven intelligence to audit your resume, analyze job market fit, and win the interview.
+            </p>
+
+            <div class="flex items-center justify-center space-x-4">
+                <span class="text-sm font-semibold text-slate-900">Monthly</span>
+                <button class="w-12 h-6 bg-slate-200 rounded-full p-1 flex items-center transition-colors focus:outline-none">
+                    <div class="bg-white w-4 h-4 rounded-full shadow-sm transform translate-x-0"></div>
+                </button>
+                <span class="text-sm font-semibold text-slate-400">Yearly <span class="text-indigo-600 text-xs font-bold ml-1">Save 20%</span></span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <div class="p-8 rounded-3xl glass-card flex flex-col">
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-900">Explorer</h3>
+                    <p class="text-sm text-slate-500 mt-1">For casual job seekers.</p>
+                </div>
+                <div class="mb-8">
+                    <span class="text-4xl font-black text-slate-900">$0</span>
+                    <span class="text-slate-400 text-sm">/forever</span>
+                </div>
+                <ul class="space-y-4 mb-10 flex-grow">
+                    <li class="flex items-center text-sm text-slate-600">
+                        <svg class="h-5 w-5 text-emerald-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        1 Resume Audit per month
+                    </li>
+                    <li class="flex items-center text-sm text-slate-600">
+                        <svg class="h-5 w-5 text-emerald-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        Basic Compatibility Score
+                    </li>
+                    <li class="flex items-center text-sm text-slate-400 line-through">
+                        Custom Cover Letter Agent
+                    </li>
+                </ul>
+                <a href="/signup" class="block w-full text-center py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition">Get Started</a>
+            </div>
+
+            <div class="p-8 rounded-3xl bg-white border-2 border-indigo-600 shadow-2xl shadow-indigo-100 relative transform md:-translate-y-4 flex flex-col">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 popular-badge text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                    Most Popular
+                </div>
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-900">Navigator</h3>
+                    <p class="text-sm text-slate-500 mt-1">For active candidates.</p>
+                </div>
+                <div class="mb-8 flex items-baseline">
+                    <span class="text-4xl font-black text-slate-900">$19</span>
+                    <span class="text-slate-400 text-sm ml-1">/month</span>
+                </div>
+                <ul class="space-y-4 mb-10 flex-grow">
+                    <li class="flex items-center text-sm text-slate-700 font-medium">
+                        <svg class="h-5 w-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        Unlimited Resume Audits
+                    </li>
+                    <li class="flex items-center text-sm text-slate-700 font-medium">
+                        <svg class="h-5 w-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        Deep Job Gap Analysis
+                    </li>
+                    <li class="flex items-center text-sm text-slate-700 font-medium">
+                        <svg class="h-5 w-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        AI Interview Talk-Tracks
+                    </li>
+                    <li class="flex items-center text-sm text-slate-700 font-medium">
+                        <svg class="h-5 w-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        Custom Cover Letter Agent
+                    </li>
+                </ul>
+                <a href="/signup" class="block w-full text-center py-4 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">Unlock Full Access</a>
+            </div>
+
+            <div class="p-8 rounded-3xl glass-card flex flex-col">
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold text-slate-900">High Performer</h3>
+                    <p class="text-sm text-slate-500 mt-1">For career professionals.</p>
+                </div>
+                <div class="mb-8">
+                    <span class="text-4xl font-black text-slate-900">$49</span>
+                    <span class="text-slate-400 text-sm">/month</span>
+                </div>
+                <ul class="space-y-4 mb-10 flex-grow text-sm text-slate-600">
+                    <li class="flex items-center">
+                        <svg class="h-5 w-5 text-emerald-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        Everything in Navigator
+                    </li>
+                    <li class="flex items-center text-slate-700 font-medium">
+                        <svg class="h-5 w-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        Salary Negotiation Agent
+                    </li>
+                    <li class="flex items-center text-slate-700 font-medium">
+                        <svg class="h-5 w-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                        Private Career Roadmap
+                    </li>
+                </ul>
+                <a href="/signup" class="block w-full text-center py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition">Go High Performer</a>
+            </div>
+
+        </div>
+
+        <div class="mt-32 max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Common Questions</h2>
+            <div class="space-y-8 text-left">
+                <div>
+                    <h4 class="font-bold text-slate-900">Can I cancel anytime?</h4>
+                    <p class="text-slate-500 mt-2">Yes. We believe in value, not traps. You can pause or cancel your subscription directly from your dashboard with one click.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900">How accurate is the AI "Job Gap" analysis?</h4>
+                    <p class="text-slate-500 mt-2">Our agents use the same semantic logic as modern Applicant Tracking Systems (ATS). If we say there is a gap, it’s because a recruiter's filter will likely see it too.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900">Is my resume data safe?</h4>
+                    <p class="text-slate-500 mt-2">Absolutely. Your data is isolated and encrypted. We do not sell your career history to third parties or recruiters.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    </body>
+</html>

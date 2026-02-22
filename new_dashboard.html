@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Career Navigator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; height: 220px; width: 100%; }
+        .sidebar-link-active { background: rgba(79, 70, 229, 0.1); border-left: 4px solid #4f46e5; color: #4f46e5; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 flex min-h-screen">
+
+    <aside class="w-64 bg-white border-r border-slate-200 hidden lg:flex flex-col sticky top-0 h-screen">
+        <div class="p-6 border-b border-slate-100 flex items-center space-x-2">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">CN</div>
+            <span class="font-bold text-xl tracking-tight">Navigator</span>
+        </div>
+        <nav class="flex-grow py-6">
+            <a href="#" class="flex items-center px-6 py-3 sidebar-link-active font-semibold">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Home
+            </a>
+            <a href="#" class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 transition">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                Analyze
+            </a>
+            <a href="#" class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 transition">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                Applied Jobs
+            </a>
+            <a href="#" class="flex items-center px-6 py-3 text-slate-500 hover:bg-slate-50 transition">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                Plan
+            </a>
+        </nav>
+        <div class="p-6 border-t border-slate-100">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">JD</div>
+                <div class="flex-grow overflow-hidden">
+                    <p class="text-sm font-bold truncate">John Doe</p>
+                    <p class="text-xs text-slate-500">Pro Account</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-grow p-8 overflow-y-auto">
+        
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold">Command Center</h1>
+                <p class="text-slate-500 text-sm">Welcome back. Your agents have updated your 4-week roadmap.</p>
+            </div>
+            <div class="flex space-x-3">
+                <button class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 transition">Export Data</button>
+                <button class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100">+ New Analysis</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Market Readiness</span>
+              <div class="flex items-end justify-between mt-1">
+                  <span class="text-2xl font-black text-indigo-600">84%</span>
+                  <span class="text-xs text-emerald-500 font-bold">+2.4% <span class="text-slate-300">wk</span></span>
+              </div>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Leverage Score</span>
+              <div class="flex items-end justify-between mt-1">
+                  <span class="text-2xl font-black text-slate-900">7.2</span>
+                  <span class="text-[10px] text-slate-400">Strong Positioning</span>
+              </div>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Critical Gaps</span>
+              <div class="flex items-end justify-between mt-1">
+                  <span class="text-2xl font-black text-rose-500">3</span>
+                  <span class="text-[10px] text-slate-400">Across 12 JDs</span>
+              </div>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Signal Strength</span>
+              <div class="flex items-end justify-between mt-1">
+                  <span class="text-2xl font-black text-emerald-500">High</span>
+                  <span class="text-[10px] text-slate-400 text-right leading-none">Resume matches<br>Market Intent</span>
+              </div>
+          </div>
+      </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Top Weighted Gaps</h3>
+                <div class="chart-container">
+                    <canvas id="radarGaps"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Gap Priorities (Do Next)</h3>
+                <div class="chart-container">
+                    <canvas id="barPriorities"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Role Clusters (Targets)</h3>
+                <div class="chart-container">
+                    <canvas id="bubbleClusters"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Salary Market View</h3>
+                <div class="chart-container">
+                    <canvas id="barSalary"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Fit vs. Outcome Calibration</h3>
+                <div class="chart-container">
+                    <canvas id="lineCalibration"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Prep Plan (Highest ROI)</h3>
+                <div class="chart-container">
+                    <canvas id="doughnutROI"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Shared Styles
+        const indigo = '#4f46e5';
+        const slate400 = '#94a3b8';
+
+        // 1. Radar: Weighted Gaps
+        new Chart(document.getElementById('radarGaps'), {
+            type: 'radar',
+            data: {
+                labels: ['Technical', 'Leadership', 'Domain Knowledge', 'Certifications', 'Soft Skills'],
+                datasets: [{
+                    label: 'Current Gap',
+                    data: [65, 40, 80, 20, 55],
+                    fill: true,
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    borderColor: indigo,
+                    pointBackgroundColor: indigo
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { r: { ticks: { display: false }, grid: { color: '#f1f5f9' } } } }
+        });
+
+        // 2. Bar: Priorities
+        new Chart(document.getElementById('barPriorities'), {
+            type: 'bar',
+            data: {
+                labels: ['Impact Metrics', 'AWS Cert', 'PM Methodologies', 'Portfolio Sync'],
+                datasets: [{
+                    data: [90, 75, 60, 45],
+                    backgroundColor: [indigo, '#6366f1', '#818cf8', '#a5b4fc'],
+                    borderRadius: 8
+                }]
+            },
+            options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false } } } }
+        });
+
+        // 3. Bubble: Role Clusters
+        new Chart(document.getElementById('bubbleClusters'), {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Product Mgr', data: [{x: 10, y: 85, r: 15}], backgroundColor: indigo
+                }, {
+                    label: 'Growth Lead', data: [{x: 25, y: 60, r: 10}], backgroundColor: '#fbbf24'
+                }, {
+                    label: 'Solution Architect', data: [{x: 40, y: 40, r: 20}], backgroundColor: '#10b981'
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }, scales: { x: { title: { display: true, text: 'Pivot Distance', font: { size: 10 } } }, y: { title: { display: true, text: 'Fit %', font: { size: 10 } } } } }
+        });
+
+        // 4. Bar: Salary View
+        new Chart(document.getElementById('barSalary'), {
+            type: 'bar',
+            data: {
+                labels: ['25th', 'Median', 'Your Target', '90th'],
+                datasets: [{
+                    data: [110, 145, 165, 195],
+                    backgroundColor: ['#e2e8f0', '#cbd5e1', indigo, '#e2e8f0'],
+                    borderRadius: 8
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        // 5. Line: Fit vs Outcome
+        new Chart(document.getElementById('lineCalibration'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                datasets: [{
+                    label: 'Fit Score', data: [65, 72, 85, 82], borderColor: indigo, tension: 0.4
+                }, {
+                    label: 'Interview Rate', data: [10, 15, 45, 40], borderColor: '#10b981', tension: 0.4
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+        });
+
+        // 6. Doughnut: ROI Plan
+        new Chart(document.getElementById('doughnutROI'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Skill Gaps', 'Networking', 'Outreach', 'Prep'],
+                datasets: [{
+                    data: [40, 20, 25, 15],
+                    backgroundColor: [indigo, '#818cf8', '#c7d2fe', '#e0e7ff'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
+        });
+    </script>
+</body>
+</html>
